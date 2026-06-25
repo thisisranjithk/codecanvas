@@ -1,0 +1,453 @@
+import { useState } from "react"
+import {
+  Plus, Search, Pencil, Trash2, MoreHorizontal, Code2,
+  ChevronDown, ChevronRight, Terminal, Layers, Server,
+  Database, Cloud, PenTool, type LucideIcon,
+} from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
+import { mockSkills } from "@/data/mock"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+
+type Skill = typeof mockSkills[0]
+
+interface CategoryMeta {
+  icon: LucideIcon
+  color: string
+  bg: string
+  border: string
+  bar: string
+}
+
+const categoryMeta: Record<string, CategoryMeta> = {
+  "Languages": {
+    icon: Terminal,
+    color: "text-blue-500",
+    bg: "bg-blue-500/8",
+    border: "border-blue-500/20",
+    bar: "bg-blue-500",
+  },
+  "Frontend": {
+    icon: Layers,
+    color: "text-violet-500",
+    bg: "bg-violet-500/8",
+    border: "border-violet-500/20",
+    bar: "bg-violet-500",
+  },
+  "Backend": {
+    icon: Server,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/8",
+    border: "border-emerald-500/20",
+    bar: "bg-emerald-500",
+  },
+  "Databases": {
+    icon: Database,
+    color: "text-amber-500",
+    bg: "bg-amber-500/8",
+    border: "border-amber-500/20",
+    bar: "bg-amber-500",
+  },
+  "Cloud / DevOps": {
+    icon: Cloud,
+    color: "text-sky-500",
+    bg: "bg-sky-500/8",
+    border: "border-sky-500/20",
+    bar: "bg-sky-500",
+  },
+  "Design": {
+    icon: PenTool,
+    color: "text-pink-500",
+    bg: "bg-pink-500/8",
+    border: "border-pink-500/20",
+    bar: "bg-pink-500",
+  },
+}
+
+function getProficiencyLabel(p: number) {
+  if (p >= 90) return "Expert"
+  if (p >= 75) return "Advanced"
+  if (p >= 55) return "Intermediate"
+  return "Beginner"
+}
+
+function getProficiencyBadgeClass(p: number) {
+  if (p >= 90) return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+  if (p >= 75) return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+  if (p >= 55) return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+  return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20"
+}
+
+export function Skills() {
+  const [skills, setSkills] = useState(mockSkills)
+  const [search, setSearch] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null)
+  const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null)
+  const [proficiency, setProficiency] = useState(80)
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+
+  const categories = Array.from(new Set(mockSkills.map((s) => s.category)))
+
+  const filtered = skills.filter((s) => {
+    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase())
+    const matchCat = categoryFilter === "all" || s.category === categoryFilter
+    return matchSearch && matchCat
+  })
+
+  const grouped = categories.reduce<Record<string, Skill[]>>((acc, cat) => {
+    const inCategory = filtered.filter((s) => s.category === cat)
+    if (inCategory.length > 0) acc[cat] = inCategory
+    return acc
+  }, {})
+
+  function handleDelete(skill: Skill) {
+    setSkills((prev) => prev.filter((s) => s.id !== skill.id))
+    setDeleteDialog(null)
+    toast.success(`"${skill.name}" removed`)
+  }
+
+  function openEdit(skill: Skill) {
+    setEditingSkill(skill)
+    setProficiency(skill.proficiency)
+    setDialogOpen(true)
+  }
+
+  function openNew() {
+    setEditingSkill(null)
+    setProficiency(80)
+    setDialogOpen(true)
+  }
+
+  function toggleCollapse(cat: string) {
+    setCollapsed((prev) => ({ ...prev, [cat]: !prev[cat] }))
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Skills</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {skills.length} skills across {categories.length} categories
+          </p>
+        </div>
+        <Button size="sm" onClick={openNew} className="h-8 gap-1.5">
+          <Plus className="size-3.5" />
+          Add Skill
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 max-w-64">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none" />
+          <Input
+            placeholder="Search skills..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 h-8 text-xs"
+          />
+        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Category Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        {categories.map((cat) => {
+          const catSkills = skills.filter((s) => s.category === cat)
+          const avg = Math.round(catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length)
+          const meta = categoryMeta[cat]
+          const Icon = meta?.icon ?? Code2
+          const isActive = categoryFilter === cat
+
+          return (
+            <button
+              key={cat}
+              onClick={() => setCategoryFilter(isActive ? "all" : cat)}
+              className={cn(
+                "flex flex-col gap-2 rounded-xl border p-3 text-left transition-all duration-150",
+                "hover:shadow-sm hover:-translate-y-px",
+                isActive
+                  ? "border-primary/30 bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border/60 bg-card hover:border-border"
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <div className={cn("flex size-8 items-center justify-center rounded-lg", meta?.bg, meta?.color)}>
+                  <Icon className="size-4" />
+                </div>
+                <span className={cn("text-lg font-bold", meta?.color)}>{catSkills.length}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] font-medium text-foreground">{cat}</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500", meta?.bar)}
+                      style={{ width: `${avg}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-muted-foreground tabular-nums">{avg}%</span>
+                </div>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Grouped Skills */}
+      {Object.entries(grouped).length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
+            <Code2 className="size-5 text-muted-foreground" />
+          </div>
+          <p className="font-medium text-sm">No skills found</p>
+          <Button size="sm" variant="outline" onClick={() => { setSearch(""); setCategoryFilter("all") }}>
+            Clear filters
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {Object.entries(grouped).map(([cat, catSkills]) => {
+            const meta = categoryMeta[cat]
+            const isCollapsed = collapsed[cat]
+            const avg = Math.round(catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length)
+
+            return (
+              <div key={cat} className="flex flex-col gap-2">
+                {/* Section Header */}
+                <button
+                  onClick={() => toggleCollapse(cat)}
+                  className="flex items-center gap-2 group"
+                >
+                  {isCollapsed ? (
+                    <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                  ) : (
+                    <ChevronDown className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                  )}
+                  <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {cat}
+                  </h2>
+                  <span className="text-[10px] text-muted-foreground/50">({catSkills.length})</span>
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <span className="text-[10px] text-muted-foreground/60">Avg {avg}%</span>
+                    <div className="h-1 w-12 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className={cn("h-full rounded-full", meta?.bar)}
+                        style={{ width: `${avg}%` }}
+                      />
+                    </div>
+                  </div>
+                </button>
+
+                {/* Skill Cards */}
+                {!isCollapsed && (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 pl-5">
+                    {catSkills.map((skill) => (
+                      <Card
+                        key={skill.id}
+                        className={cn(
+                          "group border-border/60 transition-all duration-200",
+                          "hover:shadow-md hover:-translate-y-0.5 hover:border-border"
+                        )}
+                      >
+                        <CardContent className="p-3 flex flex-col gap-2">
+                          {/* Top row: icon + name + menu */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className={cn("flex size-7 items-center justify-center rounded-md shrink-0", meta?.bg, meta?.color)}>
+                                <Code2 className="size-3.5" />
+                              </div>
+                              <span className="text-sm font-semibold truncate">{skill.name}</span>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1"
+                                >
+                                  <MoreHorizontal className="size-3.5 text-muted-foreground" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-36">
+                                <DropdownMenuItem onClick={() => openEdit(skill)}>
+                                  <Pencil className="size-3.5 mr-2" />Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => setDeleteDialog(skill)}
+                                >
+                                  <Trash2 className="size-3.5 mr-2" />Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+
+                          {/* Proficiency bar */}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] text-muted-foreground font-medium">Proficiency</span>
+                              <span className="text-[11px] font-semibold tabular-nums">{skill.proficiency}%</span>
+                            </div>
+                            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                              <div
+                                className={cn("h-full rounded-full transition-all duration-700 ease-out", meta?.bar)}
+                                style={{ width: `${skill.proficiency}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Bottom row: years + level badge */}
+                          <div className="flex items-center justify-between pt-0.5">
+                            <span className="text-[10px] text-muted-foreground">
+                              {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? "year" : "years"} exp.
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={cn("text-[9px] h-4 px-1.5 font-medium", getProficiencyBadgeClass(skill.proficiency))}
+                            >
+                              {getProficiencyLabel(skill.proficiency)}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Edit/New Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">
+              {editingSkill ? "Edit Skill" : "Add Skill"}
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              {editingSkill ? "Update skill details." : "Add a new skill to your portfolio."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-1">
+            <div className="grid gap-1.5">
+              <Label className="text-xs">Skill Name</Label>
+              <Input
+                defaultValue={editingSkill?.name}
+                placeholder="e.g. TypeScript"
+                className="h-8 text-xs"
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label className="text-xs">Category</Label>
+              <Select defaultValue={editingSkill?.category ?? "Frontend"}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Proficiency</Label>
+                <span className="text-xs font-medium tabular-nums">
+                  {proficiency}% — {getProficiencyLabel(proficiency)}
+                </span>
+              </div>
+              <Slider
+                value={[proficiency]}
+                onValueChange={([v]) => setProficiency(v)}
+                min={0}
+                max={100}
+                step={1}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label className="text-xs">Years of Experience</Label>
+              <Input
+                type="number"
+                defaultValue={editingSkill?.yearsOfExperience}
+                placeholder="e.g. 3"
+                min={0}
+                max={30}
+                className="h-8 text-xs"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setDialogOpen(false)
+                toast.success(editingSkill ? "Skill updated" : "Skill added")
+              }}
+            >
+              {editingSkill ? "Save Changes" : "Add Skill"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-base">Remove Skill</DialogTitle>
+            <DialogDescription className="text-xs">
+              Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => deleteDialog && handleDelete(deleteDialog)}
+            >
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
