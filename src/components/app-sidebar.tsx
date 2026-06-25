@@ -9,6 +9,7 @@ import {
   Settings,
   Layers,
 } from "lucide-react"
+import { Link, useRouterState } from "@tanstack/react-router"
 import {
   Sidebar,
   SidebarContent,
@@ -35,19 +36,17 @@ const navItems = [
   { label: "Blog", icon: BookOpen, path: "/blog" },
 ]
 
-interface AppSidebarProps {
-  currentPath: string
-  onNavigate: (path: string) => void
-}
+export function AppSidebar() {
+  const routerState = useRouterState()
+  const currentPath = routerState.location.pathname
 
-export function AppSidebar({ currentPath, onNavigate }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-3 px-2.5">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="hover:bg-sidebar-accent/50" asChild>
-              <button onClick={() => onNavigate("/")} className="flex items-center gap-2.5">
+              <Link to="/" className="flex items-center gap-2.5">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-bold shrink-0 shadow-sm shadow-primary/20">
                   <Layers className="size-4" />
                 </div>
@@ -55,7 +54,7 @@ export function AppSidebar({ currentPath, onNavigate }: AppSidebarProps) {
                   <span className="font-semibold text-sm tracking-tight">Portfolio CMS</span>
                   <span className="text-[11px] text-sidebar-foreground/60">alexmorgan.dev</span>
                 </div>
-              </button>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -81,10 +80,10 @@ export function AppSidebar({ currentPath, onNavigate }: AppSidebarProps) {
                           : "hover:bg-sidebar-accent/50"
                       }
                     >
-                      <button onClick={() => onNavigate(item.path)} className="relative">
+                      <Link to={item.path} className="relative flex items-center">
                         <item.icon className="size-[18px]" />
                         <span className="font-medium">{item.label}</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
@@ -109,10 +108,10 @@ export function AppSidebar({ currentPath, onNavigate }: AppSidebarProps) {
                   : "hover:bg-sidebar-accent/50"
               }
             >
-              <button onClick={() => onNavigate("/settings")}>
+              <Link to="/settings" className="flex items-center">
                 <Settings className="size-[18px]" />
                 <span className="font-medium">Settings</span>
-              </button>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

@@ -3,10 +3,10 @@ import {
   TrendingUp, FolderKanban, BookOpen, Zap, Briefcase, Award, GraduationCap,
   FileText, Code2, Pencil, ExternalLink, Check, Circle, ArrowUpRight,
 } from "lucide-react"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-// Progress removed
 import {
   ChartContainer,
   ChartTooltip,
@@ -32,15 +32,10 @@ import {
   mockCertifications,
   mockUser,
 } from "@/data/mock"
-// formatNumber removed
 
 const barChartConfig = {
   count: { label: "Projects", color: "var(--chart-1)" },
 } satisfies ChartConfig
-
-interface DashboardProps {
-  onNavigate: (path: string) => void
-}
 
 function CircularProgress({ percentage, size = 80 }: { percentage: number; size?: number }) {
   const radius = (size - 8) / 2
@@ -78,7 +73,9 @@ function CircularProgress({ percentage, size = 80 }: { percentage: number; size?
   )
 }
 
-export function Dashboard({ onNavigate }: DashboardProps) {
+export function Dashboard() {
+  const navigate = useNavigate()
+
   const statCards = useMemo(() => [
     {
       label: "Total Projects",
@@ -161,9 +158,11 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <Code2 className="size-6" />
               </div>
             </div>
-            <Button size="sm" className="h-8 w-fit gap-1.5 text-xs" onClick={() => onNavigate("/projects")}>
-              <ExternalLink className="size-3.5" />
-              View Portfolio
+            <Button size="sm" className="h-8 w-fit gap-1.5 text-xs" asChild>
+              <Link to="/projects">
+                <ExternalLink className="size-3.5" />
+                View Portfolio
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -176,16 +175,16 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           <CardContent className="px-4 pb-4">
             <div className="grid grid-cols-3 gap-2">
               {quickActions.map((action) => (
-                <button
+                <Link
                   key={action.label}
-                  onClick={() => onNavigate(action.path)}
+                  to={action.path}
                   className="flex flex-col items-center gap-1.5 rounded-lg border border-border/40 p-2.5 hover:bg-muted/40 hover:border-border transition-all duration-150 text-center"
                 >
                   <div className={`flex size-8 items-center justify-center rounded-lg ${action.color}`}>
                     <action.icon className="size-4" />
                   </div>
                   <span className="text-[10px] font-medium leading-tight">{action.label}</span>
-                </button>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -250,8 +249,10 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               <h3 className="text-sm font-semibold">Recent Projects</h3>
               <p className="text-[11px] text-muted-foreground">Latest updates</p>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1" onClick={() => onNavigate("/projects")}>
-              View all <ArrowUpRight className="size-3" />
+            <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1" asChild>
+              <Link to="/projects">
+                View all <ArrowUpRight className="size-3" />
+              </Link>
             </Button>
           </CardHeader>
           <CardContent className="px-4 pb-4">
@@ -286,7 +287,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                       {project.status}
                     </Badge>
                     <span className="text-[10px] text-muted-foreground/60 hidden sm:inline">{project.updatedAt}</span>
-                    <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onNavigate("/projects")}>
+                    <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigate({ to: "/projects" })}>
                       <Pencil className="size-3 text-muted-foreground" />
                     </Button>
                   </div>
@@ -303,8 +304,10 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               <h3 className="text-sm font-semibold">Recent Blog Posts</h3>
               <p className="text-[11px] text-muted-foreground">Latest updates</p>
             </div>
-            <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1" onClick={() => onNavigate("/blog")}>
-              View all <ArrowUpRight className="size-3" />
+            <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1" asChild>
+              <Link to="/blog">
+                View all <ArrowUpRight className="size-3" />
+              </Link>
             </Button>
           </CardHeader>
           <CardContent className="px-4 pb-4">
@@ -335,7 +338,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                     </Badge>
                     <span className="text-[10px] text-muted-foreground/60 hidden sm:inline">{blog.updatedAt}</span>
                     <span className="text-[10px] text-muted-foreground/60">{blog.readTime} min</span>
-                    <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onNavigate("/blog")}>
+                    <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigate({ to: "/blog" })}>
                       <Pencil className="size-3 text-muted-foreground" />
                     </Button>
                   </div>

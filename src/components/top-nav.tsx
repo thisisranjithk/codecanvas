@@ -1,4 +1,5 @@
 import { Search, ChevronRight } from "lucide-react"
+import { Link, useMatches } from "@tanstack/react-router"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,17 +16,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { mockUser } from "@/data/mock"
 
-interface BreadcrumbItem {
-  label: string
-  path?: string
-}
+export function TopNav() {
+  const matches = useMatches()
+  const currentMatch = matches[matches.length - 1]
+  const breadcrumbs = (currentMatch?.staticData?.breadcrumbs as { label: string; path?: string }[]) || []
 
-interface TopNavProps {
-  breadcrumbs: BreadcrumbItem[]
-  onNavigate: (path: string) => void
-}
-
-export function TopNav({ breadcrumbs, onNavigate }: TopNavProps) {
   return (
     <header className="sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b border-border/60 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-3">
       <SidebarTrigger className="size-7 hover:bg-accent" />
@@ -37,12 +32,12 @@ export function TopNav({ breadcrumbs, onNavigate }: TopNavProps) {
           <div key={crumb.label} className="flex items-center gap-1">
             {i > 0 && <ChevronRight className="size-3 text-muted-foreground/60" />}
             {crumb.path && i < breadcrumbs.length - 1 ? (
-              <button
-                onClick={() => onNavigate(crumb.path!)}
+              <Link
+                to={crumb.path}
                 className="text-muted-foreground hover:text-foreground transition-colors duration-150"
               >
                 {crumb.label}
-              </button>
+              </Link>
             ) : (
               <span className={i === breadcrumbs.length - 1 ? "font-semibold text-foreground" : "text-muted-foreground"}>
                 {crumb.label}
@@ -87,7 +82,9 @@ export function TopNav({ breadcrumbs, onNavigate }: TopNavProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onNavigate("/settings")}>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings" className="w-full cursor-pointer">Settings</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>View Portfolio</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive focus:text-destructive">Sign out</DropdownMenuItem>
