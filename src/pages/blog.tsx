@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -21,14 +21,40 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { mockBlogs } from "@/data/mock"
-import { formatDateTime, formatNumber } from "@/lib/utils"
+import { formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
 
 type Blog = typeof mockBlogs[0]
 
 const statusStyles: Record<string, string> = {
-  published: "bg-success/8 text-success border-success/20",
-  draft: "bg-warning/8 text-warning border-warning/20",
+  published: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  draft: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+}
+
+function formatDateDisplay(dateString: string | null) {
+  if (!dateString) return "Unpublished"
+  const d = new Date(dateString)
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}
+
+// A simple placeholder generator based on blog id
+function BlogImagePlaceholder({ id }: { id: string }) {
+  const numId = parseInt(id) || 1
+  const colors = [
+    "from-blue-600/20 to-indigo-600/20",
+    "from-emerald-600/20 to-teal-600/20",
+    "from-purple-600/20 to-fuchsia-600/20",
+    "from-cyan-600/20 to-blue-600/20",
+    "from-indigo-600/20 to-blue-600/20"
+  ]
+  const color = colors[(numId - 1) % colors.length]
+  return (
+    <div className={`w-full h-full bg-gradient-to-br ${color} flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity`}>
+      <div className="w-20 h-20 rounded-xl bg-background/10 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+        <BookOpen className="size-8 text-white/40" />
+      </div>
+    </div>
+  )
 }
 
 export function Blog() {
@@ -56,7 +82,7 @@ export function Blog() {
     .sort((a, b) => {
       if (sortBy === "views") return b.views - a.views
       if (sortBy === "title") return a.title.localeCompare(b.title)
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
     })
 
   function handleDelete(blog: Blog) {
@@ -88,172 +114,208 @@ export function Blog() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-6 p-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Blog</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {blogs.length} posts · {counts.published} published
-          </p>
+      <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Blog</h1>
+          <p className="text-[15px] text-muted-foreground">Manage and organize your blog posts</p>
+          <div className="text-[13px] text-muted-foreground mt-0.5 font-medium flex items-center gap-1.5">
+            <span>{counts.all} posts</span>
+            <span>•</span>
+            <span className="text-emerald-500">{counts.published} published</span>
+          </div>
         </div>
-        <Button size="sm" onClick={() => { setEditingBlog(null); setDialogOpen(true) }} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={() => { setEditingBlog(null); setDialogOpen(true) }} className="h-10 px-4 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-medium">
+          <Plus className="size-4" />
           New Post
         </Button>
       </div>
 
       {/* Tabs + Filters */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <TabsList className="h-7">
-            <TabsTrigger value="all" className="text-[11px] h-5 px-2.5">All ({counts.all})</TabsTrigger>
-            <TabsTrigger value="published" className="text-[11px] h-5 px-2.5">Published ({counts.published})</TabsTrigger>
-            <TabsTrigger value="draft" className="text-[11px] h-5 px-2.5">Drafts ({counts.draft})</TabsTrigger>
-            <TabsTrigger value="featured" className="text-[11px] h-5 px-2.5">Featured ({counts.featured})</TabsTrigger>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+          <TabsList className="h-10 bg-muted/40 p-1 border border-border/40 w-full sm:w-auto justify-start">
+            <TabsTrigger value="all" className="text-[13px] h-8 px-4 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">All ({counts.all})</TabsTrigger>
+            <TabsTrigger value="published" className="text-[13px] h-8 px-4 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">Published ({counts.published})</TabsTrigger>
+            <TabsTrigger value="draft" className="text-[13px] h-8 px-4 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">Drafts ({counts.draft})</TabsTrigger>
+            <TabsTrigger value="featured" className="text-[13px] h-8 px-4 rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">Featured ({counts.featured})</TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none" />
-              <Input placeholder="Search posts..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-xs w-48" />
-            </div>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-32 h-8 text-xs">
-                <ArrowUpDown className="size-3 mr-1 text-muted-foreground/60" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="updatedAt">Last Updated</SelectItem>
-                <SelectItem value="views">Most Views</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        </Tabs>
 
-        <TabsContent value={activeTab} className="mt-3">
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
-                <BookOpen className="size-5 text-muted-foreground" />
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 pointer-events-none" />
+            <Input
+              placeholder="Search posts..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 h-10 text-[13px] sm:w-64 bg-muted/20 border-border/60"
+            />
+          </div>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-40 h-10 text-[13px] bg-muted/20 border-border/60">
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="size-3.5 text-muted-foreground" />
+                <SelectValue />
               </div>
-              <p className="font-medium text-sm">No posts found</p>
-              <Button size="sm" variant="outline" onClick={() => setSearch("")}>Clear search</Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {filtered.map((blog) => (
-                <Card key={blog.id} className="card-hover border-border/60 group">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {blog.featured && <Star className="size-3.5 text-warning fill-warning shrink-0" />}
-                          <h3 className="font-semibold text-sm leading-snug">{blog.title}</h3>
-                          <Badge variant="outline" className={`text-[9px] h-4 px-1 shrink-0 ${statusStyles[blog.status] ?? ""}`}>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="updatedAt">Last Updated</SelectItem>
+              <SelectItem value="views">Most Views</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Blog List */}
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="flex size-14 items-center justify-center rounded-xl bg-muted/50">
+            <BookOpen className="size-6 text-muted-foreground" />
+          </div>
+          <p className="font-medium text-base text-foreground">No posts found</p>
+          <Button size="sm" variant="outline" onClick={() => setSearch("")}>Clear search</Button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {filtered.map((blog) => (
+            <Card key={blog.id} className="card-hover border-border/50 group overflow-hidden bg-card/40 hover:bg-card/60 transition-colors py-0">
+              <CardContent className="p-0 flex flex-col md:flex-row">
+
+                {/* Image Area */}
+                <div className="w-full md:w-64 md:h-auto h-48 bg-muted/40 shrink-0 border-b md:border-b-0 md:border-r border-border/50">
+                  {blog.coverImage ? (
+                    <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <BlogImagePlaceholder id={blog.id} />
+                  )}
+                </div>
+
+                {/* Content Area */}
+                <div className="flex-1 p-5 md:p-6 flex flex-col justify-between min-w-0">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-start gap-3 justify-between">
+                      <div className="flex flex-col gap-2 min-w-0 flex-1">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          {blog.featured && <Star className="size-4 text-amber-500 fill-amber-500 shrink-0" />}
+                          <h3 className="font-bold text-lg leading-snug text-foreground hover:text-primary transition-colors cursor-pointer line-clamp-2">{blog.title}</h3>
+                          <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider h-5 px-2 shrink-0 ${statusStyles[blog.status] ?? ""}`}>
                             {blog.status}
                           </Badge>
                         </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{blog.excerpt}</p>
-                        <div className="flex flex-wrap items-center gap-1">
-                          {blog.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-[9px] h-4 px-1 font-normal border-border/60">{tag}</Badge>
-                          ))}
-                        </div>
+                        <p className="text-[14.5px] text-muted-foreground leading-relaxed line-clamp-2 max-w-3xl">
+                          {blog.excerpt}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="hidden md:flex flex-col items-end gap-0.5">
-                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                            <Eye className="size-3" />{formatNumber(blog.views)}
-                          </div>
-                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                            <Clock className="size-3" />{blog.readTime} min
-                          </div>
-                          <span className="text-[9px] text-muted-foreground/60">
-                            {blog.publishedAt ? formatDateTime(blog.publishedAt) : "Unpublished"}
-                          </span>
-                        </div>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <MoreHorizontal className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={() => openEdit(blog)}><Pencil className="size-3.5" />Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleFeatured(blog.id)}>
-                              <Star className="size-3.5" />{blog.featured ? "Unfeature" : "Feature"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleStatusChange(blog.id, blog.status === "published" ? "draft" : "published")}>
-                              {blog.status === "published" ? "Unpublish" : "Publish"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(blog)}>
-                              <Trash2 className="size-3.5" />Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                      {/* Action Menu (Desktop top right of content) */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground shrink-0 md:-mt-1 md:-mr-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreHorizontal className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={() => openEdit(blog)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleFeatured(blog.id)}>
+                            <Star className="size-3.5 mr-2" />{blog.featured ? "Unfeature" : "Feature"}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleStatusChange(blog.id, blog.status === "published" ? "draft" : "published")}>
+                            {blog.status === "published" ? "Unpublish" : "Publish"}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(blog)}>
+                            <Trash2 className="size-3.5 mr-2" />Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      {blog.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="bg-secondary/40 hover:bg-secondary/60 text-[11px] font-medium px-2 py-0.5 border-border/40">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meta Area (Right Side Sidebar in Desktop) */}
+                <div className="w-full md:w-48 bg-muted/10 border-t md:border-t-0 md:border-l border-border/50 p-5 md:p-6 flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4 shrink-0">
+                  <div className="flex md:flex-col items-center md:items-end gap-4 md:gap-3 w-full">
+                    <div className="flex items-center gap-2 text-[13px] text-muted-foreground font-medium">
+                      <Eye className="size-4 opacity-70" />
+                      <span>{formatNumber(blog.views)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[13px] text-muted-foreground font-medium">
+                      <Clock className="size-4 opacity-70" />
+                      <span>{blog.readTime} min read</span>
+                    </div>
+                  </div>
+
+                  <div className="text-[13px] text-muted-foreground font-medium md:mt-2 text-right">
+                    {formatDateDisplay(blog.publishedAt)}
+                  </div>
+                </div>
+
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Edit/New Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base">{editingBlog ? "Edit Post" : "New Post"}</DialogTitle>
-            <DialogDescription className="text-xs">{editingBlog ? "Update post details." : "Create a new blog post."}</DialogDescription>
+            <DialogTitle className="text-lg">{editingBlog ? "Edit Post" : "New Post"}</DialogTitle>
+            <DialogDescription className="text-[15px]">{editingBlog ? "Update post details." : "Create a new blog post."}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Title</Label>
-              <Input defaultValue={editingBlog?.title} placeholder="Post title" className="h-8 text-xs" />
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Title</Label>
+              <Input defaultValue={editingBlog?.title} placeholder="Post title" className="h-9 text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Slug</Label>
-              <Input defaultValue={editingBlog?.slug} placeholder="post-slug-here" className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Slug</Label>
+              <Input defaultValue={editingBlog?.slug} placeholder="post-slug-here" className="h-9 text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Excerpt</Label>
-              <Textarea defaultValue={editingBlog?.excerpt} placeholder="Short summary..." rows={2} className="text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Excerpt</Label>
+              <Textarea defaultValue={editingBlog?.excerpt} placeholder="Short summary..." rows={3} className="text-[15px]" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Category</Label>
-                <Input defaultValue={editingBlog?.category} placeholder="e.g. Engineering" className="h-8 text-xs" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Category</Label>
+                <Input defaultValue={editingBlog?.category} placeholder="e.g. Engineering" className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Read Time (minutes)</Label>
-                <Input type="number" defaultValue={editingBlog?.readTime} min={1} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Read Time (minutes)</Label>
+                <Input type="number" defaultValue={editingBlog?.readTime} min={1} className="h-9 text-[15px]" />
               </div>
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Tags (comma-separated)</Label>
-              <Input defaultValue={editingBlog?.tags.join(", ")} placeholder="React, TypeScript, ..." className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Tags (comma-separated)</Label>
+              <Input defaultValue={editingBlog?.tags.join(", ")} placeholder="React, TypeScript, ..." className="h-9 text-[15px]" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
-                <Label className="text-xs font-medium">Featured</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 bg-muted/20">
+                <Label className="text-[15px] font-medium">Featured Post</Label>
                 <Switch defaultChecked={editingBlog?.featured} />
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
-                <Label className="text-xs font-medium">Published</Label>
+              <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 bg-muted/20">
+                <Label className="text-[15px] font-medium">Published Status</Label>
                 <Switch defaultChecked={editingBlog?.status === "published"} />
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingBlog ? "Post updated" : "Post created") }}>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-9 text-[15px]">Cancel</Button>
+            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingBlog ? "Post updated" : "Post created") }} className="h-9 text-[15px]">
               {editingBlog ? "Save Changes" : "Create Post"}
             </Button>
           </DialogFooter>
@@ -264,8 +326,8 @@ export function Blog() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Delete Post</DialogTitle>
-            <DialogDescription className="text-xs">Delete <strong>"{deleteDialog?.title}"</strong>? This cannot be undone.</DialogDescription>
+            <DialogTitle className="text-lg">Delete Post</DialogTitle>
+            <DialogDescription className="text-[15px]">Delete <strong>"{deleteDialog?.title}"</strong>? This cannot be undone.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
