@@ -23,57 +23,13 @@ import { cn } from "@/lib/utils"
 
 type Skill = typeof mockSkills[0]
 
-interface CategoryMeta {
-  icon: LucideIcon
-  color: string
-  bg: string
-  border: string
-  bar: string
-}
-
-const categoryMeta: Record<string, CategoryMeta> = {
-  "Languages": {
-    icon: Terminal,
-    color: "text-blue-500",
-    bg: "bg-blue-500/8",
-    border: "border-blue-500/20",
-    bar: "bg-blue-500",
-  },
-  "Frontend": {
-    icon: Layers,
-    color: "text-violet-500",
-    bg: "bg-violet-500/8",
-    border: "border-violet-500/20",
-    bar: "bg-violet-500",
-  },
-  "Backend": {
-    icon: Server,
-    color: "text-emerald-500",
-    bg: "bg-emerald-500/8",
-    border: "border-emerald-500/20",
-    bar: "bg-emerald-500",
-  },
-  "Databases": {
-    icon: Database,
-    color: "text-amber-500",
-    bg: "bg-amber-500/8",
-    border: "border-amber-500/20",
-    bar: "bg-amber-500",
-  },
-  "Cloud / DevOps": {
-    icon: Cloud,
-    color: "text-sky-500",
-    bg: "bg-sky-500/8",
-    border: "border-sky-500/20",
-    bar: "bg-sky-500",
-  },
-  "Design": {
-    icon: PenTool,
-    color: "text-pink-500",
-    bg: "bg-pink-500/8",
-    border: "border-pink-500/20",
-    bar: "bg-pink-500",
-  },
+const categoryIcons: Record<string, LucideIcon> = {
+  "Languages": Terminal,
+  "Frontend": Layers,
+  "Backend": Server,
+  "Databases": Database,
+  "Cloud / DevOps": Cloud,
+  "Design": PenTool,
 }
 
 function getProficiencyLabel(p: number) {
@@ -84,10 +40,10 @@ function getProficiencyLabel(p: number) {
 }
 
 function getProficiencyBadgeClass(p: number) {
-  if (p >= 90) return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-  if (p >= 75) return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
-  if (p >= 55) return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-  return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20"
+  if (p >= 90) return "bg-primary/10 text-primary border-primary/20"
+  if (p >= 75) return "bg-secondary text-secondary-foreground border-transparent"
+  if (p >= 55) return "bg-muted text-muted-foreground border-border/50"
+  return "bg-background text-muted-foreground border-border/50"
 }
 
 export function Skills() {
@@ -176,49 +132,6 @@ export function Skills() {
         </Select>
       </div>
 
-      {/* Category Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        {categories.map((cat) => {
-          const catSkills = skills.filter((s) => s.category === cat)
-          const avg = Math.round(catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length)
-          const meta = categoryMeta[cat]
-          const Icon = meta?.icon ?? Code2
-          const isActive = categoryFilter === cat
-
-          return (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(isActive ? "all" : cat)}
-              className={cn(
-                "flex flex-col gap-2 rounded-xl border p-3.5 text-left transition-all duration-150",
-                "hover:shadow-sm hover:-translate-y-px",
-                isActive
-                  ? "border-primary/30 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border/60 bg-card hover:border-border"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <div className={cn("flex size-9 items-center justify-center rounded-lg", meta?.bg, meta?.color)}>
-                  <Icon className="size-4" />
-                </div>
-                <span className={cn("text-xl font-bold", meta?.color)}>{catSkills.length}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-foreground">{cat}</span>
-                <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={cn("h-full rounded-full transition-all duration-500", meta?.bar)}
-                      style={{ width: `${avg}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-muted-foreground tabular-nums">{avg}%</span>
-                </div>
-              </div>
-            </button>
-          )
-        })}
-      </div>
 
       {/* Grouped Skills */}
       {Object.entries(grouped).length === 0 ? (
@@ -234,31 +147,34 @@ export function Skills() {
       ) : (
         <div className="flex flex-col gap-4">
           {Object.entries(grouped).map(([cat, catSkills]) => {
-            const meta = categoryMeta[cat]
+            const Icon = categoryIcons[cat] ?? Code2
             const isCollapsed = collapsed[cat]
             const avg = Math.round(catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length)
 
             return (
-              <div key={cat} className="flex flex-col gap-2">
+              <div key={cat} className="flex flex-col gap-3">
                 {/* Section Header */}
                 <button
                   onClick={() => toggleCollapse(cat)}
-                  className="flex items-center gap-2 group"
+                  className="flex items-center gap-2 group py-1"
                 >
                   {isCollapsed ? (
-                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
                   ) : (
-                    <ChevronDown className="size-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                    <ChevronDown className="size-4 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
                   )}
-                  <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Icon className="size-4 text-muted-foreground/60" />
+                  <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
                     {cat}
                   </h2>
-                  <span className="text-xs text-muted-foreground/50">({catSkills.length})</span>
-                  <div className="ml-auto flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground/60">Avg {avg}%</span>
-                    <div className="h-1 w-12 rounded-full bg-muted overflow-hidden">
+                  <Badge variant="secondary" className="ml-1 text-[10px] h-4 px-1.5 bg-muted">
+                    {catSkills.length}
+                  </Badge>
+                  <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-xs text-muted-foreground">Avg {avg}%</span>
+                    <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
                       <div
-                        className={cn("h-full rounded-full", meta?.bar)}
+                        className="h-full rounded-full bg-primary/40"
                         style={{ width: `${avg}%` }}
                       />
                     </div>
@@ -280,10 +196,10 @@ export function Skills() {
                           {/* Top row: icon + name + menu */}
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className={cn("flex size-8 items-center justify-center rounded-md shrink-0", meta?.bg, meta?.color)}>
+                              <div className="flex size-8 items-center justify-center rounded-md shrink-0 bg-muted/50 border border-border/40 text-muted-foreground">
                                 <Code2 className="size-4" />
                               </div>
-                              <span className="text-base font-semibold truncate">{skill.name}</span>
+                              <span className="text-base font-medium truncate">{skill.name}</span>
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -316,9 +232,9 @@ export function Skills() {
                               <span className="text-xs text-muted-foreground font-medium">Proficiency</span>
                               <span className="text-sm font-semibold tabular-nums">{skill.proficiency}%</span>
                             </div>
-                            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                               <div
-                                className={cn("h-full rounded-full transition-all duration-700 ease-out", meta?.bar)}
+                                className="h-full rounded-full transition-all duration-700 ease-out bg-primary"
                                 style={{ width: `${skill.proficiency}%` }}
                               />
                             </div>
