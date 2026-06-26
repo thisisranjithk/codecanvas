@@ -1,8 +1,10 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Plus, Search, Eye, MoreHorizontal,
   Pencil, Trash2, Star, BookOpen, Clock,
 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,9 +16,6 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { mockBlogs } from "@/data/blogs"
 import { formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
@@ -24,6 +23,8 @@ import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { FormInput, FormTextarea, FormSwitch } from "@/components/shared/form-field"
+import { blogSchema, type BlogFormData } from "@/schemas"
 
 type Blog = typeof mockBlogs[0]
 
@@ -247,58 +248,11 @@ export function Blog() {
       )}
 
       {/* Edit/New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg">{editingBlog ? "Edit Post" : "New Post"}</DialogTitle>
-            <DialogDescription className="text-[15px]">{editingBlog ? "Update post details." : "Create a new blog post."}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Title</Label>
-              <Input defaultValue={editingBlog?.title} placeholder="Post title" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Slug</Label>
-              <Input defaultValue={editingBlog?.slug} placeholder="post-slug-here" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Excerpt</Label>
-              <Textarea defaultValue={editingBlog?.excerpt} placeholder="Short summary..." rows={3} className="text-[15px]" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Category</Label>
-                <Input defaultValue={editingBlog?.category} placeholder="e.g. Engineering" className="h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Read Time (minutes)</Label>
-                <Input type="number" defaultValue={editingBlog?.readTime} min={1} className="h-9 text-[15px]" />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Tags (comma-separated)</Label>
-              <Input defaultValue={editingBlog?.tags.join(", ")} placeholder="React, TypeScript, ..." className="h-9 text-[15px]" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 bg-muted/20">
-                <Label className="text-[15px] font-medium">Featured Post</Label>
-                <Switch defaultChecked={editingBlog?.featured} />
-              </div>
-              <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 bg-muted/20">
-                <Label className="text-[15px] font-medium">Published Status</Label>
-                <Switch defaultChecked={editingBlog?.status === "published"} />
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="pt-2">
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-9 text-[15px]">Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingBlog ? "Post updated" : "Post created") }} className="h-9 text-[15px]">
-              {editingBlog ? "Save Changes" : "Create Post"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <BlogDialog
+        blog={editingBlog}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -309,5 +263,150 @@ export function Blog() {
         itemName={deleteDialog?.title}
       />
     </div>
+  )
+}
+
+function BlogDialog({
+  blog,
+  open,
+  onOpenChange,
+}: {
+  blog: Blog | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BlogFormData>({
+    resolver: zodResolver(blogSchema),
+    defaultValues: {
+      title: "",
+      slug: "",
+      excerpt: "",
+      category: "",
+      readTime: 5,
+      tags: "",
+      featured: false,
+      published: false,
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        title: blog?.title ?? "",
+        slug: blog?.slug ?? "",
+        excerpt: blog?.excerpt ?? "",
+        category: blog?.category ?? "",
+        readTime: blog?.readTime ?? 5,
+        tags: blog?.tags.join(", ") ?? "",
+        featured: blog?.featured ?? false,
+        published: blog?.status === "published",
+      })
+    }
+  }, [open, blog, reset])
+
+  function onSubmit(_data: BlogFormData) {
+    onOpenChange(false)
+    toast.success(blog ? "Post updated" : "Post created")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{blog ? "Edit Post" : "New Post"}</DialogTitle>
+          <DialogDescription className="text-[15px]">{blog ? "Update post details." : "Create a new blog post."}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-2">
+            <FormInput
+              label="Title"
+              registration={register("title")}
+              error={errors.title}
+              placeholder="Post title"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <FormInput
+              label="Slug"
+              registration={register("slug")}
+              error={errors.slug}
+              placeholder="post-slug-here"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <FormTextarea
+              label="Excerpt"
+              registration={register("excerpt")}
+              error={errors.excerpt}
+              placeholder="Short summary..."
+              rows={3}
+              required
+              labelClassName="text-[15px]"
+              textareaClassName="text-[15px]"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput
+                label="Category"
+                registration={register("category")}
+                error={errors.category}
+                placeholder="e.g. Engineering"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="Read Time (minutes)"
+                registration={register("readTime", { valueAsNumber: true })}
+                error={errors.readTime}
+                type="number"
+                min={1}
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
+            <FormInput
+              label="Tags (comma-separated)"
+              registration={register("tags")}
+              error={errors.tags}
+              placeholder="React, TypeScript, ..."
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormSwitch
+                label="Featured Post"
+                name="featured"
+                control={control}
+                className="bg-muted/20"
+                labelClassName="text-[15px]"
+              />
+              <FormSwitch
+                label="Published Status"
+                name="published"
+                control={control}
+                className="bg-muted/20"
+                labelClassName="text-[15px]"
+              />
+            </div>
+          </div>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)} className="h-9 text-[15px]">Cancel</Button>
+            <Button size="sm" type="submit" className="h-9 text-[15px]">
+              {blog ? "Save Changes" : "Create Post"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -4,6 +4,8 @@ import {
   ChevronDown, ChevronRight, Terminal, Layers, Server,
   Database, Cloud, PenTool, type LucideIcon,
 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,15 +16,15 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
 import { mockSkills } from "@/data/skills"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { FormInput, FormSelect, FormSlider } from "@/components/shared/form-field"
+import { skillSchema, type SkillFormData } from "@/schemas"
 
 type Skill = typeof mockSkills[0]
 
@@ -287,13 +289,45 @@ function SkillDialog({
   onOpenChange: (open: boolean) => void
   categories: string[]
 }) {
-  const [proficiency, setProficiency] = useState(80)
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<SkillFormData>({
+    resolver: zodResolver(skillSchema),
+    defaultValues: {
+      name: "",
+      category: "Frontend",
+      proficiency: 80,
+      yearsOfExperience: 0,
+    },
+  })
 
   useEffect(() => {
     if (open) {
-      setProficiency(skill?.proficiency ?? 80)
+      reset({
+        name: skill?.name ?? "",
+        category: skill?.category ?? "Frontend",
+        proficiency: skill?.proficiency ?? 80,
+        yearsOfExperience: skill?.yearsOfExperience ?? 0,
+      })
     }
-  }, [open, skill])
+  }, [open, skill, reset])
+
+  const proficiencyValue = watch("proficiency")
+
+  function onSubmit(_data: SkillFormData) {
+    onOpenChange(false)
+    toast.success(skill ? "Skill updated" : "Skill added")
+  }
+
+  const categoryOptions = [
+    ...categories.map((c) => ({ label: c, value: c })),
+    { label: "Other", value: "Other" },
+  ]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -306,70 +340,53 @@ function SkillDialog({
             {skill ? "Update skill details." : "Add a new skill to your portfolio."}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-1">
-          <div className="grid gap-2">
-            <Label className="text-sm">Skill Name</Label>
-            <Input
-              defaultValue={skill?.name}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-1">
+            <FormInput
+              label="Skill Name"
+              registration={register("name")}
+              error={errors.name}
               placeholder="e.g. TypeScript"
-              className="h-9 text-sm"
+              required
             />
-          </div>
-          <div className="grid gap-2">
-            <Label className="text-sm">Category</Label>
-            <Select defaultValue={skill?.category ?? "Frontend"}>
-              <SelectTrigger className="h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-                <SelectItem value="Other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm">Proficiency</Label>
-              <span className="text-sm font-medium tabular-nums">
-                {proficiency}% — {getProficiencyLabel(proficiency)}
-              </span>
-            </div>
-            <Slider
-              value={[proficiency]}
-              onValueChange={([v]) => setProficiency(v)}
+            <FormSelect
+              label="Category"
+              name="category"
+              control={control}
+              error={errors.category}
+              options={categoryOptions}
+              required
+            />
+            <FormSlider
+              label="Proficiency"
+              name="proficiency"
+              control={control}
+              error={errors.proficiency}
               min={0}
               max={100}
               step={1}
+              renderValue={(v) => `${v}% — ${getProficiencyLabel(proficiencyValue)}`}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label className="text-sm">Years of Experience</Label>
-            <Input
-              type="number"
-              defaultValue={skill?.yearsOfExperience}
+            <FormInput
+              label="Years of Experience"
+              registration={register("yearsOfExperience", { valueAsNumber: true })}
+              error={errors.yearsOfExperience}
               placeholder="e.g. 3"
+              type="number"
               min={0}
               max={30}
-              className="h-9 text-sm"
+              required
             />
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              onOpenChange(false)
-              toast.success(skill ? "Skill updated" : "Skill added")
-            }}
-          >
-            {skill ? "Save Changes" : "Add Skill"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" type="submit">
+              {skill ? "Save Changes" : "Add Skill"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

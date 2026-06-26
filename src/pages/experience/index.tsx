@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, MoreHorizontal, MapPin, Calendar, Briefcase } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,18 +11,16 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { mockExperience } from "@/data/experience"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
-import { MonthPicker } from "@/components/ui/month-picker"
+import {
+  FormInput, FormTextarea, FormSelect, FormSwitch, FormMonthPicker,
+} from "@/components/shared/form-field"
+import { experienceSchema, type ExperienceFormData } from "@/schemas"
 
 type Experience = typeof mockExperience[0]
 
@@ -47,9 +47,6 @@ export function Experience() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingExp, setEditingExp] = useState<Experience | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Experience | null>(null)
-  const [isCurrent, setIsCurrent] = useState(false)
-  const [startDate, setStartDate] = useState<Date | undefined>()
-  const [endDate, setEndDate] = useState<Date | undefined>()
 
   function handleDelete(exp: Experience) {
     setExperiences((prev) => prev.filter((e) => e.id !== exp.id))
@@ -59,17 +56,11 @@ export function Experience() {
 
   function openEdit(exp: Experience) {
     setEditingExp(exp)
-    setIsCurrent(exp.current)
-    setStartDate(new Date(exp.startDate))
-    setEndDate(exp.endDate ? new Date(exp.endDate) : undefined)
     setDialogOpen(true)
   }
 
   function openNew() {
     setEditingExp(null)
-    setIsCurrent(false)
-    setStartDate(undefined)
-    setEndDate(undefined)
     setDialogOpen(true)
   }
 
@@ -193,102 +184,11 @@ export function Experience() {
       )}
 
       {/* Edit/New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg">{editingExp ? "Edit Experience" : "Add Experience"}</DialogTitle>
-            <DialogDescription className="text-[15px]">{editingExp ? "Update position details." : "Add a work experience entry."}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Company</Label>
-                <Input defaultValue={editingExp?.company} placeholder="TechCorp Pvt. Ltd." className="h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Role / Title</Label>
-                <Input defaultValue={editingExp?.role} placeholder="Frontend Developer" className="h-9 text-[15px]" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Employment Type</Label>
-                <Select defaultValue={editingExp?.type ?? "Full-time"}>
-                  <SelectTrigger className="h-9 text-[15px]"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                    <SelectItem value="Freelance">Freelance</SelectItem>
-                    <SelectItem value="Internship">Internship</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Location</Label>
-                <Input defaultValue={editingExp?.location} placeholder="Bengaluru, India" className="h-9 text-[15px]" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Start Date</Label>
-                <MonthPicker value={startDate} onChange={setStartDate} className="w-full h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">End Date</Label>
-                <MonthPicker value={endDate} onChange={setEndDate} disabled={isCurrent} className="w-full h-9 text-[15px]" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3 bg-muted/20">
-              <div className="flex flex-col gap-0.5">
-                <Label className="text-[15px] font-medium">I currently work here</Label>
-                <p className="text-[13px] text-muted-foreground">This will hide the end date</p>
-              </div>
-              <Switch checked={isCurrent} onCheckedChange={setIsCurrent} />
-            </div>
-
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Short Description</Label>
-              <Textarea
-                defaultValue={editingExp?.description}
-                placeholder="Brief summary of your role..."
-                rows={2}
-                className="text-[15px]"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Key Responsibilities</Label>
-              <Textarea
-                defaultValue={editingExp?.responsibilities?.join("\n")}
-                placeholder="List your responsibilities (one per line)..."
-                rows={4}
-                className="text-[15px]"
-              />
-              <p className="text-[13px] text-muted-foreground">Press Enter to separate each responsibility bullet point.</p>
-            </div>
-
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Technologies</Label>
-              <Input
-                defaultValue={editingExp?.technologies.join(", ")}
-                placeholder="React, Next.js, Tailwind CSS..."
-                className="h-9 text-[15px]"
-              />
-              <p className="text-[13px] text-muted-foreground">Separate each technology with a comma.</p>
-            </div>
-          </div>
-          <DialogFooter className="pt-2">
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-9 text-[15px]">Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingExp ? "Experience updated" : "Experience added") }} className="h-9 text-[15px]">
-              {editingExp ? "Save Changes" : "Add Experience"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ExperienceDialog
+        experience={editingExp}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -301,5 +201,192 @@ export function Experience() {
         }
       />
     </div>
+  )
+}
+
+function ExperienceDialog({
+  experience,
+  open,
+  onOpenChange,
+}: {
+  experience: Experience | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<ExperienceFormData>({
+    resolver: zodResolver(experienceSchema),
+    defaultValues: {
+      company: "",
+      role: "",
+      type: "Full-time",
+      location: "",
+      startDate: undefined as unknown as Date,
+      endDate: null,
+      current: false,
+      description: "",
+      responsibilities: "",
+      technologies: "",
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        company: experience?.company ?? "",
+        role: experience?.role ?? "",
+        type: experience?.type ?? "Full-time",
+        location: experience?.location ?? "",
+        startDate: experience?.startDate ? new Date(experience.startDate) : undefined as unknown as Date,
+        endDate: experience?.endDate ? new Date(experience.endDate) : null,
+        current: experience?.current ?? false,
+        description: experience?.description ?? "",
+        responsibilities: experience?.responsibilities?.join("\n") ?? "",
+        technologies: experience?.technologies.join(", ") ?? "",
+      })
+    }
+  }, [open, experience, reset])
+
+  const isCurrent = watch("current")
+
+  function onSubmit(_data: ExperienceFormData) {
+    onOpenChange(false)
+    toast.success(experience ? "Experience updated" : "Experience added")
+  }
+
+  const employmentTypes = [
+    { label: "Full-time", value: "Full-time" },
+    { label: "Part-time", value: "Part-time" },
+    { label: "Contract", value: "Contract" },
+    { label: "Freelance", value: "Freelance" },
+    { label: "Internship", value: "Internship" },
+  ]
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{experience ? "Edit Experience" : "Add Experience"}</DialogTitle>
+          <DialogDescription className="text-[15px]">{experience ? "Update position details." : "Add a work experience entry."}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput
+                label="Company"
+                registration={register("company")}
+                error={errors.company}
+                placeholder="TechCorp Pvt. Ltd."
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="Role / Title"
+                registration={register("role")}
+                error={errors.role}
+                placeholder="Frontend Developer"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormSelect
+                label="Employment Type"
+                name="type"
+                control={control}
+                error={errors.type}
+                options={employmentTypes}
+                required
+                labelClassName="text-[15px]"
+                selectClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="Location"
+                registration={register("location")}
+                error={errors.location}
+                placeholder="Bengaluru, India"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormMonthPicker
+                label="Start Date"
+                name="startDate"
+                control={control}
+                error={errors.startDate}
+                required
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+              <FormMonthPicker
+                label="End Date"
+                name="endDate"
+                control={control}
+                error={errors.endDate}
+                disabled={isCurrent}
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+            </div>
+
+            <FormSwitch
+              label="I currently work here"
+              name="current"
+              control={control}
+              description="This will hide the end date"
+              className="bg-muted/20"
+              labelClassName="text-[15px]"
+            />
+
+            <FormTextarea
+              label="Short Description"
+              registration={register("description")}
+              error={errors.description}
+              placeholder="Brief summary of your role..."
+              rows={2}
+              labelClassName="text-[15px]"
+              textareaClassName="text-[15px]"
+            />
+
+            <FormTextarea
+              label="Key Responsibilities"
+              registration={register("responsibilities")}
+              placeholder="List your responsibilities (one per line)..."
+              rows={4}
+              description="Press Enter to separate each responsibility bullet point."
+              labelClassName="text-[15px]"
+              textareaClassName="text-[15px]"
+            />
+
+            <FormInput
+              label="Technologies"
+              registration={register("technologies")}
+              placeholder="React, Next.js, Tailwind CSS..."
+              description="Separate each technology with a comma."
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+          </div>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)} className="h-9 text-[15px]">Cancel</Button>
+            <Button size="sm" type="submit" className="h-9 text-[15px]">
+              {experience ? "Save Changes" : "Add Experience"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

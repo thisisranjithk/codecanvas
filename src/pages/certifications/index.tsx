@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, MoreHorizontal, Award, ExternalLink, AlertCircle } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,12 +11,11 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { mockCertifications } from "@/data/certifications"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
-import { MonthPicker } from "@/components/ui/month-picker"
+import { FormInput, FormMonthPicker } from "@/components/shared/form-field"
+import { certificationSchema, type CertificationFormData } from "@/schemas"
 
 type Certification = typeof mockCertifications[0]
 
@@ -23,8 +24,6 @@ export function Certifications() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCert, setEditingCert] = useState<Certification | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Certification | null>(null)
-  const [issueDate, setIssueDate] = useState<Date | undefined>()
-  const [expiryDate, setExpiryDate] = useState<Date | undefined>()
 
   function handleDelete(cert: Certification) {
     setCerts((prev) => prev.filter((c) => c.id !== cert.id))
@@ -34,15 +33,11 @@ export function Certifications() {
 
   function openEdit(cert: Certification) {
     setEditingCert(cert)
-    setIssueDate(new Date(cert.issueDate))
-    setExpiryDate(cert.expiryDate ? new Date(cert.expiryDate) : undefined)
     setDialogOpen(true)
   }
 
   function openNew() {
     setEditingCert(null)
-    setIssueDate(undefined)
-    setExpiryDate(undefined)
     setDialogOpen(true)
   }
 
@@ -155,48 +150,11 @@ export function Certifications() {
       )}
 
       {/* Edit/New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-lg">{editingCert ? "Edit Certification" : "Add Certification"}</DialogTitle>
-            <DialogDescription className="text-[15px]">{editingCert ? "Update certification details." : "Add a new certification."}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-1">
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Certification Name</Label>
-              <Input defaultValue={editingCert?.name} placeholder="e.g. AWS Certified Solutions Architect" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Issuing Organization</Label>
-              <Input defaultValue={editingCert?.issuer} placeholder="e.g. Amazon Web Services" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Issue Date</Label>
-                <MonthPicker value={issueDate} onChange={setIssueDate} className="w-full h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Expiry Date (optional)</Label>
-                <MonthPicker value={expiryDate} onChange={setExpiryDate} className="w-full h-9 text-[15px]" />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Credential ID</Label>
-              <Input defaultValue={editingCert?.credentialId} placeholder="e.g. AWS-SAA-12345" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Credential URL</Label>
-              <Input defaultValue={editingCert?.credentialUrl} placeholder="https://..." className="h-9 text-[15px]" />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingCert ? "Certification updated" : "Certification added") }}>
-              {editingCert ? "Save Changes" : "Add"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CertificationDialog
+        certification={editingCert}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Dialog */}
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
@@ -212,5 +170,125 @@ export function Certifications() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function CertificationDialog({
+  certification,
+  open,
+  onOpenChange,
+}: {
+  certification: Certification | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CertificationFormData>({
+    resolver: zodResolver(certificationSchema),
+    defaultValues: {
+      name: "",
+      issuer: "",
+      issueDate: undefined as unknown as Date,
+      expiryDate: null,
+      credentialId: "",
+      credentialUrl: "",
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: certification?.name ?? "",
+        issuer: certification?.issuer ?? "",
+        issueDate: certification?.issueDate ? new Date(certification.issueDate) : undefined as unknown as Date,
+        expiryDate: certification?.expiryDate ? new Date(certification.expiryDate) : null,
+        credentialId: certification?.credentialId ?? "",
+        credentialUrl: certification?.credentialUrl ?? "",
+      })
+    }
+  }, [open, certification, reset])
+
+  function onSubmit(_data: CertificationFormData) {
+    onOpenChange(false)
+    toast.success(certification ? "Certification updated" : "Certification added")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{certification ? "Edit Certification" : "Add Certification"}</DialogTitle>
+          <DialogDescription className="text-[15px]">{certification ? "Update certification details." : "Add a new certification."}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-1">
+            <FormInput
+              label="Certification Name"
+              registration={register("name")}
+              error={errors.name}
+              placeholder="e.g. AWS Certified Solutions Architect"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <FormInput
+              label="Issuing Organization"
+              registration={register("issuer")}
+              error={errors.issuer}
+              placeholder="e.g. Amazon Web Services"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <FormMonthPicker
+                label="Issue Date"
+                name="issueDate"
+                control={control}
+                error={errors.issueDate}
+                required
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+              <FormMonthPicker
+                label="Expiry Date (optional)"
+                name="expiryDate"
+                control={control}
+                error={errors.expiryDate}
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+            </div>
+            <FormInput
+              label="Credential ID"
+              registration={register("credentialId")}
+              error={errors.credentialId}
+              placeholder="e.g. AWS-SAA-12345"
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <FormInput
+              label="Credential URL"
+              registration={register("credentialUrl")}
+              error={errors.credentialUrl}
+              placeholder="https://..."
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button size="sm" type="submit">
+              {certification ? "Save Changes" : "Add"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

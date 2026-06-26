@@ -1,8 +1,10 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Plus, Search, Eye, ExternalLink, MoreHorizontal,
   Pencil, Trash2, Star, Archive, Code2,
 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,9 +18,6 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { mockProjects } from "@/data/projects"
 import { formatDateTime, formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
@@ -26,6 +25,8 @@ import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { FormInput, FormTextarea, FormSelect, FormSwitch } from "@/components/shared/form-field"
+import { projectSchema, type ProjectFormData } from "@/schemas"
 
 type Project = typeof mockProjects[0]
 
@@ -211,70 +212,11 @@ export function Projects() {
       )}
 
       {/* Edit / New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg">{editingProject ? "Edit Project" : "New Project"}</DialogTitle>
-            <DialogDescription className="text-sm">
-              {editingProject ? "Update project details." : "Fill in details to create a new project."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-1">
-            <div className="grid gap-2">
-              <Label className="text-sm">Title</Label>
-              <Input id="title" defaultValue={editingProject?.title} placeholder="Project title" className="h-9 text-sm" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-sm">Description</Label>
-              <Textarea id="description" defaultValue={editingProject?.description} placeholder="Short description..." rows={3} className="text-sm" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-sm">Category</Label>
-                <Input id="category" defaultValue={editingProject?.category} placeholder="e.g. Full Stack" className="h-9 text-sm" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-sm">Status</Label>
-                <Select defaultValue={editingProject?.status ?? "draft"}>
-                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-sm">Technologies (comma-separated)</Label>
-              <Input id="technologies" defaultValue={editingProject?.technologies.join(", ")} placeholder="React, TypeScript, ..." className="h-9 text-sm" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-sm">Live URL</Label>
-                <Input id="liveUrl" defaultValue={editingProject?.liveUrl} placeholder="https://" className="h-9 text-sm" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-sm">GitHub URL</Label>
-                <Input id="githubUrl" defaultValue={editingProject?.githubUrl} placeholder="https://github.com/..." className="h-9 text-sm" />
-              </div>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
-              <div>
-                <Label htmlFor="featured" className="text-sm font-medium">Featured Project</Label>
-                <p className="text-xs text-muted-foreground">Show prominently on your portfolio</p>
-              </div>
-              <Switch id="featured" defaultChecked={editingProject?.featured} />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingProject ? "Project updated" : "Project created") }}>
-              {editingProject ? "Save Changes" : "Create"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ProjectDialog
+        project={editingProject}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDeleteDialog
@@ -285,5 +227,141 @@ export function Projects() {
         itemName={deleteDialog?.title}
       />
     </div>
+  )
+}
+
+function ProjectDialog({
+  project,
+  open,
+  onOpenChange,
+}: {
+  project: Project | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      status: "draft",
+      technologies: "",
+      liveUrl: "",
+      githubUrl: "",
+      featured: false,
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        title: project?.title ?? "",
+        description: project?.description ?? "",
+        category: project?.category ?? "",
+        status: (project?.status as ProjectFormData["status"]) ?? "draft",
+        technologies: project?.technologies.join(", ") ?? "",
+        liveUrl: project?.liveUrl ?? "",
+        githubUrl: project?.githubUrl ?? "",
+        featured: project?.featured ?? false,
+      })
+    }
+  }, [open, project, reset])
+
+  function onSubmit(_data: ProjectFormData) {
+    onOpenChange(false)
+    toast.success(project ? "Project updated" : "Project created")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{project ? "Edit Project" : "New Project"}</DialogTitle>
+          <DialogDescription className="text-sm">
+            {project ? "Update project details." : "Fill in details to create a new project."}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-1">
+            <FormInput
+              label="Title"
+              registration={register("title")}
+              error={errors.title}
+              placeholder="Project title"
+              required
+            />
+            <FormTextarea
+              label="Description"
+              registration={register("description")}
+              error={errors.description}
+              placeholder="Short description..."
+              rows={3}
+              required
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput
+                label="Category"
+                registration={register("category")}
+                error={errors.category}
+                placeholder="e.g. Full Stack"
+                required
+              />
+              <FormSelect
+                label="Status"
+                name="status"
+                control={control}
+                error={errors.status}
+                options={[
+                  { label: "Draft", value: "draft" },
+                  { label: "Published", value: "published" },
+                  { label: "Archived", value: "archived" },
+                ]}
+                required
+              />
+            </div>
+            <FormInput
+              label="Technologies (comma-separated)"
+              registration={register("technologies")}
+              error={errors.technologies}
+              placeholder="React, TypeScript, ..."
+              required
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput
+                label="Live URL"
+                registration={register("liveUrl")}
+                error={errors.liveUrl}
+                placeholder="https://"
+              />
+              <FormInput
+                label="GitHub URL"
+                registration={register("githubUrl")}
+                error={errors.githubUrl}
+                placeholder="https://github.com/..."
+              />
+            </div>
+            <FormSwitch
+              label="Featured Project"
+              name="featured"
+              control={control}
+              description="Show prominently on your portfolio"
+            />
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button size="sm" type="submit">
+              {project ? "Save Changes" : "Create"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

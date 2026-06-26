@@ -1,8 +1,10 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Plus, Pencil, Trash2, MoreHorizontal, GraduationCap, Calendar,
   Star, BookOpen, MapPin, Landmark, Trophy, Users, Briefcase
 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,13 +13,13 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { mockEducation } from "@/data/education"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
-import { MonthPicker } from "@/components/ui/month-picker"
+import {
+  FormInput, FormTextarea, FormMonthPicker,
+} from "@/components/shared/form-field"
+import { educationSchema, type EducationFormData } from "@/schemas"
 
 type Education = typeof mockEducation[0]
 
@@ -53,8 +55,6 @@ export function Education() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingEdu, setEditingEdu] = useState<Education | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Education | null>(null)
-  const [startDate, setStartDate] = useState<Date | undefined>()
-  const [endDate, setEndDate] = useState<Date | undefined>()
 
   function handleDelete(edu: Education) {
     setEducations((prev) => prev.filter((e) => e.id !== edu.id))
@@ -64,15 +64,11 @@ export function Education() {
 
   function openEdit(edu: Education) {
     setEditingEdu(edu)
-    setStartDate(new Date(edu.startDate))
-    setEndDate(edu.endDate ? new Date(edu.endDate) : undefined)
     setDialogOpen(true)
   }
 
   function openNew() {
     setEditingEdu(null)
-    setStartDate(undefined)
-    setEndDate(undefined)
     setDialogOpen(true)
   }
 
@@ -242,64 +238,11 @@ export function Education() {
       )}
 
       {/* Edit/New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-lg">{editingEdu ? "Edit Education" : "Add Education"}</DialogTitle>
-            <DialogDescription className="text-[15px]">{editingEdu ? "Update education details." : "Add an education entry."}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Institution</Label>
-              <Input defaultValue={editingEdu?.institution} placeholder="e.g. Carnegie Mellon University" className="h-9 text-[15px]" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Degree</Label>
-                <Input defaultValue={editingEdu?.degree} placeholder="e.g. Bachelor of Science" className="h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Field of Study</Label>
-                <Input defaultValue={editingEdu?.field} placeholder="e.g. Computer Science" className="h-9 text-[15px]" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Start Date</Label>
-                <MonthPicker value={startDate} onChange={setStartDate} className="w-full h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">End Date</Label>
-                <MonthPicker value={endDate} onChange={setEndDate} className="w-full h-9 text-[15px]" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label className="text-[15px]">GPA (optional)</Label>
-                <Input defaultValue={editingEdu?.gpa} placeholder="e.g. 3.8" className="h-9 text-[15px]" />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-[15px]">Location</Label>
-                <Input defaultValue={editingEdu?.location} placeholder="e.g. Pittsburgh, PA" className="h-9 text-[15px]" />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Description</Label>
-              <Textarea defaultValue={editingEdu?.description} placeholder="Describe your studies, thesis, or focus areas..." rows={3} className="text-[15px]" />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[15px]">Activities (comma-separated)</Label>
-              <Input defaultValue={editingEdu?.activities.join(", ")} placeholder="ACM Chapter, Hackathon Organizer, ..." className="h-9 text-[15px]" />
-            </div>
-          </div>
-          <DialogFooter className="pt-2">
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)} className="h-9">Cancel</Button>
-            <Button size="sm" onClick={() => { setDialogOpen(false); toast.success(editingEdu ? "Education updated" : "Education added") }} className="h-9">
-              {editingEdu ? "Save Changes" : "Add Education"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EducationDialog
+        education={editingEdu}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Dialog */}
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
@@ -315,5 +258,160 @@ export function Education() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+function EducationDialog({
+  education,
+  open,
+  onOpenChange,
+}: {
+  education: Education | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<EducationFormData>({
+    resolver: zodResolver(educationSchema),
+    defaultValues: {
+      institution: "",
+      degree: "",
+      field: "",
+      startDate: undefined as unknown as Date,
+      endDate: null,
+      gpa: "",
+      location: "",
+      description: "",
+      activities: "",
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        institution: education?.institution ?? "",
+        degree: education?.degree ?? "",
+        field: education?.field ?? "",
+        startDate: education?.startDate ? new Date(education.startDate) : undefined as unknown as Date,
+        endDate: education?.endDate ? new Date(education.endDate) : null,
+        gpa: education?.gpa ?? "",
+        location: education?.location ?? "",
+        description: education?.description ?? "",
+        activities: education?.activities.join(", ") ?? "",
+      })
+    }
+  }, [open, education, reset])
+
+  function onSubmit(_data: EducationFormData) {
+    onOpenChange(false)
+    toast.success(education ? "Education updated" : "Education added")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{education ? "Edit Education" : "Add Education"}</DialogTitle>
+          <DialogDescription className="text-[15px]">{education ? "Update education details." : "Add an education entry."}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-4 py-2">
+            <FormInput
+              label="Institution"
+              registration={register("institution")}
+              error={errors.institution}
+              placeholder="e.g. Carnegie Mellon University"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput
+                label="Degree"
+                registration={register("degree")}
+                error={errors.degree}
+                placeholder="e.g. Bachelor of Science"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="Field of Study"
+                registration={register("field")}
+                error={errors.field}
+                placeholder="e.g. Computer Science"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FormMonthPicker
+                label="Start Date"
+                name="startDate"
+                control={control}
+                error={errors.startDate}
+                required
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+              <FormMonthPicker
+                label="End Date"
+                name="endDate"
+                control={control}
+                error={errors.endDate}
+                labelClassName="text-[15px]"
+                pickerClassName="w-full h-9 text-[15px]"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput
+                label="GPA (optional)"
+                registration={register("gpa")}
+                error={errors.gpa}
+                placeholder="e.g. 3.8"
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="Location"
+                registration={register("location")}
+                error={errors.location}
+                placeholder="e.g. Pittsburgh, PA"
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
+            <FormTextarea
+              label="Description"
+              registration={register("description")}
+              error={errors.description}
+              placeholder="Describe your studies, thesis, or focus areas..."
+              rows={3}
+              labelClassName="text-[15px]"
+              textareaClassName="text-[15px]"
+            />
+            <FormInput
+              label="Activities (comma-separated)"
+              registration={register("activities")}
+              placeholder="ACM Chapter, Hackathon Organizer, ..."
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+          </div>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)} className="h-9">Cancel</Button>
+            <Button size="sm" type="submit" className="h-9">
+              {education ? "Save Changes" : "Add Education"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
