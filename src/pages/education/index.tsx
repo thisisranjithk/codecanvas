@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import {
   FormInput, FormTextarea, FormMonthPicker,
 } from "@/components/shared/form-field"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { educationSchema, type EducationFormData } from "@/schemas"
 
 type Education = typeof mockEducation[0]
@@ -245,18 +246,13 @@ export function Education() {
       />
 
       {/* Delete Dialog */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Education</DialogTitle>
-            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.institution}"</strong>?</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
-            <Button variant="destructive" size="sm" onClick={() => deleteDialog && handleDelete(deleteDialog)}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Delete Education"
+        description={<>Remove <strong>"{deleteDialog?.institution}"</strong>?</>}
+      />
     </div>
   )
 }

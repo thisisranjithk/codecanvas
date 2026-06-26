@@ -15,6 +15,7 @@ import { mockCertifications } from "@/data/certifications"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { FormInput, FormMonthPicker } from "@/components/shared/form-field"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { certificationSchema, type CertificationFormData } from "@/schemas"
 
 type Certification = typeof mockCertifications[0]
@@ -157,18 +158,13 @@ export function Certifications() {
       />
 
       {/* Delete Dialog */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Certification</DialogTitle>
-            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.name}"</strong>?</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
-            <Button variant="destructive" size="sm" onClick={() => deleteDialog && handleDelete(deleteDialog)}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Delete Certification"
+        description={<>Remove <strong>"{deleteDialog?.name}"</strong>?</>}
+      />
     </div>
   )
 }
