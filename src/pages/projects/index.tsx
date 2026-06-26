@@ -22,14 +22,12 @@ import { Switch } from "@/components/ui/switch"
 import { mockProjects } from "@/data/projects"
 import { formatDateTime, formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
+import { PageHeader } from "@/components/shared/page-header"
+import { EmptyState } from "@/components/shared/empty-state"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { StatusBadge } from "@/components/shared/status-badge"
 
 type Project = typeof mockProjects[0]
-
-const statusStyles: Record<string, string> = {
-  published: "bg-success/8 text-success border-success/20",
-  draft: "bg-warning/8 text-warning border-warning/20",
-  archived: "bg-muted text-muted-foreground border-border",
-}
 
 export function Projects() {
   const [projects, setProjects] = useState(mockProjects)
@@ -88,18 +86,11 @@ export function Projects() {
   return (
     <div className="flex flex-col gap-5 p-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {projects.length} projects · {projects.filter((p) => p.status === "published").length} published
-          </p>
-        </div>
-        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
-          <Plus className="size-4" />
-          New Project
-        </Button>
-      </div>
+      <PageHeader
+        title="Projects"
+        description={`${projects.length} projects · ${projects.filter((p) => p.status === "published").length} published`}
+        action={{ label: "New Project", onClick: openNew, icon: <Plus className="size-4" /> }}
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
@@ -147,16 +138,12 @@ export function Projects() {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
-            <Code2 className="size-5 text-muted-foreground" />
-          </div>
-          <p className="font-medium text-base">No projects found</p>
-          <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
-          <Button size="sm" variant="outline" onClick={() => { setSearch(""); setStatusFilter("all"); setCategoryFilter("all") }}>
-            Clear filters
-          </Button>
-        </div>
+        <EmptyState
+          icon={Code2}
+          title="No projects found"
+          description="Try adjusting your search or filters"
+          action={{ label: "Clear filters", onClick: () => { setSearch(""); setStatusFilter("all"); setCategoryFilter("all") } }}
+        />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((project) => (
@@ -177,9 +164,7 @@ export function Projects() {
                     <span className="text-xs text-muted-foreground">{project.category}</span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Badge variant="outline" className={`text-[11px] h-5 px-1.5 ${statusStyles[project.status]}`}>
-                      {project.status}
-                    </Badge>
+                    <StatusBadge status={project.status} />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -305,20 +290,13 @@ export function Projects() {
       </Dialog>
 
       {/* Delete Confirmation */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Project</DialogTitle>
-            <DialogDescription className="text-sm">
-              Delete <strong>"{deleteDialog?.title}"</strong>? This cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
-            <Button variant="destructive" size="sm" onClick={() => deleteDialog && handleDelete(deleteDialog)}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Delete Project"
+        itemName={deleteDialog?.title}
+      />
     </div>
   )
 }

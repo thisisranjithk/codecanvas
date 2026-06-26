@@ -24,7 +24,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="py-3 px-2.5">
+      <SidebarHeader className="h-16 justify-center border-b border-sidebar-border px-2.5 py-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="hover:bg-sidebar-accent/50" asChild>
@@ -41,8 +41,6 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-
-      <SidebarSeparator />
 
       <SidebarContent className="py-2 px-1">
         <SidebarGroup>

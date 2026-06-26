@@ -20,6 +20,9 @@ import { Slider } from "@/components/ui/slider"
 import { mockSkills } from "@/data/skills"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { PageHeader } from "@/components/shared/page-header"
+import { EmptyState } from "@/components/shared/empty-state"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 
 type Skill = typeof mockSkills[0]
 
@@ -95,18 +98,11 @@ export function Skills() {
   return (
     <div className="flex flex-col gap-5 p-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {skills.length} skills across {categories.length} categories
-          </p>
-        </div>
-        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
-          <Plus className="size-4" />
-          Add Skill
-        </Button>
-      </div>
+      <PageHeader
+        title="Skills"
+        description={`${skills.length} skills across ${categories.length} categories`}
+        action={{ label: "Add Skill", onClick: openNew, icon: <Plus className="size-4" /> }}
+      />
 
       {/* Filters */}
       <div className="flex items-center gap-2">
@@ -135,15 +131,11 @@ export function Skills() {
 
       {/* Grouped Skills */}
       {Object.entries(grouped).length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
-            <Code2 className="size-5 text-muted-foreground" />
-          </div>
-          <p className="font-medium text-base">No skills found</p>
-          <Button size="sm" variant="outline" onClick={() => { setSearch(""); setCategoryFilter("all") }}>
-            Clear filters
-          </Button>
-        </div>
+        <EmptyState
+          icon={Code2}
+          title="No skills found"
+          action={{ label: "Clear filters", onClick: () => { setSearch(""); setCategoryFilter("all") } }}
+        />
       ) : (
         <div className="flex flex-col gap-4">
           {Object.entries(grouped).map(([cat, catSkills]) => {
@@ -342,28 +334,13 @@ export function Skills() {
       </Dialog>
 
       {/* Delete Dialog */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Remove Skill</DialogTitle>
-            <DialogDescription className="text-sm">
-              Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => deleteDialog && handleDelete(deleteDialog)}
-            >
-              Remove
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Remove Skill"
+        description={<>Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?</>}
+      />
     </div>
   )
 }

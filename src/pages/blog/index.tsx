@@ -23,13 +23,12 @@ import { Switch } from "@/components/ui/switch"
 import { mockBlogs } from "@/data/blogs"
 import { formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
+import { PageHeader } from "@/components/shared/page-header"
+import { EmptyState } from "@/components/shared/empty-state"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { StatusBadge } from "@/components/shared/status-badge"
 
 type Blog = typeof mockBlogs[0]
-
-const statusStyles: Record<string, string> = {
-  published: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  draft: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-}
 
 function formatDateDisplay(dateString: string | null) {
   if (!dateString) return "Unpublished"
@@ -116,21 +115,20 @@ export function Blog() {
   return (
     <div className="flex flex-col gap-6 p-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Blog</h1>
-          <p className="text-[15px] text-muted-foreground">Manage and organize your blog posts</p>
-          <div className="text-[13px] text-muted-foreground mt-0.5 font-medium flex items-center gap-1.5">
-            <span>{counts.all} posts</span>
-            <span>•</span>
-            <span className="text-emerald-500">{counts.published} published</span>
+      <PageHeader
+        title="Blog"
+        description={
+          <div className="flex flex-col gap-0.5">
+            <span>Manage and organize your blog posts</span>
+            <div className="text-[13px] font-medium flex items-center gap-1.5">
+              <span>{counts.all} posts</span>
+              <span>•</span>
+              <span className="text-emerald-500">{counts.published} published</span>
+            </div>
           </div>
-        </div>
-        <Button size="sm" onClick={() => { setEditingBlog(null); setDialogOpen(true) }} className="h-10 px-4 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-medium">
-          <Plus className="size-4" />
-          New Post
-        </Button>
-      </div>
+        }
+        action={{ label: "New Post", onClick: () => { setEditingBlog(null); setDialogOpen(true) }, icon: <Plus className="size-4" /> }}
+      />
 
       {/* Tabs + Filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -171,13 +169,12 @@ export function Blog() {
 
       {/* Blog List */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4">
-          <div className="flex size-14 items-center justify-center rounded-xl bg-muted/50">
-            <BookOpen className="size-6 text-muted-foreground" />
-          </div>
-          <p className="font-medium text-base text-foreground">No posts found</p>
-          <Button size="sm" variant="outline" onClick={() => setSearch("")}>Clear search</Button>
-        </div>
+        <EmptyState
+          icon={BookOpen}
+          title="No posts found"
+          action={{ label: "Clear search", onClick: () => setSearch("") }}
+          className="py-24"
+        />
       ) : (
         <div className="flex flex-col gap-4">
           {filtered.map((blog) => (
@@ -201,9 +198,7 @@ export function Blog() {
                         <div className="flex items-center gap-2.5 flex-wrap">
                           {blog.featured && <Star className="size-4 text-amber-500 fill-amber-500 shrink-0" />}
                           <h3 className="font-bold text-lg leading-snug text-foreground hover:text-primary transition-colors cursor-pointer line-clamp-2">{blog.title}</h3>
-                          <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider h-5 px-2 shrink-0 ${statusStyles[blog.status] ?? ""}`}>
-                            {blog.status}
-                          </Badge>
+                          <StatusBadge status={`blog-${blog.status}`} className="text-[10px] uppercase tracking-wider h-5 px-2" />
                         </div>
                         <p className="text-[14.5px] text-muted-foreground leading-relaxed line-clamp-2 max-w-3xl">
                           {blog.excerpt}
@@ -323,18 +318,13 @@ export function Blog() {
       </Dialog>
 
       {/* Delete Dialog */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Post</DialogTitle>
-            <DialogDescription className="text-[15px]">Delete <strong>"{deleteDialog?.title}"</strong>? This cannot be undone.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
-            <Button variant="destructive" size="sm" onClick={() => deleteDialog && handleDelete(deleteDialog)}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Delete Post"
+        itemName={deleteDialog?.title}
+      />
     </div>
   )
 }

@@ -17,6 +17,9 @@ import { Switch } from "@/components/ui/switch"
 import { mockExperience } from "@/data/experience"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
+import { PageHeader } from "@/components/shared/page-header"
+import { EmptyState } from "@/components/shared/empty-state"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 
 type Experience = typeof mockExperience[0]
 
@@ -65,25 +68,18 @@ export function Experience() {
 
   return (
     <div className="flex flex-col gap-6 p-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Experience</h1>
-          <p className="text-[15px] text-muted-foreground mt-0.5">{experiences.length} positions</p>
-        </div>
-        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
-          <Plus className="size-4" />
-          Add Experience
-        </Button>
-      </div>
+      <PageHeader
+        title="Experience"
+        description={`${experiences.length} positions`}
+        action={{ label: "Add Experience", onClick: openNew, icon: <Plus className="size-4" /> }}
+      />
 
       {experiences.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
-            <Briefcase className="size-5 text-muted-foreground" />
-          </div>
-          <p className="font-medium text-base">No experience added</p>
-          <Button size="sm" onClick={openNew}>Add your first position</Button>
-        </div>
+        <EmptyState
+          icon={Briefcase}
+          title="No experience added"
+          action={{ label: "Add your first position", onClick: openNew }}
+        />
       ) : (
         <div className="flex flex-col gap-5">
           {experiences.map((exp) => (
@@ -288,18 +284,15 @@ export function Experience() {
       </Dialog>
 
       {/* Delete Dialog */}
-      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Delete Experience</DialogTitle>
-            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.role} at {deleteDialog?.company}"</strong>?</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>
-            <Button variant="destructive" size="sm" onClick={() => deleteDialog && handleDelete(deleteDialog)}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        isOpen={!!deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        title="Delete Experience"
+        description={
+          <>Remove <strong>"{deleteDialog?.role} at {deleteDialog?.company}"</strong>?</>
+        }
+      />
     </div>
   )
 }
