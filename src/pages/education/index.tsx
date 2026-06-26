@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { mockEducation } from "@/data/education"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
+import { MonthPicker } from "@/components/ui/month-picker"
 
 type Education = typeof mockEducation[0]
 
@@ -52,6 +53,8 @@ export function Education() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingEdu, setEditingEdu] = useState<Education | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Education | null>(null)
+  const [startDate, setStartDate] = useState<Date | undefined>()
+  const [endDate, setEndDate] = useState<Date | undefined>()
 
   function handleDelete(edu: Education) {
     setEducations((prev) => prev.filter((e) => e.id !== edu.id))
@@ -61,6 +64,15 @@ export function Education() {
 
   function openEdit(edu: Education) {
     setEditingEdu(edu)
+    setStartDate(new Date(edu.startDate))
+    setEndDate(edu.endDate ? new Date(edu.endDate) : undefined)
+    setDialogOpen(true)
+  }
+
+  function openNew() {
+    setEditingEdu(null)
+    setStartDate(undefined)
+    setEndDate(undefined)
     setDialogOpen(true)
   }
 
@@ -71,7 +83,7 @@ export function Education() {
           <h1 className="text-2xl font-semibold tracking-tight">Education</h1>
           <p className="text-[15px] text-muted-foreground mt-0.5">{educations.length} entries</p>
         </div>
-        <Button size="sm" onClick={() => { setEditingEdu(null); setDialogOpen(true) }} className="h-9 gap-1.5">
+        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
           <Plus className="size-4" />
           Add Education
         </Button>
@@ -83,7 +95,7 @@ export function Education() {
             <GraduationCap className="size-5 text-muted-foreground" />
           </div>
           <p className="font-medium text-base">No education added</p>
-          <Button size="sm" onClick={() => { setEditingEdu(null); setDialogOpen(true) }}>Add education</Button>
+          <Button size="sm" onClick={openNew}>Add education</Button>
         </div>
       ) : (
         <div className="flex flex-col gap-5">
@@ -254,11 +266,11 @@ export function Education() {
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-2">
                 <Label className="text-[15px]">Start Date</Label>
-                <Input type="month" defaultValue={editingEdu?.startDate} className="h-9 text-[15px]" />
+                <MonthPicker value={startDate} onChange={setStartDate} className="w-full h-9 text-[15px]" />
               </div>
               <div className="grid gap-2">
                 <Label className="text-[15px]">End Date</Label>
-                <Input type="month" defaultValue={editingEdu?.endDate ?? ""} className="h-9 text-[15px]" />
+                <MonthPicker value={endDate} onChange={setEndDate} className="w-full h-9 text-[15px]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">

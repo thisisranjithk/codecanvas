@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { mockCertifications } from "@/data/certifications"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
+import { MonthPicker } from "@/components/ui/month-picker"
 
 type Certification = typeof mockCertifications[0]
 
@@ -22,6 +23,8 @@ export function Certifications() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCert, setEditingCert] = useState<Certification | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Certification | null>(null)
+  const [issueDate, setIssueDate] = useState<Date | undefined>()
+  const [expiryDate, setExpiryDate] = useState<Date | undefined>()
 
   function handleDelete(cert: Certification) {
     setCerts((prev) => prev.filter((c) => c.id !== cert.id))
@@ -31,6 +34,15 @@ export function Certifications() {
 
   function openEdit(cert: Certification) {
     setEditingCert(cert)
+    setIssueDate(new Date(cert.issueDate))
+    setExpiryDate(cert.expiryDate ? new Date(cert.expiryDate) : undefined)
+    setDialogOpen(true)
+  }
+
+  function openNew() {
+    setEditingCert(null)
+    setIssueDate(undefined)
+    setExpiryDate(undefined)
     setDialogOpen(true)
   }
 
@@ -107,7 +119,7 @@ export function Certifications() {
             {activeCerts.length} active · {expiredCerts.length} expired
           </p>
         </div>
-        <Button size="sm" onClick={() => { setEditingCert(null); setDialogOpen(true) }} className="h-9 gap-1.5">
+        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
           <Plus className="size-4" />
           Add Certification
         </Button>
@@ -119,7 +131,7 @@ export function Certifications() {
             <Award className="size-5 text-muted-foreground" />
           </div>
           <p className="font-medium text-base">No certifications added</p>
-          <Button size="sm" onClick={() => { setEditingCert(null); setDialogOpen(true) }}>Add certification</Button>
+          <Button size="sm" onClick={openNew}>Add certification</Button>
         </div>
       ) : (
         <div className="flex flex-col gap-5">
@@ -161,11 +173,11 @@ export function Certifications() {
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-2">
                 <Label className="text-[15px]">Issue Date</Label>
-                <Input type="month" defaultValue={editingCert?.issueDate} className="h-9 text-[15px]" />
+                <MonthPicker value={issueDate} onChange={setIssueDate} className="w-full h-9 text-[15px]" />
               </div>
               <div className="grid gap-2">
                 <Label className="text-[15px]">Expiry Date (optional)</Label>
-                <Input type="month" defaultValue={editingCert?.expiryDate ?? ""} className="h-9 text-[15px]" />
+                <MonthPicker value={expiryDate} onChange={setExpiryDate} className="w-full h-9 text-[15px]" />
               </div>
             </div>
             <div className="grid gap-2">

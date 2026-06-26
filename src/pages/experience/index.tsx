@@ -20,6 +20,7 @@ import { toast } from "sonner"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { MonthPicker } from "@/components/ui/month-picker"
 
 type Experience = typeof mockExperience[0]
 
@@ -47,6 +48,8 @@ export function Experience() {
   const [editingExp, setEditingExp] = useState<Experience | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Experience | null>(null)
   const [isCurrent, setIsCurrent] = useState(false)
+  const [startDate, setStartDate] = useState<Date | undefined>()
+  const [endDate, setEndDate] = useState<Date | undefined>()
 
   function handleDelete(exp: Experience) {
     setExperiences((prev) => prev.filter((e) => e.id !== exp.id))
@@ -57,12 +60,16 @@ export function Experience() {
   function openEdit(exp: Experience) {
     setEditingExp(exp)
     setIsCurrent(exp.current)
+    setStartDate(new Date(exp.startDate))
+    setEndDate(exp.endDate ? new Date(exp.endDate) : undefined)
     setDialogOpen(true)
   }
 
   function openNew() {
     setEditingExp(null)
     setIsCurrent(false)
+    setStartDate(undefined)
+    setEndDate(undefined)
     setDialogOpen(true)
   }
 
@@ -227,11 +234,11 @@ export function Experience() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label className="text-[15px]">Start Date</Label>
-                <Input type="month" defaultValue={editingExp?.startDate} className="h-9 text-[15px]" />
+                <MonthPicker value={startDate} onChange={setStartDate} className="w-full h-9 text-[15px]" />
               </div>
               <div className="grid gap-2">
                 <Label className="text-[15px]">End Date</Label>
-                <Input type="month" defaultValue={editingExp?.endDate ?? ""} disabled={isCurrent} className="h-9 text-[15px]" />
+                <MonthPicker value={endDate} onChange={setEndDate} disabled={isCurrent} className="w-full h-9 text-[15px]" />
               </div>
             </div>
 
