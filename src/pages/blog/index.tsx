@@ -17,7 +17,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { mockBlogs } from "@/data/blogs"
-import { formatNumber } from "@/lib/utils"
+import { formatNumber, formatPublishDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -28,11 +28,6 @@ import { blogSchema, type BlogFormData } from "@/schemas"
 
 type Blog = typeof mockBlogs[0]
 
-function formatDateDisplay(dateString: string | null) {
-  if (!dateString) return "Unpublished"
-  const d = new Date(dateString)
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-}
 
 // A simple placeholder generator based on blog id
 function BlogImagePlaceholder({ id }: { id: string }) {
@@ -237,7 +232,7 @@ export function Blog() {
                   </div>
 
                   <div className="text-[13px] text-muted-foreground font-medium md:mt-2 text-right">
-                    {formatDateDisplay(blog.publishedAt)}
+                    {formatPublishDate(blog.publishedAt)}
                   </div>
                 </div>
 

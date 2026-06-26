@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import {
   Plus, Pencil, Trash2, MoreHorizontal, GraduationCap, Calendar,
-  Star, BookOpen, MapPin, Landmark, Trophy, Users, Briefcase
+  Star, BookOpen, MapPin, Landmark,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,36 +20,12 @@ import {
   FormInput, FormTextarea, FormMonthPicker,
 } from "@/components/shared/form-field"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { getEducationDuration, getEducationActivityIcon } from "@/lib/utils"
 import { educationSchema, type EducationFormData } from "@/schemas"
 
 type Education = typeof mockEducation[0]
 
-function getDurationInYears(start: string, end: string | null) {
-  const d1 = new Date(start)
-  const d2 = end ? new Date(end) : new Date()
 
-  let months = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth())
-  if (months < 0) months = 0
-  months += 1 // Inclusive of end month
-
-  const years = Math.floor(months / 12)
-  if (years > 0) return `${years} Years (Full-time)`
-  return `${months} Months`
-}
-
-function getActivityIcon(activity: string) {
-  const lower = activity.toLowerCase()
-  if (lower.includes("president") || lower.includes("member") || lower.includes("club") || lower.includes("chapter")) {
-    return <Users className="size-3.5 text-primary" />
-  }
-  if (lower.includes("hackathon") || lower.includes("award") || lower.includes("winner")) {
-    return <Trophy className="size-3.5 text-emerald-500" />
-  }
-  if (lower.includes("teaching") || lower.includes("assistant") || lower.includes("tutor")) {
-    return <GraduationCap className="size-3.5 text-blue-500" />
-  }
-  return <Briefcase className="size-3.5 text-muted-foreground" />
-}
 
 export function Education() {
   const [educations, setEducations] = useState(mockEducation)
@@ -154,7 +130,7 @@ export function Education() {
                               key={act}
                               className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border/60 bg-background text-[13.5px] font-medium shadow-sm"
                             >
-                              {getActivityIcon(act)}
+                              {getEducationActivityIcon(act)}
                               <span>{act}</span>
                             </div>
                           ))}
@@ -226,7 +202,7 @@ export function Education() {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[13px] text-muted-foreground font-medium">Duration</span>
-                        <span className="text-[14.5px] font-medium text-foreground">{getDurationInYears(edu.startDate, edu.endDate)}</span>
+                        <span className="text-[14.5px] font-medium text-foreground">{getEducationDuration(edu.startDate, edu.endDate)}</span>
                       </div>
                     </div>
                   </div>

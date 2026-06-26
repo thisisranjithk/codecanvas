@@ -12,7 +12,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { mockExperience } from "@/data/experience"
-import { formatDate } from "@/lib/utils"
+import { formatDate, getEmploymentDuration } from "@/lib/utils"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -24,23 +24,6 @@ import { experienceSchema, type ExperienceFormData } from "@/schemas"
 
 type Experience = typeof mockExperience[0]
 
-function getDuration(start: string, end: string | null) {
-  const d1 = new Date(start)
-  const d2 = end ? new Date(end) : new Date()
-
-  let months = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth())
-  if (months < 0) months = 0
-
-  // round up slightly for partial months to avoid 0 mos
-  months += 1
-
-  const years = Math.floor(months / 12)
-  const remMonths = months % 12
-
-  if (years > 0 && remMonths > 0) return `${years} yr ${remMonths} mos`
-  if (years > 0) return `${years} yr`
-  return `${remMonths} mos`
-}
 
 export function Experience() {
   const [experiences, setExperiences] = useState(mockExperience)
@@ -100,7 +83,7 @@ export function Experience() {
                       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground font-medium">
                           <Calendar className="size-3.5" />
-                          {formatDate(exp.startDate)} — {exp.current ? "Present" : formatDate(exp.endDate)}
+                          {formatDate(exp.startDate)} — {formatDate(exp.endDate)} · {getEmploymentDuration(exp.startDate, exp.endDate)}
                         </span>
                         <span className="text-muted-foreground/30">•</span>
                         <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground font-medium">
@@ -134,7 +117,7 @@ export function Experience() {
                     </DropdownMenu>
 
                     <Badge variant="secondary" className="bg-primary/15 text-primary hover:bg-primary/15 border-transparent text-xs font-medium px-2.5 h-6 rounded-full">
-                      {getDuration(exp.startDate, exp.current ? null : exp.endDate)}
+                      {getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)}
                     </Badge>
                   </div>
                 </div>

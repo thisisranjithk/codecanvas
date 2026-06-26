@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { mockSkills } from "@/data/skills"
+import { getSkillProficiencyBadgeClass, getSkillProficiencyLabel } from "@/lib/utils"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { PageHeader } from "@/components/shared/page-header"
@@ -37,19 +38,6 @@ const categoryIcons: Record<string, LucideIcon> = {
   "Design": PenTool,
 }
 
-function getProficiencyLabel(p: number) {
-  if (p >= 90) return "Expert"
-  if (p >= 75) return "Advanced"
-  if (p >= 55) return "Intermediate"
-  return "Beginner"
-}
-
-function getProficiencyBadgeClass(p: number) {
-  if (p >= 90) return "bg-primary/10 text-primary border-primary/20"
-  if (p >= 75) return "bg-secondary text-secondary-foreground border-transparent"
-  if (p >= 55) return "bg-muted text-muted-foreground border-border/50"
-  return "bg-background text-muted-foreground border-border/50"
-}
 
 export function Skills() {
   const [skills, setSkills] = useState(mockSkills)
@@ -240,11 +228,8 @@ export function Skills() {
                             <span className="text-xs text-muted-foreground">
                               {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? "year" : "years"} exp.
                             </span>
-                            <Badge
-                              variant="outline"
-                              className={cn("text-[11px] h-5 px-1.5 font-medium", getProficiencyBadgeClass(skill.proficiency))}
-                            >
-                              {getProficiencyLabel(skill.proficiency)}
+                            <Badge variant="outline" className={cn("px-2 py-0 h-5 border", getSkillProficiencyBadgeClass(skill.proficiency))}>
+                              {getSkillProficiencyLabel(skill.proficiency)}
                             </Badge>
                           </div>
                         </CardContent>
@@ -365,7 +350,7 @@ function SkillDialog({
               min={0}
               max={100}
               step={1}
-              renderValue={(v) => `${v}% — ${getProficiencyLabel(proficiencyValue)}`}
+              renderValue={(v) => `${v}% — ${getSkillProficiencyLabel(v)}`}
             />
             <FormInput
               label="Years of Experience"
