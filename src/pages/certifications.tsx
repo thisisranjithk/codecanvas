@@ -44,36 +44,36 @@ export function Certifications() {
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-[10px] font-bold">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted text-[13px] font-bold">
                 {cert.logo}
               </div>
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm leading-tight">{cert.name}</span>
+                  <span className="font-semibold text-base leading-tight">{cert.name}</span>
                   {isExpired ? (
-                    <Badge variant="outline" className="text-[9px] h-4 px-1 text-destructive border-destructive/20 bg-destructive/5">
-                      <AlertCircle className="size-2.5 mr-0.5" />Expired
+                    <Badge variant="outline" className="text-xs h-5 px-1.5 text-destructive border-destructive/20 bg-destructive/5">
+                      <AlertCircle className="size-3 mr-0.5" />Expired
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-[9px] h-4 px-1 text-success border-success/20 bg-success/5">
+                    <Badge variant="outline" className="text-xs h-5 px-1.5 text-success border-success/20 bg-success/5">
                       Active
                     </Badge>
                   )}
                 </div>
-                <span className="text-xs text-muted-foreground">{cert.issuer}</span>
+                <span className="text-[15px] text-muted-foreground">{cert.issuer}</span>
                 <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                  <span className="text-[10px] text-muted-foreground">Issued: {formatDate(cert.issueDate)}</span>
+                  <span className="text-[13px] text-muted-foreground">Issued: {formatDate(cert.issueDate)}</span>
                   {cert.expiryDate && (
-                    <span className={`text-[10px] ${isExpired ? "text-destructive" : "text-muted-foreground"}`}>
+                    <span className={`text-[13px] ${isExpired ? "text-destructive" : "text-muted-foreground"}`}>
                       Expires: {formatDate(cert.expiryDate)}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[10px] text-muted-foreground font-mono">ID: {cert.credentialId}</span>
+                  <span className="text-[13px] text-muted-foreground font-mono">ID: {cert.credentialId}</span>
                   {cert.credentialUrl && (
-                    <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-[10px] text-primary hover:underline">
-                      <ExternalLink className="size-2.5" />Verify
+                    <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-[13px] text-primary hover:underline">
+                      <ExternalLink className="size-3" />Verify
                     </a>
                   )}
                 </div>
@@ -99,16 +99,16 @@ export function Certifications() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-5 p-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Certifications</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-semibold tracking-tight">Certifications</h1>
+          <p className="text-[15px] text-muted-foreground mt-0.5">
             {activeCerts.length} active · {expiredCerts.length} expired
           </p>
         </div>
-        <Button size="sm" onClick={() => { setEditingCert(null); setDialogOpen(true) }} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={() => { setEditingCert(null); setDialogOpen(true) }} className="h-9 gap-1.5">
+          <Plus className="size-4" />
           Add Certification
         </Button>
       </div>
@@ -118,14 +118,14 @@ export function Certifications() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             <Award className="size-5 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">No certifications added</p>
+          <p className="font-medium text-base">No certifications added</p>
           <Button size="sm" onClick={() => { setEditingCert(null); setDialogOpen(true) }}>Add certification</Button>
         </div>
       ) : (
         <div className="flex flex-col gap-5">
           {activeCerts.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Active ({activeCerts.length})</h2>
+              <h2 className="text-[15px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Active ({activeCerts.length})</h2>
               <div className="grid gap-2.5 md:grid-cols-2">
                 {activeCerts.map((cert) => <CertCard key={cert.id} cert={cert} />)}
               </div>
@@ -133,7 +133,7 @@ export function Certifications() {
           )}
           {expiredCerts.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2.5">Expired ({expiredCerts.length})</h2>
+              <h2 className="text-[15px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2.5">Expired ({expiredCerts.length})</h2>
               <div className="grid gap-2.5 md:grid-cols-2">
                 {expiredCerts.map((cert) => <CertCard key={cert.id} cert={cert} />)}
               </div>
@@ -146,35 +146,35 @@ export function Certifications() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-base">{editingCert ? "Edit Certification" : "Add Certification"}</DialogTitle>
-            <DialogDescription className="text-xs">{editingCert ? "Update certification details." : "Add a new certification."}</DialogDescription>
+            <DialogTitle className="text-lg">{editingCert ? "Edit Certification" : "Add Certification"}</DialogTitle>
+            <DialogDescription className="text-[15px]">{editingCert ? "Update certification details." : "Add a new certification."}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Certification Name</Label>
-              <Input defaultValue={editingCert?.name} placeholder="e.g. AWS Certified Solutions Architect" className="h-8 text-xs" />
+          <div className="grid gap-4 py-1">
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Certification Name</Label>
+              <Input defaultValue={editingCert?.name} placeholder="e.g. AWS Certified Solutions Architect" className="h-9 text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Issuing Organization</Label>
-              <Input defaultValue={editingCert?.issuer} placeholder="e.g. Amazon Web Services" className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Issuing Organization</Label>
+              <Input defaultValue={editingCert?.issuer} placeholder="e.g. Amazon Web Services" className="h-9 text-[15px]" />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Issue Date</Label>
-                <Input type="month" defaultValue={editingCert?.issueDate} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Issue Date</Label>
+                <Input type="month" defaultValue={editingCert?.issueDate} className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Expiry Date (optional)</Label>
-                <Input type="month" defaultValue={editingCert?.expiryDate ?? ""} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Expiry Date (optional)</Label>
+                <Input type="month" defaultValue={editingCert?.expiryDate ?? ""} className="h-9 text-[15px]" />
               </div>
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Credential ID</Label>
-              <Input defaultValue={editingCert?.credentialId} placeholder="e.g. AWS-SAA-12345" className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Credential ID</Label>
+              <Input defaultValue={editingCert?.credentialId} placeholder="e.g. AWS-SAA-12345" className="h-9 text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Credential URL</Label>
-              <Input defaultValue={editingCert?.credentialUrl} placeholder="https://..." className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Credential URL</Label>
+              <Input defaultValue={editingCert?.credentialUrl} placeholder="https://..." className="h-9 text-[15px]" />
             </div>
           </div>
           <DialogFooter>
@@ -190,8 +190,8 @@ export function Certifications() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Delete Certification</DialogTitle>
-            <DialogDescription className="text-xs">Remove <strong>"{deleteDialog?.name}"</strong>?</DialogDescription>
+            <DialogTitle className="text-lg">Delete Certification</DialogTitle>
+            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.name}"</strong>?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>

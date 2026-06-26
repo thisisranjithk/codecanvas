@@ -51,8 +51,8 @@ export function AppSidebar() {
                   <Layers className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold text-sm tracking-tight">Portfolio CMS</span>
-                  <span className="text-[11px] text-sidebar-foreground/60">alexmorgan.dev</span>
+                  <span className="font-semibold text-[15px] tracking-tight">Portfolio CMS</span>
+                  <span className="text-xs text-sidebar-foreground/60">alexmorgan.dev</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -82,7 +82,7 @@ export function AppSidebar() {
                     >
                       <Link to={item.path} className="relative flex items-center">
                         <item.icon className="size-[18px]" />
-                        <span className="font-medium">{item.label}</span>
+                        <span className="font-medium text-sm">{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -110,7 +110,7 @@ export function AppSidebar() {
             >
               <Link to="/settings" className="flex items-center">
                 <Settings className="size-[18px]" />
-                <span className="font-medium">Settings</span>
+                <span className="font-medium text-sm">Settings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -118,13 +118,13 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild tooltip={mockUser.name} className="hover:bg-sidebar-accent/50">
               <button className="flex items-center gap-2">
                 <Avatar className="size-7 shrink-0 ring-2 ring-sidebar-border">
-                  <AvatarFallback className="text-[10px] bg-primary text-primary-foreground font-semibold">
+                  <AvatarFallback className="text-xs bg-primary text-primary-foreground font-semibold">
                     {mockUser.avatar}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-0.5 leading-none text-left">
                   <span className="font-medium text-sm truncate">{mockUser.name}</span>
-                  <span className="text-[11px] text-sidebar-foreground/60 truncate">{mockUser.email}</span>
+                  <span className="text-xs text-sidebar-foreground/60 truncate">{mockUser.email}</span>
                 </div>
               </button>
             </SidebarMenuButton>

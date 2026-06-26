@@ -36,14 +36,14 @@ export function Education() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-5 p-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Education</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">{educations.length} entries</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Education</h1>
+          <p className="text-[15px] text-muted-foreground mt-0.5">{educations.length} entries</p>
         </div>
-        <Button size="sm" onClick={() => { setEditingEdu(null); setDialogOpen(true) }} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={() => { setEditingEdu(null); setDialogOpen(true) }} className="h-9 gap-1.5">
+          <Plus className="size-4" />
           Add Education
         </Button>
       </div>
@@ -53,7 +53,7 @@ export function Education() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             <GraduationCap className="size-5 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">No education added</p>
+          <p className="font-medium text-base">No education added</p>
           <Button size="sm" onClick={() => { setEditingEdu(null); setDialogOpen(true) }}>Add education</Button>
         </div>
       ) : (
@@ -63,21 +63,21 @@ export function Education() {
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3.5">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border bg-muted text-[10px] font-bold">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border bg-muted text-[13px] font-bold">
                       {edu.logo}
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      <h3 className="font-semibold text-sm">{edu.institution}</h3>
-                      <p className="text-xs text-muted-foreground">
+                      <h3 className="font-semibold text-base">{edu.institution}</h3>
+                      <p className="text-[15px] text-muted-foreground">
                         {edu.degree} in <span className="font-medium text-foreground">{edu.field}</span>
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                          <Calendar className="size-3" />
+                        <span className="flex items-center gap-1 text-[13px] text-muted-foreground">
+                          <Calendar className="size-3.5" />
                           {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
                         </span>
                         {edu.gpa && (
-                          <Badge variant="secondary" className="text-[9px] h-4 px-1.5 bg-secondary/60">GPA: {edu.gpa}</Badge>
+                          <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-secondary/60">GPA: {edu.gpa}</Badge>
                         )}
                       </div>
                     </div>
@@ -98,15 +98,15 @@ export function Education() {
                 </div>
 
                 {edu.description && (
-                  <p className="text-xs text-muted-foreground mt-3 leading-relaxed">{edu.description}</p>
+                  <p className="text-[15px] text-muted-foreground mt-3 leading-relaxed">{edu.description}</p>
                 )}
 
                 {edu.activities.length > 0 && (
                   <div className="mt-2.5">
-                    <p className="text-[10px] font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Activities</p>
+                    <p className="text-[13px] font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Activities</p>
                     <div className="flex flex-wrap gap-1.5">
                       {edu.activities.map((act) => (
-                        <Badge key={act} variant="secondary" className="text-[9px] font-normal bg-secondary/60">{act}</Badge>
+                        <Badge key={act} variant="secondary" className="text-xs font-normal bg-secondary/60">{act}</Badge>
                       ))}
                     </div>
                   </div>
@@ -121,45 +121,45 @@ export function Education() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-base">{editingEdu ? "Edit Education" : "Add Education"}</DialogTitle>
-            <DialogDescription className="text-xs">{editingEdu ? "Update education details." : "Add an education entry."}</DialogDescription>
+            <DialogTitle className="text-lg">{editingEdu ? "Edit Education" : "Add Education"}</DialogTitle>
+            <DialogDescription className="text-[15px]">{editingEdu ? "Update education details." : "Add an education entry."}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Institution</Label>
-              <Input defaultValue={editingEdu?.institution} placeholder="e.g. Carnegie Mellon University" className="h-8 text-xs" />
+          <div className="grid gap-4 py-1">
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Institution</Label>
+              <Input defaultValue={editingEdu?.institution} placeholder="e.g. Carnegie Mellon University" className="h-9 text-[15px]" />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Degree</Label>
-                <Input defaultValue={editingEdu?.degree} placeholder="e.g. Bachelor of Science" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Degree</Label>
+                <Input defaultValue={editingEdu?.degree} placeholder="e.g. Bachelor of Science" className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Field of Study</Label>
-                <Input defaultValue={editingEdu?.field} placeholder="e.g. Computer Science" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Field of Study</Label>
+                <Input defaultValue={editingEdu?.field} placeholder="e.g. Computer Science" className="h-9 text-[15px]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Start Date</Label>
-                <Input type="month" defaultValue={editingEdu?.startDate} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Start Date</Label>
+                <Input type="month" defaultValue={editingEdu?.startDate} className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">End Date</Label>
-                <Input type="month" defaultValue={editingEdu?.endDate ?? ""} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">End Date</Label>
+                <Input type="month" defaultValue={editingEdu?.endDate ?? ""} className="h-9 text-[15px]" />
               </div>
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">GPA (optional)</Label>
-              <Input defaultValue={editingEdu?.gpa} placeholder="e.g. 3.8" className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">GPA (optional)</Label>
+              <Input defaultValue={editingEdu?.gpa} placeholder="e.g. 3.8" className="h-9 text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Description</Label>
-              <Textarea defaultValue={editingEdu?.description} placeholder="Describe your studies, thesis, or focus areas..." rows={3} className="text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Description</Label>
+              <Textarea defaultValue={editingEdu?.description} placeholder="Describe your studies, thesis, or focus areas..." rows={3} className="text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Activities (comma-separated)</Label>
-              <Input defaultValue={editingEdu?.activities.join(", ")} placeholder="ACM Chapter, Hackathon Organizer, ..." className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Activities (comma-separated)</Label>
+              <Input defaultValue={editingEdu?.activities.join(", ")} placeholder="ACM Chapter, Hackathon Organizer, ..." className="h-9 text-[15px]" />
             </div>
           </div>
           <DialogFooter>
@@ -175,8 +175,8 @@ export function Education() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Delete Education</DialogTitle>
-            <DialogDescription className="text-xs">Remove <strong>"{deleteDialog?.institution}"</strong>?</DialogDescription>
+            <DialogTitle className="text-lg">Delete Education</DialogTitle>
+            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.institution}"</strong>?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>

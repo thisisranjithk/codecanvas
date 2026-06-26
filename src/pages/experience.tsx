@@ -53,14 +53,14 @@ export function Experience() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-5 p-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Experience</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">{experiences.length} positions</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Experience</h1>
+          <p className="text-[15px] text-muted-foreground mt-0.5">{experiences.length} positions</p>
         </div>
-        <Button size="sm" onClick={openNew} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
+          <Plus className="size-4" />
           Add Experience
         </Button>
       </div>
@@ -70,7 +70,7 @@ export function Experience() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             <Briefcase className="size-5 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">No experience added</p>
+          <p className="font-medium text-base">No experience added</p>
           <Button size="sm" onClick={openNew}>Add your first position</Button>
         </div>
       ) : (
@@ -90,32 +90,32 @@ export function Experience() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-muted text-xs font-bold">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted text-[13px] font-bold">
                           {exp.logo}
                         </div>
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-sm">{exp.role}</span>
+                            <span className="font-semibold text-base">{exp.role}</span>
                             {exp.current && (
-                              <Badge className="text-[9px] h-4 px-1.5 bg-primary/10 text-primary hover:bg-primary/10 border-0">
+                              <Badge className="text-xs h-5 px-1.5 bg-primary/10 text-primary hover:bg-primary/10 border-0">
                                 Current
                               </Badge>
                             )}
                           </div>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-xs font-medium text-muted-foreground">{exp.company}</span>
+                            <span className="text-[15px] font-medium text-muted-foreground">{exp.company}</span>
                             <span className="text-muted-foreground/40">·</span>
-                            <span className={`text-[10px] rounded-md px-1.5 py-0.5 font-medium border ${typeColors[exp.type] ?? "bg-muted text-muted-foreground border-border"}`}>
+                            <span className={`text-[13px] rounded-md px-1.5 py-0.5 font-medium border ${typeColors[exp.type] ?? "bg-muted text-muted-foreground border-border"}`}>
                               {exp.type}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 mt-0.5">
-                            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                              <Calendar className="size-3" />
+                            <span className="flex items-center gap-1 text-[13px] text-muted-foreground">
+                              <Calendar className="size-3.5" />
                               {formatDate(exp.startDate)} — {exp.current ? "Present" : formatDate(exp.endDate)}
                             </span>
-                            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                              <MapPin className="size-3" />
+                            <span className="flex items-center gap-1 text-[13px] text-muted-foreground">
+                              <MapPin className="size-3.5" />
                               {exp.location}
                             </span>
                           </div>
@@ -136,11 +136,11 @@ export function Experience() {
                       </DropdownMenu>
                     </div>
 
-                    <p className="text-xs text-muted-foreground mt-2.5 leading-relaxed">{exp.description}</p>
+                    <p className="text-[15px] text-muted-foreground mt-2.5 leading-relaxed">{exp.description}</p>
 
-                    <div className="flex flex-wrap gap-1 mt-2.5">
+                    <div className="flex flex-wrap gap-1.5 mt-2.5">
                       {exp.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary" className="text-[9px] h-4 px-1.5 font-normal bg-secondary/60">{tech}</Badge>
+                        <Badge key={tech} variant="secondary" className="text-xs h-5 px-1.5 font-normal bg-secondary/60">{tech}</Badge>
                       ))}
                     </div>
                   </CardContent>
@@ -155,25 +155,25 @@ export function Experience() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-base">{editingExp ? "Edit Experience" : "Add Experience"}</DialogTitle>
-            <DialogDescription className="text-xs">{editingExp ? "Update position details." : "Add a work experience entry."}</DialogDescription>
+            <DialogTitle className="text-lg">{editingExp ? "Edit Experience" : "Add Experience"}</DialogTitle>
+            <DialogDescription className="text-[15px]">{editingExp ? "Update position details." : "Add a work experience entry."}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
+          <div className="grid gap-4 py-1">
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Company</Label>
-                <Input defaultValue={editingExp?.company} placeholder="Company name" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Company</Label>
+                <Input defaultValue={editingExp?.company} placeholder="Company name" className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Role / Title</Label>
-                <Input defaultValue={editingExp?.role} placeholder="e.g. Senior Engineer" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Role / Title</Label>
+                <Input defaultValue={editingExp?.role} placeholder="e.g. Senior Engineer" className="h-9 text-[15px]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Type</Label>
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Type</Label>
                 <Select defaultValue={editingExp?.type ?? "Full-time"}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-[15px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Full-time">Full-time</SelectItem>
                     <SelectItem value="Part-time">Part-time</SelectItem>
@@ -183,32 +183,32 @@ export function Experience() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Location</Label>
-                <Input defaultValue={editingExp?.location} placeholder="e.g. Remote" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Location</Label>
+                <Input defaultValue={editingExp?.location} placeholder="e.g. Remote" className="h-9 text-[15px]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Start Date</Label>
-                <Input type="month" defaultValue={editingExp?.startDate} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">Start Date</Label>
+                <Input type="month" defaultValue={editingExp?.startDate} className="h-9 text-[15px]" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">End Date</Label>
-                <Input type="month" defaultValue={editingExp?.endDate ?? ""} disabled={isCurrent} className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-[15px]">End Date</Label>
+                <Input type="month" defaultValue={editingExp?.endDate ?? ""} disabled={isCurrent} className="h-9 text-[15px]" />
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
-              <Label className="text-xs font-medium">Currently working here</Label>
+            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
+              <Label className="text-[15px] font-medium">Currently working here</Label>
               <Switch checked={isCurrent} onCheckedChange={setIsCurrent} />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Description</Label>
-              <Textarea defaultValue={editingExp?.description} placeholder="Describe your role and achievements..." rows={3} className="text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Description</Label>
+              <Textarea defaultValue={editingExp?.description} placeholder="Describe your role and achievements..." rows={3} className="text-[15px]" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Technologies (comma-separated)</Label>
-              <Input defaultValue={editingExp?.technologies.join(", ")} placeholder="React, TypeScript, ..." className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-[15px]">Technologies (comma-separated)</Label>
+              <Input defaultValue={editingExp?.technologies.join(", ")} placeholder="React, TypeScript, ..." className="h-9 text-[15px]" />
             </div>
           </div>
           <DialogFooter>
@@ -224,8 +224,8 @@ export function Experience() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Delete Experience</DialogTitle>
-            <DialogDescription className="text-xs">Remove <strong>"{deleteDialog?.role} at {deleteDialog?.company}"</strong>?</DialogDescription>
+            <DialogTitle className="text-lg">Delete Experience</DialogTitle>
+            <DialogDescription className="text-[15px]">Remove <strong>"{deleteDialog?.role} at {deleteDialog?.company}"</strong>?</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setDeleteDialog(null)}>Cancel</Button>

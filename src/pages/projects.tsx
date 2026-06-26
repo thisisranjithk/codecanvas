@@ -86,17 +86,17 @@ export function Projects() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-5 p-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Projects</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {projects.length} projects · {projects.filter((p) => p.status === "published").length} published
           </p>
         </div>
-        <Button size="sm" onClick={openNew} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
+          <Plus className="size-4" />
           New Project
         </Button>
       </div>
@@ -104,16 +104,16 @@ export function Projects() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-48 max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 pointer-events-none" />
           <Input
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs"
+            className="pl-9 h-9 text-sm"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-32 h-8 text-xs">
+          <SelectTrigger className="w-32 h-9 text-sm">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -124,7 +124,7 @@ export function Projects() {
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-36 h-8 text-xs">
+          <SelectTrigger className="w-36 h-9 text-sm">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -133,8 +133,8 @@ export function Projects() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-32 h-8 text-xs">
-            <ArrowUpDown className="size-3 mr-1 text-muted-foreground/60" />
+          <SelectTrigger className="w-36 h-9 text-sm">
+            <ArrowUpDown className="size-3.5 mr-1 text-muted-foreground/60" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -151,8 +151,8 @@ export function Projects() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             <Code2 className="size-5 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">No projects found</p>
-          <p className="text-xs text-muted-foreground">Try adjusting your search or filters</p>
+          <p className="font-medium text-base">No projects found</p>
+          <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
           <Button size="sm" variant="outline" onClick={() => { setSearch(""); setStatusFilter("all"); setCategoryFilter("all") }}>
             Clear filters
           </Button>
@@ -166,24 +166,24 @@ export function Projects() {
                 project.status === "published" ? "bg-success" :
                 project.status === "draft" ? "bg-warning" : "bg-muted-foreground/30"
               }`} />
-              <CardContent className="p-4 flex flex-col gap-2.5">
+              <CardContent className="p-4 flex flex-col gap-3">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      {project.featured && <Star className="size-3 text-warning fill-warning shrink-0" />}
-                      <span className="font-semibold text-sm leading-tight truncate">{project.title}</span>
+                      {project.featured && <Star className="size-3.5 text-warning fill-warning shrink-0" />}
+                      <span className="font-semibold text-base leading-tight truncate">{project.title}</span>
                     </div>
-                    <span className="text-[11px] text-muted-foreground">{project.category}</span>
+                    <span className="text-xs text-muted-foreground">{project.category}</span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Badge variant="outline" className={`text-[9px] h-4 px-1 ${statusStyles[project.status]}`}>
+                    <Badge variant="outline" className={`text-[11px] h-5 px-1.5 ${statusStyles[project.status]}`}>
                       {project.status}
                     </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreHorizontal className="size-3.5" />
+                        <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreHorizontal className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
@@ -207,29 +207,29 @@ export function Projects() {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 flex-1">{project.description}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">{project.description}</p>
 
                 <div className="flex flex-wrap gap-1">
                   {project.technologies.slice(0, 4).map((tech) => (
-                    <Badge key={tech} variant="secondary" className="text-[9px] h-4 px-1.5 font-normal bg-secondary/60">{tech}</Badge>
+                    <Badge key={tech} variant="secondary" className="text-[11px] h-5 px-1.5 font-normal bg-secondary/60">{tech}</Badge>
                   ))}
                   {project.technologies.length > 4 && (
-                    <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-normal">+{project.technologies.length - 4}</Badge>
+                    <Badge variant="outline" className="text-[11px] h-5 px-1.5 font-normal">+{project.technologies.length - 4}</Badge>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-1.5 border-t border-border/40">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <Eye className="size-3" />
+                <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Eye className="size-3.5" />
                     {formatNumber(project.views)}
                   </div>
                   <div className="flex items-center gap-0.5">
                     {project.githubUrl && (
-                      <Button variant="ghost" size="icon" className="size-6" asChild>
-                        <a href={project.githubUrl} target="_blank" rel="noreferrer"><ExternalLink className="size-3" /></a>
+                      <Button variant="ghost" size="icon" className="size-7" asChild>
+                        <a href={project.githubUrl} target="_blank" rel="noreferrer"><ExternalLink className="size-3.5" /></a>
                       </Button>
                     )}
-                    <span className="text-[9px] text-muted-foreground/60">{formatDateTime(project.updatedAt)}</span>
+                    <span className="text-[11px] text-muted-foreground/60">{formatDateTime(project.updatedAt)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -242,29 +242,29 @@ export function Projects() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base">{editingProject ? "Edit Project" : "New Project"}</DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogTitle className="text-lg">{editingProject ? "Edit Project" : "New Project"}</DialogTitle>
+            <DialogDescription className="text-sm">
               {editingProject ? "Update project details." : "Fill in details to create a new project."}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Title</Label>
-              <Input id="title" defaultValue={editingProject?.title} placeholder="Project title" className="h-8 text-xs" />
+          <div className="grid gap-4 py-1">
+            <div className="grid gap-2">
+              <Label className="text-sm">Title</Label>
+              <Input id="title" defaultValue={editingProject?.title} placeholder="Project title" className="h-9 text-sm" />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Description</Label>
-              <Textarea id="description" defaultValue={editingProject?.description} placeholder="Short description..." rows={3} className="text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-sm">Description</Label>
+              <Textarea id="description" defaultValue={editingProject?.description} placeholder="Short description..." rows={3} className="text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Category</Label>
-                <Input id="category" defaultValue={editingProject?.category} placeholder="e.g. Full Stack" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-sm">Category</Label>
+                <Input id="category" defaultValue={editingProject?.category} placeholder="e.g. Full Stack" className="h-9 text-sm" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Status</Label>
+              <div className="grid gap-2">
+                <Label className="text-sm">Status</Label>
                 <Select defaultValue={editingProject?.status ?? "draft"}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="published">Published</SelectItem>
@@ -273,24 +273,24 @@ export function Projects() {
                 </Select>
               </div>
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Technologies (comma-separated)</Label>
-              <Input id="technologies" defaultValue={editingProject?.technologies.join(", ")} placeholder="React, TypeScript, ..." className="h-8 text-xs" />
+            <div className="grid gap-2">
+              <Label className="text-sm">Technologies (comma-separated)</Label>
+              <Input id="technologies" defaultValue={editingProject?.technologies.join(", ")} placeholder="React, TypeScript, ..." className="h-9 text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label className="text-xs">Live URL</Label>
-                <Input id="liveUrl" defaultValue={editingProject?.liveUrl} placeholder="https://" className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-sm">Live URL</Label>
+                <Input id="liveUrl" defaultValue={editingProject?.liveUrl} placeholder="https://" className="h-9 text-sm" />
               </div>
-              <div className="grid gap-1.5">
-                <Label className="text-xs">GitHub URL</Label>
-                <Input id="githubUrl" defaultValue={editingProject?.githubUrl} placeholder="https://github.com/..." className="h-8 text-xs" />
+              <div className="grid gap-2">
+                <Label className="text-sm">GitHub URL</Label>
+                <Input id="githubUrl" defaultValue={editingProject?.githubUrl} placeholder="https://github.com/..." className="h-9 text-sm" />
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-lg border border-border/60 px-4 py-3">
               <div>
-                <Label htmlFor="featured" className="text-xs font-medium">Featured Project</Label>
-                <p className="text-[10px] text-muted-foreground">Show prominently on your portfolio</p>
+                <Label htmlFor="featured" className="text-sm font-medium">Featured Project</Label>
+                <p className="text-xs text-muted-foreground">Show prominently on your portfolio</p>
               </div>
               <Switch id="featured" defaultChecked={editingProject?.featured} />
             </div>
@@ -308,8 +308,8 @@ export function Projects() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Delete Project</DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogTitle className="text-lg">Delete Project</DialogTitle>
+            <DialogDescription className="text-sm">
               Delete <strong>"{deleteDialog?.title}"</strong>? This cannot be undone.
             </DialogDescription>
           </DialogHeader>

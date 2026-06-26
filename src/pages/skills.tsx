@@ -137,17 +137,17 @@ export function Skills() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-5 animate-fade-in">
+    <div className="flex flex-col gap-5 p-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Skills</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             {skills.length} skills across {categories.length} categories
           </p>
         </div>
-        <Button size="sm" onClick={openNew} className="h-8 gap-1.5">
-          <Plus className="size-3.5" />
+        <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
+          <Plus className="size-4" />
           Add Skill
         </Button>
       </div>
@@ -155,16 +155,16 @@ export function Skills() {
       {/* Filters */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1 max-w-64">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 pointer-events-none" />
           <Input
             placeholder="Search skills..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs"
+            className="pl-9 h-9 text-sm"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-40 h-8 text-xs">
+          <SelectTrigger className="w-44 h-9 text-sm">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
@@ -177,7 +177,7 @@ export function Skills() {
       </div>
 
       {/* Category Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
         {categories.map((cat) => {
           const catSkills = skills.filter((s) => s.category === cat)
           const avg = Math.round(catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length)
@@ -190,7 +190,7 @@ export function Skills() {
               key={cat}
               onClick={() => setCategoryFilter(isActive ? "all" : cat)}
               className={cn(
-                "flex flex-col gap-2 rounded-xl border p-3 text-left transition-all duration-150",
+                "flex flex-col gap-2 rounded-xl border p-3.5 text-left transition-all duration-150",
                 "hover:shadow-sm hover:-translate-y-px",
                 isActive
                   ? "border-primary/30 bg-primary/5 ring-1 ring-primary/20"
@@ -198,13 +198,13 @@ export function Skills() {
               )}
             >
               <div className="flex items-center justify-between">
-                <div className={cn("flex size-8 items-center justify-center rounded-lg", meta?.bg, meta?.color)}>
+                <div className={cn("flex size-9 items-center justify-center rounded-lg", meta?.bg, meta?.color)}>
                   <Icon className="size-4" />
                 </div>
-                <span className={cn("text-lg font-bold", meta?.color)}>{catSkills.length}</span>
+                <span className={cn("text-xl font-bold", meta?.color)}>{catSkills.length}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[11px] font-medium text-foreground">{cat}</span>
+                <span className="text-sm font-medium text-foreground">{cat}</span>
                 <div className="flex items-center gap-1.5">
                   <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
                     <div
@@ -212,7 +212,7 @@ export function Skills() {
                       style={{ width: `${avg}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-muted-foreground tabular-nums">{avg}%</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">{avg}%</span>
                 </div>
               </div>
             </button>
@@ -226,7 +226,7 @@ export function Skills() {
           <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             <Code2 className="size-5 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">No skills found</p>
+          <p className="font-medium text-base">No skills found</p>
           <Button size="sm" variant="outline" onClick={() => { setSearch(""); setCategoryFilter("all") }}>
             Clear filters
           </Button>
@@ -246,16 +246,16 @@ export function Skills() {
                   className="flex items-center gap-2 group"
                 >
                   {isCollapsed ? (
-                    <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
                   ) : (
-                    <ChevronDown className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+                    <ChevronDown className="size-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
                   )}
-                  <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                     {cat}
                   </h2>
-                  <span className="text-[10px] text-muted-foreground/50">({catSkills.length})</span>
+                  <span className="text-xs text-muted-foreground/50">({catSkills.length})</span>
                   <div className="ml-auto flex items-center gap-1.5">
-                    <span className="text-[10px] text-muted-foreground/60">Avg {avg}%</span>
+                    <span className="text-xs text-muted-foreground/60">Avg {avg}%</span>
                     <div className="h-1 w-12 rounded-full bg-muted overflow-hidden">
                       <div
                         className={cn("h-full rounded-full", meta?.bar)}
@@ -267,7 +267,7 @@ export function Skills() {
 
                 {/* Skill Cards */}
                 {!isCollapsed && (
-                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 pl-5">
+                  <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 pl-6">
                     {catSkills.map((skill) => (
                       <Card
                         key={skill.id}
@@ -276,23 +276,23 @@ export function Skills() {
                           "hover:shadow-md hover:-translate-y-0.5 hover:border-border"
                         )}
                       >
-                        <CardContent className="p-3 flex flex-col gap-2">
+                        <CardContent className="p-3.5 flex flex-col gap-2.5">
                           {/* Top row: icon + name + menu */}
                           <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className={cn("flex size-7 items-center justify-center rounded-md shrink-0", meta?.bg, meta?.color)}>
-                                <Code2 className="size-3.5" />
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={cn("flex size-8 items-center justify-center rounded-md shrink-0", meta?.bg, meta?.color)}>
+                                <Code2 className="size-4" />
                               </div>
-                              <span className="text-sm font-semibold truncate">{skill.name}</span>
+                              <span className="text-base font-semibold truncate">{skill.name}</span>
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="size-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1"
+                                  className="size-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1"
                                 >
-                                  <MoreHorizontal className="size-3.5 text-muted-foreground" />
+                                  <MoreHorizontal className="size-4 text-muted-foreground" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-36">
@@ -313,8 +313,8 @@ export function Skills() {
                           {/* Proficiency bar */}
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-muted-foreground font-medium">Proficiency</span>
-                              <span className="text-[11px] font-semibold tabular-nums">{skill.proficiency}%</span>
+                              <span className="text-xs text-muted-foreground font-medium">Proficiency</span>
+                              <span className="text-sm font-semibold tabular-nums">{skill.proficiency}%</span>
                             </div>
                             <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                               <div
@@ -326,12 +326,12 @@ export function Skills() {
 
                           {/* Bottom row: years + level badge */}
                           <div className="flex items-center justify-between pt-0.5">
-                            <span className="text-[10px] text-muted-foreground">
+                            <span className="text-xs text-muted-foreground">
                               {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? "year" : "years"} exp.
                             </span>
                             <Badge
                               variant="outline"
-                              className={cn("text-[9px] h-4 px-1.5 font-medium", getProficiencyBadgeClass(skill.proficiency))}
+                              className={cn("text-[11px] h-5 px-1.5 font-medium", getProficiencyBadgeClass(skill.proficiency))}
                             >
                               {getProficiencyLabel(skill.proficiency)}
                             </Badge>
@@ -351,26 +351,26 @@ export function Skills() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base">
+            <DialogTitle className="text-lg">
               {editingSkill ? "Edit Skill" : "Add Skill"}
             </DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogDescription className="text-sm">
               {editingSkill ? "Update skill details." : "Add a new skill to your portfolio."}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-3 py-1">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Skill Name</Label>
+          <div className="grid gap-4 py-1">
+            <div className="grid gap-2">
+              <Label className="text-sm">Skill Name</Label>
               <Input
                 defaultValue={editingSkill?.name}
                 placeholder="e.g. TypeScript"
-                className="h-8 text-xs"
+                className="h-9 text-sm"
               />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Category</Label>
+            <div className="grid gap-2">
+              <Label className="text-sm">Category</Label>
               <Select defaultValue={editingSkill?.category ?? "Frontend"}>
-                <SelectTrigger className="h-8 text-xs">
+                <SelectTrigger className="h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -383,8 +383,8 @@ export function Skills() {
             </div>
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs">Proficiency</Label>
-                <span className="text-xs font-medium tabular-nums">
+                <Label className="text-sm">Proficiency</Label>
+                <span className="text-sm font-medium tabular-nums">
                   {proficiency}% — {getProficiencyLabel(proficiency)}
                 </span>
               </div>
@@ -396,15 +396,15 @@ export function Skills() {
                 step={1}
               />
             </div>
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Years of Experience</Label>
+            <div className="grid gap-2">
+              <Label className="text-sm">Years of Experience</Label>
               <Input
                 type="number"
                 defaultValue={editingSkill?.yearsOfExperience}
                 placeholder="e.g. 3"
                 min={0}
                 max={30}
-                className="h-8 text-xs"
+                className="h-9 text-sm"
               />
             </div>
           </div>
@@ -429,8 +429,8 @@ export function Skills() {
       <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base">Remove Skill</DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogTitle className="text-lg">Remove Skill</DialogTitle>
+            <DialogDescription className="text-sm">
               Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?
             </DialogDescription>
           </DialogHeader>
