@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Plus, Search, Pencil, Trash2, MoreHorizontal, Code2,
   ChevronDown, ChevronRight, Terminal, Layers, Server,
@@ -56,7 +56,6 @@ export function Skills() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null)
-  const [proficiency, setProficiency] = useState(80)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
   const categories = useMemo(() => Array.from(new Set(mockSkills.map((s) => s.category))), [])
@@ -85,13 +84,11 @@ export function Skills() {
 
   function openEdit(skill: Skill) {
     setEditingSkill(skill)
-    setProficiency(skill.proficiency)
     setDialogOpen(true)
   }
 
   function openNew() {
     setEditingSkill(null)
-    setProficiency(80)
     setDialogOpen(true)
   }
 
@@ -260,82 +257,12 @@ export function Skills() {
       )}
 
       {/* Edit/New Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg">
-              {editingSkill ? "Edit Skill" : "Add Skill"}
-            </DialogTitle>
-            <DialogDescription className="text-sm">
-              {editingSkill ? "Update skill details." : "Add a new skill to your portfolio."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-1">
-            <div className="grid gap-2">
-              <Label className="text-sm">Skill Name</Label>
-              <Input
-                defaultValue={editingSkill?.name}
-                placeholder="e.g. TypeScript"
-                className="h-9 text-sm"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-sm">Category</Label>
-              <Select defaultValue={editingSkill?.category ?? "Frontend"}>
-                <SelectTrigger className="h-9 text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Proficiency</Label>
-                <span className="text-sm font-medium tabular-nums">
-                  {proficiency}% — {getProficiencyLabel(proficiency)}
-                </span>
-              </div>
-              <Slider
-                value={[proficiency]}
-                onValueChange={([v]) => setProficiency(v)}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-sm">Years of Experience</Label>
-              <Input
-                type="number"
-                defaultValue={editingSkill?.yearsOfExperience}
-                placeholder="e.g. 3"
-                min={0}
-                max={30}
-                className="h-9 text-sm"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setDialogOpen(false)
-                toast.success(editingSkill ? "Skill updated" : "Skill added")
-              }}
-            >
-              {editingSkill ? "Save Changes" : "Add Skill"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SkillDialog
+        skill={editingSkill}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        categories={categories}
+      />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -346,5 +273,104 @@ export function Skills() {
         description={<>Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?</>}
       />
     </div>
+  )
+}
+
+function SkillDialog({
+  skill,
+  open,
+  onOpenChange,
+  categories,
+}: {
+  skill: Skill | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  categories: string[]
+}) {
+  const [proficiency, setProficiency] = useState(80)
+
+  useEffect(() => {
+    if (open) {
+      setProficiency(skill?.proficiency ?? 80)
+    }
+  }, [open, skill])
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-lg">
+            {skill ? "Edit Skill" : "Add Skill"}
+          </DialogTitle>
+          <DialogDescription className="text-sm">
+            {skill ? "Update skill details." : "Add a new skill to your portfolio."}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-1">
+          <div className="grid gap-2">
+            <Label className="text-sm">Skill Name</Label>
+            <Input
+              defaultValue={skill?.name}
+              placeholder="e.g. TypeScript"
+              className="h-9 text-sm"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label className="text-sm">Category</Label>
+            <Select defaultValue={skill?.category ?? "Frontend"}>
+              <SelectTrigger className="h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm">Proficiency</Label>
+              <span className="text-sm font-medium tabular-nums">
+                {proficiency}% — {getProficiencyLabel(proficiency)}
+              </span>
+            </div>
+            <Slider
+              value={[proficiency]}
+              onValueChange={([v]) => setProficiency(v)}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label className="text-sm">Years of Experience</Label>
+            <Input
+              type="number"
+              defaultValue={skill?.yearsOfExperience}
+              placeholder="e.g. 3"
+              min={0}
+              max={30}
+              className="h-9 text-sm"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              onOpenChange(false)
+              toast.success(skill ? "Skill updated" : "Skill added")
+            }}
+          >
+            {skill ? "Save Changes" : "Add Skill"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
