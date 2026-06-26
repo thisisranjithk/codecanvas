@@ -1,6 +1,6 @@
 import { useState } from "react"
 import {
-  Plus, Search, ArrowUpDown, Eye, MoreHorizontal,
+  Plus, Search, Eye, MoreHorizontal,
   Pencil, Trash2, Star, BookOpen, Clock,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,9 +11,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
@@ -59,7 +56,6 @@ function BlogImagePlaceholder({ id }: { id: string }) {
 export function Blog() {
   const [blogs, setBlogs] = useState(mockBlogs)
   const [search, setSearch] = useState("")
-  const [sortBy, setSortBy] = useState("updatedAt")
   const [activeTab, setActiveTab] = useState("all")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null)
@@ -79,8 +75,6 @@ export function Blog() {
       return matchSearch && matchTab
     })
     .sort((a, b) => {
-      if (sortBy === "views") return b.views - a.views
-      if (sortBy === "title") return a.title.localeCompare(b.title)
       return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
     })
 
@@ -151,19 +145,6 @@ export function Blog() {
               className="pl-9 h-10 text-[13px] sm:w-64 bg-muted/20 border-border/60"
             />
           </div>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-40 h-10 text-[13px] bg-muted/20 border-border/60">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="size-3.5 text-muted-foreground" />
-                <SelectValue />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="updatedAt">Last Updated</SelectItem>
-              <SelectItem value="views">Most Views</SelectItem>
-              <SelectItem value="title">Title</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 

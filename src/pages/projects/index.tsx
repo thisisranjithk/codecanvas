@@ -1,6 +1,6 @@
 import { useState } from "react"
 import {
-  Plus, Search, ArrowUpDown, Eye, ExternalLink, MoreHorizontal,
+  Plus, Search, Eye, ExternalLink, MoreHorizontal,
   Pencil, Trash2, Star, Archive, Code2,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -34,7 +34,6 @@ export function Projects() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [categoryFilter, setCategoryFilter] = useState("all")
-  const [sortBy, setSortBy] = useState("updatedAt")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState<Project | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -52,8 +51,6 @@ export function Projects() {
       return matchSearch && matchStatus && matchCategory
     })
     .sort((a, b) => {
-      if (sortBy === "views") return b.views - a.views
-      if (sortBy === "title") return a.title.localeCompare(b.title)
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     })
 
@@ -123,17 +120,6 @@ export function Projects() {
             {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-36 h-9 text-sm">
-            <ArrowUpDown className="size-3.5 mr-1 text-muted-foreground/60" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="updatedAt">Last Updated</SelectItem>
-            <SelectItem value="views">Most Views</SelectItem>
-            <SelectItem value="title">Title</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Grid */}
@@ -147,12 +133,11 @@ export function Projects() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((project) => (
-            <Card key={project.id} className="card-hover border-border/60 overflow-hidden group">
+            <Card key={project.id} className="card-hover border-border/60 overflow-hidden group py-0">
               {/* Color bar */}
-              <div className={`h-0.5 w-full ${
-                project.status === "published" ? "bg-success" :
-                project.status === "draft" ? "bg-warning" : "bg-muted-foreground/30"
-              }`} />
+              <div className={`h-0.5 w-full ${project.status === "published" ? "bg-success" :
+                  project.status === "draft" ? "bg-warning" : "bg-muted-foreground/30"
+                }`} />
               <CardContent className="p-4 flex flex-col gap-3">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2">
