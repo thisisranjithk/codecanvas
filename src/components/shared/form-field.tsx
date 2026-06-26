@@ -16,14 +16,17 @@ import { Slider } from "@/components/ui/slider"
 import { MonthPicker } from "@/components/ui/month-picker"
 import { cn } from "@/lib/utils"
 
-// ── Error Message ──
-
-function FormErrorMessage({ error }: { error?: FieldError }) {
-  if (!error?.message) return null
+function FormErrorMessage({ error, description }: { error?: FieldError; description?: string }) {
   return (
-    <p className="text-[13px] text-destructive mt-1 animate-in fade-in-0 slide-in-from-top-1 duration-200">
-      {error.message}
-    </p>
+    <div className="min-h-[20px] flex flex-col justify-start">
+      {error?.message ? (
+        <p className="text-[13px] text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-200">
+          {error.message}
+        </p>
+      ) : description ? (
+        <p className="text-[13px] text-muted-foreground">{description}</p>
+      ) : null}
+    </div>
   )
 }
 
@@ -55,10 +58,7 @@ function FormFieldWrapper({
         {required && <span className="text-destructive ml-0.5">*</span>}
       </Label>
       {children}
-      {description && !error && (
-        <p className="text-[13px] text-muted-foreground">{description}</p>
-      )}
-      <FormErrorMessage error={error} />
+      <FormErrorMessage error={error} description={description} />
     </div>
   )
 }
@@ -110,7 +110,7 @@ function FormInput({
         min={min}
         max={max}
         aria-invalid={!!error}
-        className={cn("h-9 text-sm", error && "border-destructive/50 focus-visible:ring-destructive/30", inputClassName)}
+        className={cn("h-9 text-sm", inputClassName)}
       />
     </FormFieldWrapper>
   )
@@ -157,7 +157,7 @@ function FormTextarea({
         placeholder={placeholder}
         rows={rows}
         aria-invalid={!!error}
-        className={cn("text-sm", error && "border-destructive/50 focus-visible:ring-destructive/30", textareaClassName)}
+        className={cn("text-sm", textareaClassName)}
       />
     </FormFieldWrapper>
   )
@@ -207,7 +207,7 @@ function FormSelect<T extends FieldValues>({
         render={({ field }) => (
           <Select value={field.value} onValueChange={field.onChange}>
             <SelectTrigger
-              className={cn("h-9 text-sm", error && "border-destructive/50", selectClassName)}
+              className={cn("h-9 text-sm", selectClassName)}
               aria-invalid={!!error}
             >
               <SelectValue placeholder={placeholder} />
