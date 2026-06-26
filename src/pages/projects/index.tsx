@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
   Plus, Search, Eye, ExternalLink, MoreHorizontal,
   Pencil, Trash2, Star, Archive, Code2,
@@ -38,21 +38,23 @@ export function Projects() {
   const [deleteDialog, setDeleteDialog] = useState<Project | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
 
-  const categories = Array.from(new Set(mockProjects.map((p) => p.category)))
+  const categories = useMemo(() => Array.from(new Set(mockProjects.map((p) => p.category))), [])
 
-  const filtered = projects
-    .filter((p) => {
-      const matchSearch =
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.description.toLowerCase().includes(search.toLowerCase()) ||
-        p.technologies.some((t) => t.toLowerCase().includes(search.toLowerCase()))
-      const matchStatus = statusFilter === "all" || p.status === statusFilter
-      const matchCategory = categoryFilter === "all" || p.category === categoryFilter
-      return matchSearch && matchStatus && matchCategory
-    })
-    .sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    })
+  const filtered = useMemo(() => {
+    return projects
+      .filter((p) => {
+        const matchSearch =
+          p.title.toLowerCase().includes(search.toLowerCase()) ||
+          p.description.toLowerCase().includes(search.toLowerCase()) ||
+          p.technologies.some((t) => t.toLowerCase().includes(search.toLowerCase()))
+        const matchStatus = statusFilter === "all" || p.status === statusFilter
+        const matchCategory = categoryFilter === "all" || p.category === categoryFilter
+        return matchSearch && matchStatus && matchCategory
+      })
+      .sort((a, b) => {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      })
+  }, [projects, search, statusFilter, categoryFilter])
 
   function handleDelete(project: Project) {
     setProjects((prev) => prev.filter((p) => p.id !== project.id))

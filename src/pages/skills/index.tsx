@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
   Plus, Search, Pencil, Trash2, MoreHorizontal, Code2,
   ChevronDown, ChevronRight, Terminal, Layers, Server,
@@ -59,19 +59,23 @@ export function Skills() {
   const [proficiency, setProficiency] = useState(80)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
-  const categories = Array.from(new Set(mockSkills.map((s) => s.category)))
+  const categories = useMemo(() => Array.from(new Set(mockSkills.map((s) => s.category))), [])
 
-  const filtered = skills.filter((s) => {
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase())
-    const matchCat = categoryFilter === "all" || s.category === categoryFilter
-    return matchSearch && matchCat
-  })
+  const filtered = useMemo(() => {
+    return skills.filter((s) => {
+      const matchSearch = s.name.toLowerCase().includes(search.toLowerCase())
+      const matchCat = categoryFilter === "all" || s.category === categoryFilter
+      return matchSearch && matchCat
+    })
+  }, [skills, search, categoryFilter])
 
-  const grouped = categories.reduce<Record<string, Skill[]>>((acc, cat) => {
-    const inCategory = filtered.filter((s) => s.category === cat)
-    if (inCategory.length > 0) acc[cat] = inCategory
-    return acc
-  }, {})
+  const grouped = useMemo(() => {
+    return categories.reduce<Record<string, Skill[]>>((acc, cat) => {
+      const inCategory = filtered.filter((s) => s.category === cat)
+      if (inCategory.length > 0) acc[cat] = inCategory
+      return acc
+    }, {})
+  }, [categories, filtered])
 
   function handleDelete(skill: Skill) {
     setSkills((prev) => prev.filter((s) => s.id !== skill.id))

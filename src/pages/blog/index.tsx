@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
   Plus, Search, Eye, MoreHorizontal,
   Pencil, Trash2, Star, BookOpen, Clock,
@@ -61,22 +61,24 @@ export function Blog() {
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<Blog | null>(null)
 
-  const filtered = blogs
-    .filter((b) => {
-      const matchSearch =
-        b.title.toLowerCase().includes(search.toLowerCase()) ||
-        b.excerpt.toLowerCase().includes(search.toLowerCase()) ||
-        b.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
-      const matchTab =
-        activeTab === "all" ||
-        (activeTab === "published" && b.status === "published") ||
-        (activeTab === "draft" && b.status === "draft") ||
-        (activeTab === "featured" && b.featured)
-      return matchSearch && matchTab
-    })
-    .sort((a, b) => {
-      return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
-    })
+  const filtered = useMemo(() => {
+    return blogs
+      .filter((b) => {
+        const matchSearch =
+          b.title.toLowerCase().includes(search.toLowerCase()) ||
+          b.excerpt.toLowerCase().includes(search.toLowerCase()) ||
+          b.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
+        const matchTab =
+          activeTab === "all" ||
+          (activeTab === "published" && b.status === "published") ||
+          (activeTab === "draft" && b.status === "draft") ||
+          (activeTab === "featured" && b.featured)
+        return matchSearch && matchTab
+      })
+      .sort((a, b) => {
+        return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+      })
+  }, [blogs, search, activeTab])
 
   function handleDelete(blog: Blog) {
     setBlogs((prev) => prev.filter((b) => b.id !== blog.id))
