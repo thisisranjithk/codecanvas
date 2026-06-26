@@ -1,17 +1,15 @@
-import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { TopNav } from "@/components/top-nav"
-import { Toaster } from "@/components/ui/sonner"
-
-import { Dashboard } from "@/pages/dashboard"
-import { Projects } from "@/pages/projects"
-import { Skills } from "@/pages/skills"
-import { Experience } from "@/pages/experience"
-import { Education } from "@/pages/education"
-import { Certifications } from "@/pages/certifications"
-import { Blog } from "@/pages/blog"
-import { Settings } from "@/pages/settings"
+import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router"
+import { RootLayout } from "@/components/layout/root-layout"
+import {
+  Dashboard,
+  Projects,
+  Skills,
+  Experience,
+  Education,
+  Certifications,
+  Blog,
+  Settings,
+} from "@/pages"
 
 // Type for our route's static data
 export type RouteStaticData = {
@@ -19,18 +17,7 @@ export type RouteStaticData = {
 }
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <TopNav />
-        <div className="flex-1 overflow-auto">
-          <Outlet />
-        </div>
-      </SidebarInset>
-      <Toaster position="bottom-right" richColors />
-    </SidebarProvider>
-  ),
+  component: RootLayout,
 })
 
 const indexRoute = createRoute({

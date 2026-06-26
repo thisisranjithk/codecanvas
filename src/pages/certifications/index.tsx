@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { mockCertifications } from "@/data/mock"
+import { mockCertifications } from "@/data/certifications"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 

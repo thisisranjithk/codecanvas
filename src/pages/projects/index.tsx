@@ -19,7 +19,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { mockProjects } from "@/data/mock"
+import { mockProjects } from "@/data/projects"
 import { formatDateTime, formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
 

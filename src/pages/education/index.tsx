@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { mockEducation } from "@/data/mock"
+import { mockEducation } from "@/data/education"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 

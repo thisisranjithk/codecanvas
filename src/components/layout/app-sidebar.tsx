@@ -1,14 +1,4 @@
-import {
-  LayoutDashboard,
-  FolderKanban,
-  Zap,
-  Briefcase,
-  GraduationCap,
-  Award,
-  BookOpen,
-  Settings,
-  Layers,
-} from "lucide-react"
+import { Settings } from "lucide-react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import {
   Sidebar,
@@ -24,17 +14,9 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { mockUser } from "@/data/mock"
-
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { label: "Projects", icon: FolderKanban, path: "/projects" },
-  { label: "Skills", icon: Zap, path: "/skills" },
-  { label: "Experience", icon: Briefcase, path: "/experience" },
-  { label: "Education", icon: GraduationCap, path: "/education" },
-  { label: "Certifications", icon: Award, path: "/certifications" },
-  { label: "Blog", icon: BookOpen, path: "/blog" },
-]
+import { Layers } from "lucide-react"
+import { mockUser } from "@/data/user"
+import { navItems } from "@/config/navigation"
 
 export function AppSidebar() {
   const routerState = useRouterState()

@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { mockSkills } from "@/data/mock"
+import { mockSkills } from "@/data/skills"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 

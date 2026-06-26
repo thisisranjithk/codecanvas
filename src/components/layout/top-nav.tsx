@@ -3,7 +3,7 @@ import { Link, useMatches } from "@tanstack/react-router"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ModeToggle } from "@/components/mode-toggle"
+import { ModeToggle } from "@/components/shared/mode-toggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { mockUser } from "@/data/mock"
+import { mockUser } from "@/data/user"
 
 export function TopNav() {
   const matches = useMatches()

@@ -7,14 +7,12 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  mockStats,
-  mockProjects,
-  mockBlogs,
-  mockExperience,
-  mockCertifications,
-  mockUser,
-} from "@/data/mock"
+import { mockStats } from "@/data/stats"
+import { mockProjects } from "@/data/projects"
+import { mockBlogs } from "@/data/blogs"
+import { mockExperience } from "@/data/experience"
+import { mockCertifications } from "@/data/certifications"
+import { mockUser } from "@/data/user"
 
 export function Dashboard() {
   const navigate = useNavigate()

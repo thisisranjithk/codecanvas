@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { mockExperience } from "@/data/mock"
+import { mockExperience } from "@/data/experience"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 

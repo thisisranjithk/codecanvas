@@ -20,7 +20,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { mockBlogs } from "@/data/mock"
+import { mockBlogs } from "@/data/blogs"
 import { formatNumber } from "@/lib/utils"
 import { toast } from "sonner"
 
