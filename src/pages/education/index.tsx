@@ -71,7 +71,7 @@ export function Education() {
           <Button size="sm" onClick={openNew}>Add education</Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {educations.map((edu) => (
             <Card key={edu.id} className="card-hover border-border/60 py-0 overflow-hidden">
               <CardContent className="p-0 flex flex-col md:flex-row">

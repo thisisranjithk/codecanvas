@@ -62,7 +62,7 @@ export function Experience() {
           action={{ label: "Add your first position", onClick: openNew }}
         />
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {experiences.map((exp) => (
             <Card key={exp.id} className="border-border/60 card-hover py-0">
               <CardContent className="p-5 md:p-6 flex flex-col">
