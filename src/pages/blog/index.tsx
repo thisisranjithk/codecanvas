@@ -318,7 +318,7 @@ function BlogDialog({
           <DialogDescription className="text-[15px]">{blog ? "Update post details." : "Create a new blog post."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-2">
+          <div className="grid gap-2 py-2">
             <FormInput
               label="Title"
               registration={register("title")}

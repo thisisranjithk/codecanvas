@@ -222,7 +222,7 @@ function CertificationDialog({
           <DialogDescription className="text-[15px]">{certification ? "Update certification details." : "Add a new certification."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-1">
+          <div className="grid gap-2 py-1">
             <FormInput
               label="Certification Name"
               registration={register("name")}

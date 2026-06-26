@@ -139,7 +139,7 @@ export function Projects() {
             <Card key={project.id} className="card-hover border-border/60 overflow-hidden group py-0">
               {/* Color bar */}
               <div className={`h-0.5 w-full ${project.status === "published" ? "bg-success" :
-                  project.status === "draft" ? "bg-warning" : "bg-muted-foreground/30"
+                project.status === "draft" ? "bg-warning" : "bg-muted-foreground/30"
                 }`} />
               <CardContent className="p-4 flex flex-col gap-3">
                 {/* Header */}
@@ -289,7 +289,7 @@ function ProjectDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-1">
+          <div className="grid gap-2 py-1">
             <FormInput
               label="Title"
               registration={register("title")}

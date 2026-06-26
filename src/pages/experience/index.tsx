@@ -259,27 +259,26 @@ function ExperienceDialog({
           <DialogDescription className="text-[15px]">{experience ? "Update position details." : "Add a work experience entry."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-2">
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                label="Company"
-                registration={register("company")}
-                error={errors.company}
-                placeholder="TechCorp Pvt. Ltd."
-                required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
-              />
-              <FormInput
-                label="Role / Title"
-                registration={register("role")}
-                error={errors.role}
-                placeholder="Frontend Developer"
-                required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
-              />
-            </div>
+          <div className="grid gap-2 py-2">
+            <FormInput
+              label="Company"
+              registration={register("company")}
+              error={errors.company}
+              placeholder="TechCorp Pvt. Ltd."
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+            <FormInput
+              label="Role / Title"
+              registration={register("role")}
+              error={errors.role}
+              placeholder="Frontend Developer"
+              required
+              labelClassName="text-[15px]"
+              inputClassName="h-9 text-[15px]"
+            />
+
 
             <div className="grid grid-cols-2 gap-4">
               <FormSelect
@@ -290,7 +289,7 @@ function ExperienceDialog({
                 options={employmentTypes}
                 required
                 labelClassName="text-[15px]"
-                selectClassName="h-9 text-[15px]"
+                selectClassName="h-9 text-[15px] w-full"
               />
               <FormInput
                 label="Location"
@@ -299,9 +298,10 @@ function ExperienceDialog({
                 placeholder="Bengaluru, India"
                 required
                 labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                inputClassName="h-9 text-[15px] w-full"
               />
             </div>
+
 
             <div className="grid grid-cols-2 gap-4">
               <FormMonthPicker
@@ -370,6 +370,6 @@ function ExperienceDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   )
 }
