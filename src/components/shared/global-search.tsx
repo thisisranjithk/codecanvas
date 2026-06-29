@@ -9,16 +9,8 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  Code2, 
-  History, 
-  GraduationCap, 
-  Award, 
-  FileText, 
-  Settings 
-} from "lucide-react"
+import { Settings } from "lucide-react"
+import { navItems } from "@/config/navigation"
 import { useSearch } from "@/hooks/use-search"
 
 export function GlobalSearch() {
@@ -36,34 +28,15 @@ export function GlobalSearch() {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/" }))}>
-            <LayoutDashboard className="mr-2 size-4" />
-            <span>Dashboard</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/projects" }))}>
-            <Briefcase className="mr-2 size-4" />
-            <span>Projects</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/skills" }))}>
-            <Code2 className="mr-2 size-4" />
-            <span>Skills</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/experience" }))}>
-            <History className="mr-2 size-4" />
-            <span>Experience</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/education" }))}>
-            <GraduationCap className="mr-2 size-4" />
-            <span>Education</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/certifications" }))}>
-            <Award className="mr-2 size-4" />
-            <span>Certifications</span>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/blog" }))}>
-            <FileText className="mr-2 size-4" />
-            <span>Blog</span>
-          </CommandItem>
+          {navItems.map((item) => (
+            <CommandItem 
+              key={item.path} 
+              onSelect={() => runCommand(() => navigate({ to: item.path as any }))}
+            >
+              <item.icon className="mr-2 size-4" />
+              <span>{item.label}</span>
+            </CommandItem>
+          ))}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Settings">
