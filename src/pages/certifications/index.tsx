@@ -45,67 +45,6 @@ export function Certifications() {
   const activeCerts = certs.filter((c) => c.status === "active")
   const expiredCerts = certs.filter((c) => c.status === "expired")
 
-  function CertCard({ cert }: { cert: Certification }) {
-    const isExpired = cert.status === "expired"
-    return (
-      <Card className={`card-hover border-border/60 group ${isExpired ? "opacity-60" : ""}`}>
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted text-[13px] font-bold">
-                {cert.logo}
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-base leading-tight">{cert.name}</span>
-                  {isExpired ? (
-                    <Badge variant="outline" className="text-xs h-5 px-1.5 text-destructive border-destructive/20 bg-destructive/5">
-                      <AlertCircle className="size-3 mr-0.5" />Expired
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-xs h-5 px-1.5 text-success border-success/20 bg-success/5">
-                      Active
-                    </Badge>
-                  )}
-                </div>
-                <span className="text-[15px] text-muted-foreground">{cert.issuer}</span>
-                <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                  <span className="text-[13px] text-muted-foreground">Issued: {formatDate(cert.issueDate)}</span>
-                  {cert.expiryDate && (
-                    <span className={`text-[13px] ${isExpired ? "text-destructive" : "text-muted-foreground"}`}>
-                      Expires: {formatDate(cert.expiryDate)}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[13px] text-muted-foreground font-mono">ID: {cert.credentialId}</span>
-                  {cert.credentialUrl && (
-                    <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-[13px] text-primary hover:underline">
-                      <ExternalLink className="size-3" />Verify
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => openEdit(cert)}><Pencil className="size-3.5" />Edit</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(cert)}><Trash2 className="size-3.5" />Delete</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-5 p-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -135,7 +74,9 @@ export function Certifications() {
             <div>
               <h2 className="text-[15px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Active ({activeCerts.length})</h2>
               <div className="grid gap-2.5 md:grid-cols-2">
-                {activeCerts.map((cert) => <CertCard key={cert.id} cert={cert} />)}
+                {activeCerts.map((cert) => (
+                  <CertCard key={cert.id} cert={cert} onEdit={openEdit} onDelete={setDeleteDialog} />
+                ))}
               </div>
             </div>
           )}
@@ -143,7 +84,9 @@ export function Certifications() {
             <div>
               <h2 className="text-[15px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2.5">Expired ({expiredCerts.length})</h2>
               <div className="grid gap-2.5 md:grid-cols-2">
-                {expiredCerts.map((cert) => <CertCard key={cert.id} cert={cert} />)}
+                {expiredCerts.map((cert) => (
+                  <CertCard key={cert.id} cert={cert} onEdit={openEdit} onDelete={setDeleteDialog} />
+                ))}
               </div>
             </div>
           )}
@@ -222,7 +165,7 @@ function CertificationDialog({
           <DialogDescription className="text-[15px]">{certification ? "Update certification details." : "Add a new certification."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-2 py-1">
+          <div className="grid py-2">
             <FormInput
               label="Certification Name"
               registration={register("name")}
@@ -286,5 +229,86 @@ function CertificationDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function CertCard({
+  cert,
+  onEdit,
+  onDelete,
+}: {
+  cert: Certification
+  onEdit: (cert: Certification) => void
+  onDelete: (cert: Certification) => void
+}) {
+  const isExpired = cert.status === "expired"
+  return (
+    <Card className={`card-hover border-border/60 overflow-hidden group ${isExpired ? "opacity-60 grayscale-[30%]" : ""}`}>
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+            <div className="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shadow-sm">
+              {cert.logo || <Award className="size-5" />}
+            </div>
+            <div className="flex flex-col min-w-0 gap-1 mt-0.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-bold text-[15px] sm:text-base leading-tight text-foreground truncate">{cert.name}</h3>
+                {isExpired ? (
+                  <Badge variant="outline" className="text-[10px] sm:text-xs h-5 px-1.5 text-destructive border-destructive/20 bg-destructive/5 shrink-0">
+                    <AlertCircle className="size-3 mr-1" />Expired
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-[10px] sm:text-xs h-5 px-1.5 text-success bg-success/10 hover:bg-success/20 border-transparent shrink-0">
+                    Active
+                  </Badge>
+                )}
+              </div>
+              
+              <span className="text-[13px] sm:text-[14px] font-medium text-primary/80 truncate">{cert.issuer}</span>
+              
+              <div className="flex items-center gap-x-3 gap-y-1 mt-1 flex-wrap text-[12px] sm:text-[13px] text-muted-foreground font-medium">
+                <span>Issued {formatDate(cert.issueDate)}</span>
+                {cert.expiryDate && (
+                  <>
+                    <span className="hidden sm:inline text-muted-foreground/30">•</span>
+                    <span className={`${isExpired ? "text-destructive/80" : ""}`}>
+                      Expires {formatDate(cert.expiryDate)}
+                    </span>
+                  </>
+                )}
+              </div>
+              
+              {(cert.credentialId || cert.credentialUrl) && (
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {cert.credentialId && (
+                    <span className="inline-flex items-center rounded-md bg-muted/50 px-2 py-0.5 text-[11px] sm:text-[12px] font-mono text-muted-foreground border border-border/50">
+                      ID: {cert.credentialId}
+                    </span>
+                  )}
+                  {cert.credentialUrl && (
+                    <a href={cert.credentialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11.5px] sm:text-[12px] font-medium text-primary hover:underline bg-primary/5 px-2 py-0.5 rounded-md transition-colors">
+                      Verify <ExternalLink className="size-3" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-8 -mr-2 text-muted-foreground hover:text-foreground opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <MoreHorizontal className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(cert)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive" onClick={() => onDelete(cert)}><Trash2 className="size-3.5 mr-2" />Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

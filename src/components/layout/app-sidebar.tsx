@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Settings } from "lucide-react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import {
@@ -12,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Layers } from "lucide-react"
@@ -21,6 +23,11 @@ import { navItems } from "@/config/navigation"
 export function AppSidebar() {
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
+  const { setOpenMobile } = useSidebar()
+
+  useEffect(() => {
+    setOpenMobile(false)
+  }, [currentPath, setOpenMobile])
 
   return (
     <Sidebar collapsible="icon">

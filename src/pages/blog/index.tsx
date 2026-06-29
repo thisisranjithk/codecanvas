@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react"
 import {
-  Plus, Search, Eye, MoreHorizontal,
+  Plus, Search, MoreHorizontal, ExternalLink,
   Pencil, Trash2, Star, BookOpen, Clock,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -17,7 +17,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { mockBlogs } from "@/data/blogs"
-import { formatNumber, formatPublishDate } from "@/lib/utils"
+import { formatPublishDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/shared/page-header"
 import { EmptyState } from "@/components/shared/empty-state"
@@ -157,87 +157,14 @@ export function Blog() {
       ) : (
         <div className="flex flex-col gap-4">
           {filtered.map((blog) => (
-            <Card key={blog.id} className="card-hover border-border/50 group overflow-hidden bg-card/40 hover:bg-card/60 transition-colors py-0">
-              <CardContent className="p-0 flex flex-col md:flex-row">
-
-                {/* Image Area */}
-                <div className="w-full md:w-64 md:h-auto h-48 bg-muted/40 shrink-0 border-b md:border-b-0 md:border-r border-border/50">
-                  {blog.coverImage ? (
-                    <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <BlogImagePlaceholder id={blog.id} />
-                  )}
-                </div>
-
-                {/* Content Area */}
-                <div className="flex-1 p-5 md:p-6 flex flex-col justify-between min-w-0">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-start gap-3 justify-between">
-                      <div className="flex flex-col gap-2 min-w-0 flex-1">
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          {blog.featured && <Star className="size-4 text-amber-500 fill-amber-500 shrink-0" />}
-                          <h3 className="font-bold text-lg leading-snug text-foreground hover:text-primary transition-colors cursor-pointer line-clamp-2">{blog.title}</h3>
-                          <StatusBadge status={`blog-${blog.status}`} className="text-[10px] uppercase tracking-wider h-5 px-2" />
-                        </div>
-                        <p className="text-[14.5px] text-muted-foreground leading-relaxed line-clamp-2 max-w-3xl">
-                          {blog.excerpt}
-                        </p>
-                      </div>
-
-                      {/* Action Menu (Desktop top right of content) */}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground shrink-0 md:-mt-1 md:-mr-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreHorizontal className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => openEdit(blog)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleFeatured(blog.id)}>
-                            <Star className="size-3.5 mr-2" />{blog.featured ? "Unfeature" : "Feature"}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleStatusChange(blog.id, blog.status === "published" ? "draft" : "published")}>
-                            {blog.status === "published" ? "Unpublish" : "Publish"}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(blog)}>
-                            <Trash2 className="size-3.5 mr-2" />Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      {blog.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="bg-secondary/40 hover:bg-secondary/60 text-[11px] font-medium px-2 py-0.5 border-border/40">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Meta Area (Right Side Sidebar in Desktop) */}
-                <div className="w-full md:w-48 bg-muted/10 border-t md:border-t-0 md:border-l border-border/50 p-5 md:p-6 flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4 shrink-0">
-                  <div className="flex md:flex-col items-center md:items-end gap-4 md:gap-3 w-full">
-                    <div className="flex items-center gap-2 text-[13px] text-muted-foreground font-medium">
-                      <Eye className="size-4 opacity-70" />
-                      <span>{formatNumber(blog.views)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[13px] text-muted-foreground font-medium">
-                      <Clock className="size-4 opacity-70" />
-                      <span>{blog.readTime} min read</span>
-                    </div>
-                  </div>
-
-                  <div className="text-[13px] text-muted-foreground font-medium md:mt-2 text-right">
-                    {formatPublishDate(blog.publishedAt)}
-                  </div>
-                </div>
-
-              </CardContent>
-            </Card>
+            <BlogCard
+              key={blog.id}
+              blog={blog}
+              onEdit={openEdit}
+              onToggleFeatured={handleToggleFeatured}
+              onStatusChange={handleStatusChange}
+              onDelete={setDeleteDialog}
+            />
           ))}
         </div>
       )}
@@ -281,6 +208,7 @@ function BlogDialog({
     defaultValues: {
       title: "",
       slug: "",
+      link: "",
       excerpt: "",
       category: "",
       readTime: 5,
@@ -295,6 +223,7 @@ function BlogDialog({
       reset({
         title: blog?.title ?? "",
         slug: blog?.slug ?? "",
+        link: blog?.link ?? "",
         excerpt: blog?.excerpt ?? "",
         category: blog?.category ?? "",
         readTime: blog?.readTime ?? 5,
@@ -318,7 +247,7 @@ function BlogDialog({
           <DialogDescription className="text-[15px]">{blog ? "Update post details." : "Create a new blog post."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-2 py-2">
+          <div className="grid py-2">
             <FormInput
               label="Title"
               registration={register("title")}
@@ -328,15 +257,25 @@ function BlogDialog({
               labelClassName="text-[15px]"
               inputClassName="h-9 text-[15px]"
             />
-            <FormInput
-              label="Slug"
-              registration={register("slug")}
-              error={errors.slug}
-              placeholder="post-slug-here"
-              required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput
+                label="Slug"
+                registration={register("slug")}
+                error={errors.slug}
+                placeholder="post-slug-here"
+                required
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+              <FormInput
+                label="External Link (Optional)"
+                registration={register("link")}
+                error={errors.link}
+                placeholder="https://..."
+                labelClassName="text-[15px]"
+                inputClassName="h-9 text-[15px]"
+              />
+            </div>
             <FormTextarea
               label="Excerpt"
               registration={register("excerpt")}
@@ -403,5 +342,140 @@ function BlogDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function BlogCard({
+  blog,
+  onEdit,
+  onToggleFeatured,
+  onStatusChange,
+  onDelete,
+}: {
+  blog: Blog
+  onEdit: (blog: Blog) => void
+  onToggleFeatured: (id: string) => void
+  onStatusChange: (id: string, status: string) => void
+  onDelete: (blog: Blog) => void
+}) {
+  return (
+    <Card className="border-border/60 card-hover overflow-hidden group py-0">
+      <CardContent className="p-0 flex flex-col sm:flex-row">
+
+        {/* Image Area */}
+        <div className="w-full sm:w-56 md:w-64 sm:h-auto h-48 shrink-0 border-b sm:border-b-0 sm:border-r border-border/50 relative overflow-hidden">
+          {blog.link ? (
+            <a href={blog.link} target="_blank" rel="noreferrer" className="block w-full h-full">
+              {blog.coverImage ? (
+                <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              ) : (
+                <BlogImagePlaceholder id={blog.id} />
+              )}
+            </a>
+          ) : (
+            <>
+              {blog.coverImage ? (
+                <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              ) : (
+                <BlogImagePlaceholder id={blog.id} />
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 p-4 sm:p-5 flex flex-col min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-2 min-w-0 flex-1">
+
+              {/* Category & Status */}
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                {blog.featured && (
+                  <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-transparent text-[10px] sm:text-[11px] h-5 px-1.5 shrink-0">
+                    <Star className="size-3 mr-1 fill-amber-600" /> Featured
+                  </Badge>
+                )}
+                <Badge variant="outline" className="text-[10px] sm:text-[11px] font-medium h-5 px-2 bg-primary/5 text-primary border-primary/20 rounded-md shrink-0">
+                  {blog.category}
+                </Badge>
+                <StatusBadge status={`blog-${blog.status}`} className="text-[10px] sm:text-[11px] uppercase tracking-wider h-5 px-2 shrink-0" />
+              </div>
+
+              {/* Title */}
+              {blog.link ? (
+                <a href={blog.link} target="_blank" rel="noreferrer" className="block hover:underline">
+                  <h3 className="font-bold text-lg leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                    {blog.title}
+                  </h3>
+                </a>
+              ) : (
+                <h3 className="font-bold text-lg leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                  {blog.title}
+                </h3>
+              )}
+
+              {/* Excerpt */}
+              <p className="text-[13.5px] sm:text-[14px] text-muted-foreground leading-relaxed line-clamp-2 mt-1">
+                {blog.excerpt}
+              </p>
+            </div>
+
+            {/* Actions Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="size-8 -mr-2 text-muted-foreground hover:text-foreground opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <MoreHorizontal className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={() => onEdit(blog)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onToggleFeatured(blog.id)}>
+                  <Star className="size-3.5 mr-2" />{blog.featured ? "Unfeature" : "Feature"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onStatusChange(blog.id, blog.status === "published" ? "draft" : "published")}>
+                  {blog.status === "published" ? "Unpublish" : "Publish"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive" onClick={() => onDelete(blog)}>
+                  <Trash2 className="size-3.5 mr-2" />Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-3">
+            {/* Tags */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {blog.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="bg-secondary/60 hover:bg-secondary/80 text-[10px] sm:text-[11px] font-medium px-2 py-0 h-5 border-transparent">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Meta: Date & Read Time */}
+            <div className="flex items-center gap-2.5 text-[12px] sm:text-[13px] text-muted-foreground font-medium shrink-0 ml-auto">
+              <span>{formatPublishDate(blog.publishedAt)}</span>
+              <span className="text-muted-foreground/30">•</span>
+              <span className="flex items-center gap-1">
+                <Clock className="size-3.5 opacity-70" />
+                {blog.readTime} min
+              </span>
+
+              {blog.link && (
+                <>
+                  <span className="text-muted-foreground/30 ml-1">•</span>
+                  <a href={blog.link} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-primary hover:underline ml-1">
+                    Read Post <ExternalLink className="size-3" />
+                  </a>
+                </>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </CardContent>
+    </Card>
   )
 }

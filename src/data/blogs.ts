@@ -15,6 +15,7 @@ export const mockBlogs: BlogPost[] = [
     views: 8420,
     publishedAt: "2024-03-15",
     updatedAt: "2024-03-20",
+    link: "https://medium.com/engineering/real-time-collaborative-editor",
     coverImage: "",
   },
   {
@@ -31,6 +32,7 @@ export const mockBlogs: BlogPost[] = [
     views: 12300,
     publishedAt: "2024-02-28",
     updatedAt: "2024-03-01",
+    link: "https://medium.com/engineering/microservices",
     coverImage: "",
   },
   {
@@ -47,6 +49,7 @@ export const mockBlogs: BlogPost[] = [
     views: 6750,
     publishedAt: "2024-01-12",
     updatedAt: "2024-01-15",
+    link: "https://dev.to/tanstack-review",
     coverImage: "",
   },
   {

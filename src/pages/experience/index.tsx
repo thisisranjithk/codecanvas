@@ -62,84 +62,87 @@ export function Experience() {
           action={{ label: "Add your first position", onClick: openNew }}
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="flex flex-col gap-5">
           {experiences.map((exp) => (
-            <Card key={exp.id} className="border-border/60 card-hover py-0">
-              <CardContent className="p-5 md:p-6 flex flex-col">
+            <Card key={exp.id} className="border-border/60 card-hover overflow-hidden">
+              <CardContent className="p-4 sm:p-6 flex flex-col">
 
-                {/* Top Section */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    {/* Logo */}
-                    <div className="flex size-[52px] shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary text-xl font-bold shadow-sm">
-                      {exp.logo}
-                    </div>
-
-                    {/* Headers & Meta */}
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-lg font-bold tracking-tight text-foreground">{exp.company}</h2>
-                      <p className="text-[15px] font-semibold text-primary">{exp.role}</p>
-
-                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                        <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground font-medium">
-                          <Calendar className="size-3.5" />
-                          {formatDate(exp.startDate)} — {formatDate(exp.endDate)} · {getEmploymentDuration(exp.startDate, exp.endDate)}
-                        </span>
-                        <span className="text-muted-foreground/30">•</span>
-                        <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground font-medium">
-                          <MapPin className="size-3.5" />
-                          {exp.location}
-                        </span>
-                        <span className="text-muted-foreground/30">•</span>
-                        <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground font-medium">
-                          <Briefcase className="size-3.5" />
-                          {exp.type}
-                        </span>
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                      <div className="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary text-base sm:text-lg font-bold shadow-sm">
+                        {exp.logo}
+                      </div>
+                      <div className="flex flex-col min-w-0 mt-0.5">
+                        <h2 className="text-base sm:text-[17px] font-bold tracking-tight text-foreground truncate">{exp.company}</h2>
+                        <p className="text-[13px] sm:text-sm font-semibold text-primary truncate">{exp.role}</p>
                       </div>
                     </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge variant="secondary" className="hidden sm:flex bg-primary/10 text-primary hover:bg-primary/10 border-transparent text-xs font-medium px-2.5 h-6 rounded-md">
+                        {getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)}
+                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-8 -mr-2 text-muted-foreground hover:text-foreground">
+                            <MoreHorizontal className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(exp)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(exp)}>
+                            <Trash2 className="size-3.5 mr-2" />Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
 
-                  {/* Actions & Duration badge */}
-                  <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-foreground">
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => openEdit(exp)}><Pencil className="size-3.5 mr-2" />Edit</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteDialog(exp)}>
-                          <Trash2 className="size-3.5 mr-2" />Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <Badge variant="secondary" className="bg-primary/15 text-primary hover:bg-primary/15 border-transparent text-xs font-medium px-2.5 h-6 rounded-full">
-                      {getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)}
-                    </Badge>
+                  {/* Metadata Row */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] sm:text-[13px] text-muted-foreground font-medium sm:pl-[64px]">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="size-3.5 opacity-70" />
+                      {formatDate(exp.startDate)} — {exp.current ? "Present" : formatDate(exp.endDate)}
+                      <span className="sm:hidden ml-1">({getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)})</span>
+                    </span>
+                    <span className="hidden sm:inline text-muted-foreground/30">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="size-3.5 opacity-70" />
+                      {exp.location}
+                    </span>
+                    <span className="hidden sm:inline text-muted-foreground/30">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <Briefcase className="size-3.5 opacity-70" />
+                      {exp.type}
+                    </span>
                   </div>
+
+                  {/* Description Text */}
+                  {exp.description && (
+                    <p className="text-[13.5px] sm:text-sm text-muted-foreground leading-relaxed sm:pl-[64px] max-w-4xl">
+                      {exp.description}
+                    </p>
+                  )}
                 </div>
 
-                {/* Description Text */}
-                <p className="text-[15px] text-muted-foreground mt-5 leading-relaxed max-w-4xl">
-                  {exp.description}
-                </p>
-
                 {/* Divider */}
-                <div className="w-full h-px bg-border/50 my-6" />
+                {(exp.responsibilities?.length > 0 || exp.technologies?.length > 0) && (
+                  <div className="w-full h-px bg-border/50 my-4 sm:my-5 sm:ml-[64px] sm:w-[calc(100%-64px)]" />
+                )}
 
-                {/* Bottom Section: Responsibilities & Tech */}
-                <div className="grid md:grid-cols-5 gap-6 md:gap-10">
+                {/* Responsibilities & Tech */}
+                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 sm:pl-[64px]">
                   {/* Left Column: Responsibilities */}
                   {exp.responsibilities && exp.responsibilities.length > 0 && (
-                    <div className="md:col-span-3 flex flex-col gap-3">
-                      <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Key Responsibilities</h4>
+                    <div className="flex-1 flex flex-col gap-2.5">
+                      <h4 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Key Responsibilities</h4>
                       <ul className="flex flex-col gap-2">
                         {exp.responsibilities.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-[14.5px] text-foreground/90">
-                            <span className="mt-2 size-1.5 rounded-full bg-primary shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-[13px] sm:text-[13.5px] text-foreground/90">
+                            <span className="mt-1.5 size-1 rounded-full bg-primary/60 shrink-0" />
                             <span className="leading-relaxed">{item}</span>
                           </li>
                         ))}
@@ -148,16 +151,18 @@ export function Experience() {
                   )}
 
                   {/* Right Column: Technologies */}
-                  <div className="md:col-span-2 flex flex-col gap-3">
-                    <h4 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Technologies</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {exp.technologies.map((tech) => (
-                        <Badge key={tech} variant="outline" className="bg-muted/40 hover:bg-muted/60 text-[13px] font-medium h-7 px-2.5 border-border/80">
-                          {tech}
-                        </Badge>
-                      ))}
+                  {exp.technologies && exp.technologies.length > 0 && (
+                    <div className="lg:w-64 flex flex-col gap-2.5 shrink-0">
+                      <h4 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Technologies</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {exp.technologies.map((tech) => (
+                          <Badge key={tech} variant="secondary" className="bg-secondary/60 hover:bg-secondary/80 text-[11px] sm:text-xs font-normal h-6 px-2.5 border-transparent">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
               </CardContent>
@@ -259,7 +264,7 @@ function ExperienceDialog({
           <DialogDescription className="text-[15px]">{experience ? "Update position details." : "Add a work experience entry."}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-2 py-2">
+          <div className="grid py-2">
             <FormInput
               label="Company"
               registration={register("company")}
@@ -329,7 +334,7 @@ function ExperienceDialog({
               name="current"
               control={control}
               description="This will hide the end date"
-              className="bg-muted/20"
+              className="bg-muted/20 mb-4"
               labelClassName="text-[15px]"
             />
 

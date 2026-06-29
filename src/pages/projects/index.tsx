@@ -289,7 +289,7 @@ function ProjectDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-2 py-1">
+          <div className="grid py-2">
             <FormInput
               label="Title"
               registration={register("title")}

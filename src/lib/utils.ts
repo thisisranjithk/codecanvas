@@ -60,19 +60,6 @@ export function getEmploymentDuration(start: string, end: string | null): string
   return `${remMonths} mos`
 }
 
-export function getEducationDuration(start: string, end: string | null): string {
-  const d1 = new Date(start)
-  const d2 = end ? new Date(end) : new Date()
-
-  let months = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth())
-  if (months < 0) months = 0
-  months += 1 // Inclusive of end month
-
-  const years = Math.floor(months / 12)
-  if (years > 0) return `${years} Years (Full-time)`
-  return `${months} Months`
-}
-
 export function getEducationActivityIcon(activity: string): React.ReactNode {
   const lower = activity.toLowerCase()
   if (lower.includes("president") || lower.includes("member") || lower.includes("club") || lower.includes("chapter")) {

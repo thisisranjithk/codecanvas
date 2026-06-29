@@ -77,6 +77,7 @@ export interface BlogPost {
   slug: string
   excerpt: string
   content: string
+  link?: string
   status: string
   featured: boolean
   tags: string[]
