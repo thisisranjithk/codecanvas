@@ -182,7 +182,7 @@ export function Skills() {
             const isCollapsed = collapsed[cat];
             const avg = Math.round(
               catSkills.reduce((sum, s) => sum + s.proficiency, 0) /
-                catSkills.length,
+              catSkills.length,
             );
 
             return (
@@ -222,94 +222,14 @@ export function Skills() {
 
                 {/* Skill Cards */}
                 {!isCollapsed && (
-                  <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 pl-6">
+                  <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 pl-2 sm:pl-6 pt-1">
                     {catSkills.map((skill) => (
-                      <Card
+                      <SkillCard
                         key={skill.id}
-                        className={cn(
-                          "group border-border/60 transition-all duration-200",
-                          "hover:shadow-md hover:-translate-y-0.5 hover:border-border",
-                        )}
-                      >
-                        <CardContent className="p-3.5 flex flex-col gap-2.5">
-                          {/* Top row: icon + name + menu */}
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="flex size-8 items-center justify-center rounded-md shrink-0 bg-muted/50 border border-border/40 text-muted-foreground">
-                                <Code2 className="size-4" />
-                              </div>
-                              <span className="text-base font-medium truncate">
-                                {skill.name}
-                              </span>
-                            </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="size-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1"
-                                >
-                                  <MoreHorizontal className="size-4 text-muted-foreground" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-36">
-                                <DropdownMenuItem
-                                  onClick={() => openEdit(skill)}
-                                >
-                                  <Pencil className="size-3.5 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-destructive"
-                                  onClick={() => setDeleteDialog(skill)}
-                                >
-                                  <Trash2 className="size-3.5 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-
-                          {/* Proficiency bar */}
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                Proficiency
-                              </span>
-                              <span className="text-sm font-semibold tabular-nums">
-                                {skill.proficiency}%
-                              </span>
-                            </div>
-                            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-700 ease-out bg-primary"
-                                style={{ width: `${skill.proficiency}%` }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Bottom row: years + level badge */}
-                          <div className="flex items-center justify-between pt-0.5">
-                            <span className="text-xs text-muted-foreground">
-                              {skill.yearsOfExperience}{" "}
-                              {skill.yearsOfExperience === 1 ? "year" : "years"}{" "}
-                              exp.
-                            </span>
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "px-2 py-0 h-5 border",
-                                getSkillProficiencyBadgeClass(
-                                  skill.proficiency,
-                                ),
-                              )}
-                            >
-                              {getSkillProficiencyLabel(skill.proficiency)}
-                            </Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
+                        skill={skill}
+                        onEdit={openEdit}
+                        onDelete={setDeleteDialog}
+                      />
                     ))}
                   </div>
                 )}
@@ -407,7 +327,7 @@ function SkillDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-1">
+          <div className="grid py-2">
             <FormInput
               label="Skill Name"
               registration={register("name")}
@@ -462,5 +382,90 @@ function SkillDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SkillCard({
+  skill,
+  onEdit,
+  onDelete,
+}: {
+  skill: Skill;
+  onEdit: (skill: Skill) => void;
+  onDelete: (skill: Skill) => void;
+}) {
+  return (
+    <Card
+      className={cn(
+        "group border-border/60 transition-all duration-300",
+        "hover:shadow-sm hover:border-primary/20 bg-card/40 hover:bg-card/80",
+      )}
+    >
+      <CardContent className="p-4 flex flex-col justify-between h-full gap-3">
+        {/* Top: Icon + Name + Menu */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shadow-sm shrink-0">
+              <Code2 className="size-5" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[14.5px] font-bold truncate text-foreground group-hover:text-primary transition-colors">
+                {skill.name}
+              </span>
+              <span className="text-[12px] text-muted-foreground font-medium">
+                {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? "year" : "years"} exp
+              </span>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mt-1 -mr-2"
+              >
+                <MoreHorizontal className="size-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem onClick={() => onEdit(skill)}>
+                <Pencil className="size-3.5 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive" onClick={() => onDelete(skill)}>
+                <Trash2 className="size-3.5 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Bottom: Proficiency Badge + Tiny minimal bar */}
+        <div className="flex items-center justify-between gap-3 mt-1 pt-2 border-t border-border/40">
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-[10px] font-medium h-5 px-2 bg-background/50",
+              getSkillProficiencyBadgeClass(skill.proficiency),
+            )}
+          >
+            {getSkillProficiencyLabel(skill.proficiency)}
+          </Badge>
+
+          <div className="flex items-center gap-2 flex-1 justify-end">
+            <div className="h-1.5 flex-1 max-w-16 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700 ease-out bg-primary/60 group-hover:bg-primary"
+                style={{ width: `${skill.proficiency}%` }}
+              />
+            </div>
+            <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
+              {skill.proficiency}%
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
