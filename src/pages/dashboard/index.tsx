@@ -100,24 +100,40 @@ export function Dashboard() {
       {/* Top Row: Welcome + Quick Actions */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Welcome Banner */}
-        <Card className="border-border/60 overflow-hidden relative">
-          <CardContent className="p-5 flex flex-col gap-3">
+        <Card className="border-border/60 overflow-hidden relative bg-gradient-to-br from-primary/10 via-background to-background">
+          {/* Decorative Background Elements */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-24 -right-24 size-64 bg-primary/20 blur-[80px] rounded-full" />
+            <div className="absolute top-20 right-10 size-40 bg-secondary/20 blur-[60px] rounded-full" />
+            <svg
+              className="absolute top-0 right-0 w-1/2 h-full opacity-[0.03] text-primary dark:opacity-[0.05]"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <pattern id="welcome-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.5" fill="currentColor" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#welcome-pattern)" />
+            </svg>
+          </div>
+
+          <CardContent className="p-6 flex flex-col gap-5 relative z-10">
             <div className="flex items-start justify-between">
-              <div className="flex flex-col gap-1">
-                <span className="text-[15px] text-muted-foreground font-medium">Welcome back,</span>
-                <h2 className="text-2xl font-bold tracking-tight">{mockUser.name}!</h2>
-                <p className="text-[13px] text-muted-foreground max-w-[280px]">
-                  You have {mockStats.publishedProjects} published projects and {mockStats.publishedBlogs} blog posts.
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[13px] text-primary font-semibold tracking-wider uppercase">Welcome back</span>
+                <h2 className="text-3xl font-bold tracking-tight">{mockUser.name}!</h2>
+                <p className="text-[14px] text-muted-foreground max-w-[300px] mt-1 leading-relaxed">
+                  You have <strong className="text-foreground font-semibold">{mockStats.publishedProjects} published projects</strong> and <strong className="text-foreground font-semibold">{mockStats.publishedBlogs} blog posts</strong>. Keep up the great work!
                 </p>
               </div>
-              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 rotate-3 hover:rotate-0 transition-transform duration-300">
                 <Code2 className="size-6" />
               </div>
             </div>
-            <Button size="sm" className="h-9 w-fit gap-1.5 text-[15px]" asChild>
+            <Button className="h-9 w-fit gap-2 text-[14px] font-medium shadow-md hover:shadow-lg transition-all duration-300 rounded-lg" asChild>
               <Link to="/projects">
-                <ExternalLink className="size-4" />
-                View Portfolio
+                View Portfolio <ExternalLink className="size-3.5" />
               </Link>
             </Button>
           </CardContent>
