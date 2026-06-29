@@ -23,9 +23,6 @@ export const portfolioSchema = z.object({
   portfolioPublic: z.boolean(),
   showEmail: z.boolean(),
   openToWork: z.boolean(),
-  customDomain: z.string().max(200),
-  seoTitle: z.string().max(200),
-  seoDescription: z.string().max(500),
 })
 
 export type PortfolioFormData = z.infer<typeof portfolioSchema>

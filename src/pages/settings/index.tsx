@@ -1,11 +1,10 @@
-import { Save, Globe, User, Bell, Shield, Link } from "lucide-react"
+import { Save, Globe, User, Bell, Shield, Link, Info } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { mockUser } from "@/data/user"
@@ -177,19 +176,14 @@ function ProfileTab() {
 
 function PortfolioTab() {
   const {
-    register,
     control,
     handleSubmit,
-    formState: { errors },
   } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema),
     defaultValues: {
       portfolioPublic: true,
       showEmail: false,
       openToWork: true,
-      customDomain: "alexmorgan.dev",
-      seoTitle: "Alex Morgan – Senior Software Engineer",
-      seoDescription: "Portfolio of Alex Morgan, a Senior Software Engineer specializing in React, TypeScript, and full-stack web development.",
     },
   })
 
@@ -226,42 +220,6 @@ function PortfolioTab() {
           </CardContent>
         </Card>
 
-        <Card className="border-border/60">
-          <CardHeader className="pb-3 pt-4 px-4">
-            <CardTitle className="text-sm">Domain & SEO</CardTitle>
-            <CardDescription className="text-[11px]">Configure your portfolio domain and search engine settings.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 px-4 pb-4">
-            <div className="grid gap-1.5">
-              <Label className="text-xs">Custom Domain</Label>
-              <div className="flex gap-2">
-                <Input
-                  {...register("customDomain")}
-                  placeholder="yourdomain.com"
-                  className="flex-1 h-8 text-xs"
-                />
-                <Button variant="outline" size="sm" className="h-8 text-xs shrink-0" type="button">Verify</Button>
-              </div>
-              <p className="text-[10px] text-muted-foreground">Point your domain CNAME to portfolio.example.com</p>
-            </div>
-            <FormInput
-              label="SEO Title"
-              registration={register("seoTitle")}
-              error={errors.seoTitle}
-              labelClassName="text-xs"
-              inputClassName="h-8 text-xs"
-            />
-            <FormTextarea
-              label="SEO Description"
-              registration={register("seoDescription")}
-              error={errors.seoDescription}
-              rows={2}
-              labelClassName="text-xs"
-              textareaClassName="text-xs"
-            />
-          </CardContent>
-        </Card>
-
         <div className="flex justify-end">
           <Button size="sm" type="submit" className="h-8 gap-1.5">
             <Save className="size-3.5" />
@@ -282,8 +240,8 @@ function NotificationsTab() {
   } = useForm<NotificationsFormData>({
     resolver: zodResolver(notificationsSchema),
     defaultValues: {
-      emailNotifications: true,
-      newMessageAlert: true,
+      emailNotifications: false,
+      newMessageAlert: false,
       weeklyDigest: false,
     },
   })
@@ -301,28 +259,42 @@ function NotificationsTab() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-3 max-w-2xl">
-        <Card className="border-border/60">
-          <CardHeader className="pb-3 pt-4 px-4">
-            <CardTitle className="text-sm">Email Notifications</CardTitle>
-            <CardDescription className="text-[11px]">Choose what emails you'd like to receive.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 px-4 pb-4">
-            {notificationItems.map((item) => (
-              <FormSwitch
-                key={item.name}
-                label={item.label}
-                name={item.name}
-                control={control}
-                description={item.desc}
-                className="px-3.5 py-2.5"
-                labelClassName="text-xs"
-              />
-            ))}
+        <Card className="border-blue-500/30 bg-blue-500/10 dark:bg-blue-500/5 shadow-sm">
+          <CardContent className="flex items-center gap-3.5 px-4">
+            <div className="rounded-full bg-blue-500/20 p-2 text-blue-600 dark:text-blue-400">
+              <Info className="size-4" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Coming Soon</p>
+              <p className="text-[11px] text-blue-600/80 dark:text-blue-400/80">Notification preferences will be available in a future update.</p>
+            </div>
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5">
+        <div className="opacity-50 pointer-events-none">
+          <Card className="border-border/60">
+            <CardHeader className="pb-3 pt-4 px-4">
+              <CardTitle className="text-sm">Email Notifications</CardTitle>
+              <CardDescription className="text-[11px]">Choose what emails you'd like to receive.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 px-4 pb-4">
+              {notificationItems.map((item) => (
+                <FormSwitch
+                  key={item.name}
+                  label={item.label}
+                  name={item.name}
+                  control={control}
+                  description={item.desc}
+                  className="px-3.5 py-2.5"
+                  labelClassName="text-xs"
+                />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end opacity-50 pointer-events-none">
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled>
             <Save className="size-3.5" />
             Save Preferences
           </Button>
@@ -399,35 +371,6 @@ function SecurityTab() {
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/60">
-        <CardHeader className="pb-3 pt-4 px-4">
-          <CardTitle className="text-sm">Active Sessions</CardTitle>
-          <CardDescription className="text-[11px]">Manage devices signed in to your account.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2 px-4 pb-4">
-          {[
-            { device: "MacBook Pro", location: "San Francisco, CA", time: "Now", current: true },
-            { device: "iPhone 15", location: "San Francisco, CA", time: "2 hours ago", current: false },
-            { device: "Chrome on Windows", location: "New York, NY", time: "3 days ago", current: false },
-          ].map((session) => (
-            <div key={session.device} className="flex items-center justify-between rounded-lg border border-border/60 px-3.5 py-2.5">
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium">{session.device}</span>
-                  {session.current && <Badge variant="secondary" className="text-[9px] h-4 px-1.5 bg-secondary/60">Current</Badge>}
-                </div>
-                <span className="text-[10px] text-muted-foreground">{session.location} · {session.time}</span>
-              </div>
-              {!session.current && (
-                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive text-xs h-7" onClick={() => toast.success("Session revoked")}>
-                  Revoke
-                </Button>
-              )}
-            </div>
-          ))}
         </CardContent>
       </Card>
 
