@@ -50,16 +50,17 @@ export function TopNav() {
       {/* Right side */}
       <div className="ml-auto flex items-center gap-2">
         {/* Global Search */}
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-2.5 size-3.5 text-muted-foreground/60 pointer-events-none" />
-          <Input
-            placeholder="Search..."
-            className="h-8 w-48 pl-8 pr-3 text-sm bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:bg-background rounded-md"
-          />
-          <kbd className="absolute right-2 pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border/60 bg-muted/60 px-1.5 font-mono text-[10px] font-medium opacity-60 sm:flex">
-            ⌘K
+        <Button
+          variant="ghost"
+          size="sm"
+          className="hidden md:flex h-8 items-center gap-2 px-2 text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+          onClick={() => window.dispatchEvent(new Event("open-global-search"))}
+        >
+          <Search className="size-4" />
+          <kbd className="pointer-events-none flex h-5 select-none items-center gap-1 rounded border border-border/60 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘</span>K
           </kbd>
-        </div>
+        </Button>
 
         <ModeToggle />
 
