@@ -1,18 +1,37 @@
 import { useMemo } from "react"
 import {
   TrendingUp, FolderKanban, BookOpen, Zap, Briefcase, Award, GraduationCap,
-  FileText, Code2, Pencil, ExternalLink, ArrowUpRight,
+  FileText, Code2, ExternalLink, ArrowUpRight, Activity, Star, Clock
 } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { mockStats } from "@/data/stats"
 import { mockProjects } from "@/data/projects"
 import { mockBlogs } from "@/data/blogs"
 import { mockExperience } from "@/data/experience"
 import { mockCertifications } from "@/data/certifications"
 import { mockUser } from "@/data/user"
+
+const mockRecentActivity = Array.from({ length: 15 }).map((_, i) => ({
+  id: String(i + 1),
+  type: ["EXPERIENCE_ADDED", "PROJECT_PUBLISHED", "BLOG_DRAFTED", "SKILL_ADDED", "CERTIFICATE_ADDED"][i % 5],
+  title: [
+    "Software Engineer at Google",
+    mockProjects[0]?.title || "Portfolio CMS",
+    mockBlogs[0]?.title || "React Patterns",
+    "Next.js",
+    "AWS Certified Developer"
+  ][i % 5] + (i > 4 ? ` (Update ${i})` : ""),
+  timestamp: new Date(Date.now() - i * 86400000 - i * 3600000).toISOString(),
+}));
+
+const mockFeaturedContent = {
+  featuredProject: mockProjects[0] || null,
+  latestBlog: mockBlogs[0] || null,
+  latestCertification: mockCertifications[0] || null
+};
 
 export function Dashboard() {
   const navigate = useNavigate()
@@ -150,111 +169,131 @@ export function Dashboard() {
         ))}
       </div>
 
-      {/* Bottom Row: Recent Projects + Recent Blog Posts */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Recent Projects */}
-        <Card className="border-border/60">
-          <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between">
-            <div>
-              <h3 className="text-[17px] font-semibold">Recent Projects</h3>
-              <p className="text-[13px] text-muted-foreground">Latest updates</p>
+      {/* Bottom Row: Recent Activity + Featured Content */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Recent Activity */}
+        <Card className="border-border/60 flex flex-col h-[420px] overflow-hidden">
+          <CardHeader className="pb-3 pt-4 px-5 flex flex-row items-center justify-between border-b border-border/40 bg-muted/20 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Activity className="size-4" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-semibold tracking-tight">Recent Activity</h3>
+                <p className="text-[12px] text-muted-foreground">Your latest updates</p>
+              </div>
             </div>
-            <Button variant="ghost" size="sm" className="h-8 text-[13px] gap-1" asChild>
-              <Link to="/projects">
-                View all <ArrowUpRight className="size-3.5" />
-              </Link>
-            </Button>
           </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="flex flex-col gap-2">
-              {mockProjects.slice(0, 4).map((project) => (
-                <div
-                  key={project.id}
-                  className="flex items-center gap-3 rounded-lg p-2.5 hover:bg-muted/50 transition-colors duration-150 group"
-                >
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary">
-                    <FolderKanban className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                    <span className="text-[15px] font-medium truncate">{project.title}</span>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {project.technologies.slice(0, 3).map((tech) => (
-                        <Badge key={tech} variant="secondary" className="text-xs h-5 px-1.5 font-normal bg-secondary/60">
-                          {tech}
-                        </Badge>
-                      ))}
+          <CardContent className="p-4 flex-1 overflow-y-auto overflow-x-hidden">
+            <div className="flex flex-col gap-3">
+              {mockRecentActivity.map((activity) => {
+                let badgeColor = "bg-muted text-muted-foreground";
+
+                if (activity.type.includes("EXPERIENCE")) badgeColor = "bg-info/10 text-info";
+                else if (activity.type.includes("PROJECT")) badgeColor = "bg-primary/10 text-primary";
+                else if (activity.type.includes("BLOG")) badgeColor = "bg-success/10 text-success";
+                else if (activity.type.includes("SKILL")) badgeColor = "bg-warning/10 text-warning";
+                else if (activity.type.includes("CERTIFICATE")) badgeColor = "bg-violet-500/10 text-violet-500";
+
+                return (
+                  <div key={activity.id} className="flex flex-col gap-1.5 rounded-xl border border-border/50 bg-card p-3.5 hover:bg-muted/40 transition-colors">
+                    <span className="text-[14px] font-semibold text-foreground truncate">{activity.title}</span>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md ${badgeColor}`}>
+                        {activity.type.replace("_", " ")}
+                      </span>
+                      <span className="text-[12px] text-muted-foreground flex items-center gap-1.5 shrink-0">
+                        <Clock className="size-3" />
+                        {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge
-                      variant="outline"
-                      className={`text-xs h-5 px-1.5 ${
-                        project.status === "published" ? "border-success/30 text-success bg-success/5" :
-                        project.status === "draft" ? "border-warning/30 text-warning bg-warning/5" :
-                        "border-border text-muted-foreground"
-                      }`}
-                    >
-                      {project.status}
-                    </Badge>
-                    <span className="text-[13px] text-muted-foreground/60 hidden sm:inline">{project.updatedAt}</span>
-                    <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigate({ to: "/projects" })}>
-                      <Pencil className="size-3.5 text-muted-foreground" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Blog Posts */}
-        <Card className="border-border/60">
-          <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between">
-            <div>
-              <h3 className="text-[17px] font-semibold">Recent Blog Posts</h3>
-              <p className="text-[13px] text-muted-foreground">Latest updates</p>
+        {/* Featured Content */}
+        <Card className="border-border/60 flex flex-col h-[420px] bg-gradient-to-br from-background via-background to-muted/10 overflow-hidden">
+          <CardHeader className="pb-3 pt-4 px-5 flex flex-row items-center justify-between border-b border-border/40 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-warning/10 text-warning">
+                <Star className="size-4" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-semibold tracking-tight">Featured Content</h3>
+                <p className="text-[12px] text-muted-foreground">Highlighting your best work</p>
+              </div>
             </div>
-            <Button variant="ghost" size="sm" className="h-8 text-[13px] gap-1" asChild>
-              <Link to="/blog">
-                View all <ArrowUpRight className="size-3.5" />
-              </Link>
-            </Button>
           </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="flex flex-col gap-2">
-              {mockBlogs.slice(0, 4).map((blog) => (
-                <div
-                  key={blog.id}
-                  className="flex items-center gap-3 rounded-lg p-2.5 hover:bg-muted/50 transition-colors duration-150 group"
-                >
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success/8 text-success">
-                    <FileText className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                    <span className="text-[15px] font-medium truncate">{blog.title}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[13px] text-muted-foreground">{blog.category}</span>
+          <CardContent className="p-4 flex-1 overflow-y-auto overflow-x-hidden">
+
+            <div className="flex flex-col gap-4">
+              {mockFeaturedContent.featuredProject ? (
+                <div className="flex flex-col gap-2 group cursor-pointer" onClick={() => navigate({ to: "/projects" })}>
+                  <span className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+                    <FolderKanban className="size-3.5 text-primary/70" /> Featured Project
+                  </span>
+                  <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <FolderKanban className="size-4" />
+                    </div>
+                    <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+                      <span className="text-[14px] font-semibold truncate group-hover:text-primary transition-colors">{mockFeaturedContent.featuredProject.title}</span>
+                      <p className="text-[12px] text-muted-foreground line-clamp-1">{mockFeaturedContent.featuredProject.description || "A showcase of my recent work."}</p>
+                    </div>
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary opacity-0 group-hover:opacity-100 group-hover:bg-primary/10 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
+                      <ArrowUpRight className="size-3.5" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge
-                      variant="outline"
-                      className={`text-xs h-5 px-1.5 ${
-                        blog.status === "published" ? "border-success/30 text-success bg-success/5" :
-                        "border-warning/30 text-warning bg-warning/5"
-                      }`}
-                    >
-                      {blog.status}
-                    </Badge>
-                    <span className="text-[13px] text-muted-foreground/60 hidden sm:inline">{blog.updatedAt}</span>
-                    <span className="text-[13px] text-muted-foreground/60">{blog.readTime} min</span>
-                    <Button variant="ghost" size="icon" className="size-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigate({ to: "/blog" })}>
-                      <Pencil className="size-3.5 text-muted-foreground" />
-                    </Button>
+                </div>
+              ) : null}
+
+              {mockFeaturedContent.latestBlog ? (
+                <div className="flex flex-col gap-2 group cursor-pointer" onClick={() => navigate({ to: "/blog" })}>
+                  <span className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+                    <FileText className="size-3.5 text-success/70" /> Latest Post
+                  </span>
+                  <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3 shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
+                      <FileText className="size-4" />
+                    </div>
+                    <div className="flex flex-col flex-1 min-w-0 gap-1">
+                      <span className="text-[14px] font-semibold truncate group-hover:text-success transition-colors">{mockFeaturedContent.latestBlog.title}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="bg-muted px-2 py-0.5 rounded-md text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{mockFeaturedContent.latestBlog.category}</span>
+                        <span className="text-[11px] text-muted-foreground flex items-center gap-1 shrink-0"><Clock className="size-3" /> {mockFeaturedContent.latestBlog.readTime} min read</span>
+                      </div>
+                    </div>
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/5 text-success opacity-0 group-hover:opacity-100 group-hover:bg-success/10 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
+                      <ArrowUpRight className="size-3.5" />
+                    </div>
                   </div>
                 </div>
-              ))}
+              ) : null}
+
+              {mockFeaturedContent.latestCertification ? (
+                <div className="flex flex-col gap-2 group cursor-pointer" onClick={() => navigate({ to: "/certifications" })}>
+                  <span className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+                    <Award className="size-3.5 text-violet-500/70" /> Latest Certification
+                  </span>
+                  <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3 shadow-sm hover:shadow-md hover:border-violet-500/30 transition-all duration-300">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500">
+                      <Award className="size-4" />
+                    </div>
+                    <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+                      <span className="text-[14px] font-semibold truncate group-hover:text-violet-500 transition-colors">{mockFeaturedContent.latestCertification.name}</span>
+                      <span className="text-[12px] text-muted-foreground truncate">{mockFeaturedContent.latestCertification.issuer}</span>
+                    </div>
+                    <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-violet-500/5 text-violet-500 opacity-0 group-hover:opacity-100 group-hover:bg-violet-500/10 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
+                      <ArrowUpRight className="size-3.5" />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </div>
+
           </CardContent>
         </Card>
       </div>
