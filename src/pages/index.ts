@@ -6,3 +6,4 @@ export { Education } from './education';
 export { Certifications } from './certifications';
 export { Blog } from './blog';
 export { Settings } from './settings';
+export { Login } from "./login"
