@@ -99,7 +99,7 @@ export function TopNav() {
             <Button variant="ghost" size="icon" className="hover:bg-accent size-8 rounded-full">
               <Avatar className="ring-border size-7 ring-1">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                  {mockUser.avatar}
+                  {mockUser.fullName.split(' ').map((n) => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -107,7 +107,7 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">{mockUser.name}</span>
+                <span className="text-sm font-semibold">{mockUser.fullName}</span>
                 <span className="text-muted-foreground text-xs">{mockUser.email}</span>
               </div>
             </DropdownMenuLabel>

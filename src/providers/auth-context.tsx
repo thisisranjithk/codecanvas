@@ -1,5 +1,9 @@
-import { createContext, useState, useEffect, type ReactNode, useCallback } from "react";
-import { mockAuth, type User } from "@/lib/mock-auth";
+import { createContext, useCallback, type ReactNode } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useLogin, useMe } from '@/hooks/api/auth';
+import { authStorage } from '@/lib/auth-storage';
+import { queryClient } from '@/api';
+import type { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -12,40 +16,28 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { data: meData, isLoading: isMeLoading } = useMe();
+  const loginMutation = useLogin();
 
+  const user = meData?.data?.user ?? null;
   const isAuthenticated = !!user;
+  const isLoading = !!authStorage.getToken() && isMeLoading;
 
-  useEffect(() => {
-    // Restore session
-    try {
-      const storedUser = localStorage.getItem("auth_user");
-      const storedIsAuthenticated = localStorage.getItem("auth_isAuthenticated");
-
-      if (storedUser && storedIsAuthenticated === "true") {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error("Failed to restore session", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    const authenticatedUser = await mockAuth.login(email, password);
-
-    setUser(authenticatedUser);
-    localStorage.setItem("auth_user", JSON.stringify(authenticatedUser));
-    localStorage.setItem("auth_isAuthenticated", "true");
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const response = await loginMutation.mutateAsync({ email, password });
+      authStorage.setToken(response.data.accessToken);
+      await queryClient.invalidateQueries({ queryKey: ['auth'] });
+    },
+    [loginMutation],
+  );
 
   const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_isAuthenticated");
-  }, []);
+    authStorage.removeToken();
+    queryClient.clear();
+    navigate({ to: '/login' });
+  }, [navigate]);
 
   return (
     <AuthContext.Provider

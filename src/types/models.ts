@@ -1,8 +1,12 @@
 export interface User {
-  name: string;
+  id: string;
+  fullName: string;
+  username: string;
   email: string;
-  avatar: string;
   role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Project {

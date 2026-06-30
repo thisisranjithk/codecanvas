@@ -24,7 +24,7 @@ import { mockProjects } from '@/data/projects';
 import { mockBlogs } from '@/data/blogs';
 import { mockExperience } from '@/data/experience';
 import { mockCertifications } from '@/data/certifications';
-import { mockUser } from '@/data/user';
+import { useAuth } from '@/hooks/use-auth';
 
 const mockRecentActivity = Array.from({ length: 15 }).map((_, i) => ({
   id: String(i + 1),
@@ -54,6 +54,7 @@ const mockFeaturedContent = {
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const statCards = useMemo(
     () => [
@@ -166,7 +167,7 @@ export function Dashboard() {
                 <span className="text-primary text-3 font-semibold tracking-wider uppercase">
                   Welcome back
                 </span>
-                <h2 className="text-3xl font-bold tracking-tight">{mockUser.name}!</h2>
+                <h2 className="text-3xl font-bold tracking-tight">{user?.fullName}!</h2>
                 <p className="text-muted-foreground mt-1 max-w-[300px] text-sm leading-relaxed">
                   You have{' '}
                   <strong className="text-foreground font-semibold">

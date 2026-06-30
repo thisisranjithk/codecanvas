@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockUser } from '@/data/user';
+import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
 import {
@@ -24,6 +24,7 @@ import {
 // ── Profile Tab ──
 
 function ProfileTab() {
+  const { user } = useAuth();
   const {
     register,
     control,
@@ -32,8 +33,8 @@ function ProfileTab() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: mockUser.name,
-      email: mockUser.email,
+      name: user?.fullName || '',
+      email: user?.email || '',
       headline: 'Senior Software Engineer & Open Source Contributor',
       bio: "I'm a software engineer with 6+ years of experience building high-performance web applications. Currently at Vercel, previously at Stripe and Linear.",
       location: 'San Francisco, CA',
@@ -70,7 +71,7 @@ function ProfileTab() {
             <div className="flex items-center gap-3">
               <Avatar className="ring-border size-14 ring-2">
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                  {mockUser.avatar}
+                  {user?.fullName?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">
