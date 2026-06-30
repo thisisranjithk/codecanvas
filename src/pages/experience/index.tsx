@@ -86,10 +86,10 @@ export function Experience() {
                         {exp.logo}
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-[17px]">
+                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
                           {exp.company}
                         </h2>
-                        <p className="text-primary truncate text-[13px] font-semibold sm:text-sm">
+                        <p className="text-primary text-3 truncate font-semibold sm:text-sm">
                           {exp.role}
                         </p>
                       </div>
@@ -131,7 +131,7 @@ export function Experience() {
                   </div>
 
                   {/* Metadata Row */}
-                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] font-medium sm:pl-[64px] sm:text-[13px]">
+                  <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
                       {formatDate(exp.startDate)} —{' '}
@@ -154,7 +154,7 @@ export function Experience() {
 
                   {/* Description Text */}
                   {exp.description && (
-                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-[64px] sm:text-sm">
+                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-16 sm:text-sm">
                       {exp.description}
                     </p>
                   )}
@@ -162,22 +162,22 @@ export function Experience() {
 
                 {/* Divider */}
                 {(exp.responsibilities?.length > 0 || exp.technologies?.length > 0) && (
-                  <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-[64px] sm:w-[calc(100%-64px)]" />
+                  <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-16 sm:w-[calc(100%-64px)]" />
                 )}
 
                 {/* Responsibilities & Tech */}
-                <div className="flex flex-col gap-5 sm:gap-8 sm:pl-[64px] lg:flex-row">
+                <div className="flex flex-col gap-5 sm:gap-8 sm:pl-16 lg:flex-row">
                   {/* Left Column: Responsibilities */}
                   {exp.responsibilities && exp.responsibilities.length > 0 && (
                     <div className="flex flex-1 flex-col gap-2.5">
-                      <h4 className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                      <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                         Key Responsibilities
                       </h4>
                       <ul className="flex flex-col gap-2">
                         {exp.responsibilities.map((item, i) => (
                           <li
                             key={i}
-                            className="text-foreground/90 flex items-start gap-2.5 text-[13px] sm:text-[13.5px]"
+                            className="text-foreground/90 text-3 flex items-start gap-2.5 sm:text-[13.5px]"
                           >
                             <span className="bg-primary/60 mt-1.5 size-1 shrink-0 rounded-full" />
                             <span className="leading-relaxed">{item}</span>
@@ -190,7 +190,7 @@ export function Experience() {
                   {/* Right Column: Technologies */}
                   {exp.technologies && exp.technologies.length > 0 && (
                     <div className="flex shrink-0 flex-col gap-2.5 lg:w-64">
-                      <h4 className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                      <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                         Technologies
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
@@ -198,7 +198,7 @@ export function Experience() {
                           <Badge
                             key={tech}
                             variant="secondary"
-                            className="bg-secondary/60 hover:bg-secondary/80 h-6 border-transparent px-2.5 text-[11px] font-normal sm:text-xs"
+                            className="bg-secondary/60 hover:bg-secondary/80 h-6 border-transparent px-2.5 text-xs font-normal sm:text-xs"
                           >
                             {tech}
                           </Badge>
@@ -309,7 +309,7 @@ function ExperienceDialog({
           <DialogTitle className="text-lg">
             {experience ? 'Edit Experience' : 'Add Experience'}
           </DialogTitle>
-          <DialogDescription className="text-[15px]">
+          <DialogDescription className="text-base">
             {experience ? 'Update position details.' : 'Add a work experience entry.'}
           </DialogDescription>
         </DialogHeader>
@@ -321,8 +321,8 @@ function ExperienceDialog({
               error={errors.company}
               placeholder="TechCorp Pvt. Ltd."
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Role / Title"
@@ -330,8 +330,8 @@ function ExperienceDialog({
               error={errors.role}
               placeholder="Frontend Developer"
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -342,8 +342,8 @@ function ExperienceDialog({
                 error={errors.type}
                 options={employmentTypes}
                 required
-                labelClassName="text-[15px]"
-                selectClassName="h-9 text-[15px] w-full"
+                labelClassName="text-base"
+                selectClassName="h-9 text-base w-full"
               />
               <FormInput
                 label="Location"
@@ -351,8 +351,8 @@ function ExperienceDialog({
                 error={errors.location}
                 placeholder="Bengaluru, India"
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px] w-full"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base w-full"
               />
             </div>
 
@@ -363,8 +363,8 @@ function ExperienceDialog({
                 control={control}
                 error={errors.startDate}
                 required
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
               <FormMonthPicker
                 label="End Date"
@@ -372,8 +372,8 @@ function ExperienceDialog({
                 control={control}
                 error={errors.endDate}
                 disabled={isCurrent}
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
             </div>
 
@@ -383,7 +383,7 @@ function ExperienceDialog({
               control={control}
               description="This will hide the end date"
               className="bg-muted/20 mb-4"
-              labelClassName="text-[15px]"
+              labelClassName="text-base"
             />
 
             <FormTextarea
@@ -392,8 +392,8 @@ function ExperienceDialog({
               error={errors.description}
               placeholder="Brief summary of your role..."
               rows={2}
-              labelClassName="text-[15px]"
-              textareaClassName="text-[15px]"
+              labelClassName="text-base"
+              textareaClassName="text-base"
             />
 
             <FormTextarea
@@ -402,8 +402,8 @@ function ExperienceDialog({
               placeholder="List your responsibilities (one per line)..."
               rows={4}
               description="Press Enter to separate each responsibility bullet point."
-              labelClassName="text-[15px]"
-              textareaClassName="text-[15px]"
+              labelClassName="text-base"
+              textareaClassName="text-base"
             />
 
             <FormInput
@@ -411,8 +411,8 @@ function ExperienceDialog({
               registration={register('technologies')}
               placeholder="React, Next.js, Tailwind CSS..."
               description="Separate each technology with a comma."
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="pt-2">
@@ -421,11 +421,11 @@ function ExperienceDialog({
               size="sm"
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-9 text-[15px]"
+              className="h-9 text-base"
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9 text-[15px]">
+            <Button size="sm" type="submit" className="h-9 text-base">
               {experience ? 'Save Changes' : 'Add Experience'}
             </Button>
           </DialogFooter>

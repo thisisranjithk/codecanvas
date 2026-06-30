@@ -65,7 +65,7 @@ export function Education() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Education</h1>
-          <p className="text-muted-foreground mt-0.5 text-[15px]">{educations.length} entries</p>
+          <p className="text-muted-foreground mt-0.5 text-base">{educations.length} entries</p>
         </div>
         <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
           <Plus className="size-4" />
@@ -96,10 +96,10 @@ export function Education() {
                         {edu.logo || <GraduationCap className="size-5" />}
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-[17px]">
+                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
                           {edu.institution}
                         </h2>
-                        <p className="text-primary truncate text-[13px] font-semibold sm:text-sm">
+                        <p className="text-primary text-3 truncate font-semibold sm:text-sm">
                           {edu.degree} in {edu.field}
                         </p>
                       </div>
@@ -135,7 +135,7 @@ export function Education() {
                   </div>
 
                   {/* Metadata Row */}
-                  <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] font-medium sm:pl-[64px] sm:text-[13px]">
+                  <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
                       {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
@@ -164,7 +164,7 @@ export function Education() {
 
                   {/* Description Text */}
                   {edu.description && (
-                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-[64px] sm:text-sm">
+                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-16 sm:text-sm">
                       {edu.description}
                     </p>
                   )}
@@ -172,20 +172,20 @@ export function Education() {
 
                 {/* Divider */}
                 {edu.activities && edu.activities.length > 0 && (
-                  <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-[64px] sm:w-[calc(100%-64px)]" />
+                  <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-16 sm:w-[calc(100%-64px)]" />
                 )}
 
                 {/* Activities section */}
                 {edu.activities && edu.activities.length > 0 && (
-                  <div className="flex flex-col gap-2.5 sm:pl-[64px]">
-                    <h4 className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
+                  <div className="flex flex-col gap-2.5 sm:pl-16">
+                    <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                       Activities & Societies
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {edu.activities.map((act) => (
                         <div
                           key={act}
-                          className="border-border/60 bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-[12px] font-medium shadow-sm transition-colors sm:text-[13px]"
+                          className="border-border/60 bg-muted/20 hover:bg-muted/40 sm:text-3 flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium shadow-sm transition-colors"
                         >
                           {getEducationActivityIcon(act)}
                           <span>{act}</span>
@@ -279,7 +279,7 @@ function EducationDialog({
           <DialogTitle className="text-lg">
             {education ? 'Edit Education' : 'Add Education'}
           </DialogTitle>
-          <DialogDescription className="text-[15px]">
+          <DialogDescription className="text-base">
             {education ? 'Update education details.' : 'Add an education entry.'}
           </DialogDescription>
         </DialogHeader>
@@ -291,8 +291,8 @@ function EducationDialog({
               error={errors.institution}
               placeholder="e.g. Carnegie Mellon University"
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-3">
               <FormInput
@@ -301,8 +301,8 @@ function EducationDialog({
                 error={errors.degree}
                 placeholder="e.g. Bachelor of Science"
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Field of Study"
@@ -310,8 +310,8 @@ function EducationDialog({
                 error={errors.field}
                 placeholder="e.g. Computer Science"
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -321,16 +321,16 @@ function EducationDialog({
                 control={control}
                 error={errors.startDate}
                 required
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
               <FormMonthPicker
                 label="End Date"
                 name="endDate"
                 control={control}
                 error={errors.endDate}
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -339,16 +339,16 @@ function EducationDialog({
                 registration={register('gpa')}
                 error={errors.gpa}
                 placeholder="e.g. 3.8"
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Location"
                 registration={register('location')}
                 error={errors.location}
                 placeholder="e.g. Pittsburgh, PA"
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
             </div>
             <FormTextarea
@@ -357,15 +357,15 @@ function EducationDialog({
               error={errors.description}
               placeholder="Describe your studies, thesis, or focus areas..."
               rows={3}
-              labelClassName="text-[15px]"
-              textareaClassName="text-[15px]"
+              labelClassName="text-base"
+              textareaClassName="text-base"
             />
             <FormInput
               label="Activities (comma-separated)"
               registration={register('activities')}
               placeholder="ACM Chapter, Hackathon Organizer, ..."
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="pt-2">

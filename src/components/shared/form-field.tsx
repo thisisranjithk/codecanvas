@@ -26,11 +26,11 @@ function FormErrorMessage({ error, description }: { error?: FieldError; descript
   return (
     <div className="flex min-h-[20px] flex-col justify-start">
       {error?.message ? (
-        <p className="text-destructive animate-in fade-in-0 slide-in-from-top-1 text-[13px] duration-200">
+        <p className="text-destructive animate-in fade-in-0 slide-in-from-top-1 text-3 duration-200">
           {error.message}
         </p>
       ) : description ? (
-        <p className="text-muted-foreground text-[13px]">{description}</p>
+        <p className="text-muted-foreground text-3">{description}</p>
       ) : null}
     </div>
   );
@@ -261,7 +261,7 @@ function FormSwitch<T extends FieldValues>({
         >
           <div className="flex flex-col gap-0.5">
             <Label className={cn('text-sm font-medium', labelClassName)}>{label}</Label>
-            {description && <p className="text-muted-foreground text-[13px]">{description}</p>}
+            {description && <p className="text-muted-foreground text-3">{description}</p>}
           </div>
           <Switch checked={field.value} onCheckedChange={field.onChange} />
         </div>

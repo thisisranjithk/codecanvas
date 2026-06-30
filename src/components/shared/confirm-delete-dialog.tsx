@@ -30,7 +30,7 @@ export function ConfirmDeleteDialog({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-lg">{title}</DialogTitle>
-          <DialogDescription className="text-[15px]">
+          <DialogDescription className="text-base">
             {description ? (
               description
             ) : itemName ? (

@@ -40,7 +40,7 @@ export function AppSidebar() {
                   <Layers className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="text-[15px] font-semibold tracking-tight">Portfolio CMS</span>
+                  <span className="text-base font-semibold tracking-tight">Portfolio CMS</span>
                   <span className="text-sidebar-foreground/60 text-xs">alexmorgan.dev</span>
                 </div>
               </Link>
@@ -68,7 +68,7 @@ export function AppSidebar() {
                       }
                     >
                       <Link to={item.path} className="relative flex items-center">
-                        <item.icon className="size-[18px]" />
+                        <item.icon className="size-4" />
                         <span className="text-sm font-medium">{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -96,7 +96,7 @@ export function AppSidebar() {
               }
             >
               <Link to="/settings" className="flex items-center">
-                <Settings className="size-[18px]" />
+                <Settings className="size-4" />
                 <span className="text-sm font-medium">Settings</span>
               </Link>
             </SidebarMenuButton>

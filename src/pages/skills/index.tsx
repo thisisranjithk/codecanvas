@@ -186,10 +186,8 @@ export function Skills() {
                     <ChevronDown className="text-muted-foreground/60 group-hover:text-foreground size-4 transition-colors" />
                   )}
                   <Icon className="text-muted-foreground/60 size-4" />
-                  <h2 className="text-foreground text-[15px] font-semibold tracking-tight">
-                    {cat}
-                  </h2>
-                  <Badge variant="secondary" className="bg-muted ml-1 h-4 px-1.5 text-[10px]">
+                  <h2 className="text-foreground text-base font-semibold tracking-tight">{cat}</h2>
+                  <Badge variant="secondary" className="bg-muted ml-1 h-4 px-1.5 text-xs">
                     {catSkills.length}
                   </Badge>
                   <div className="ml-auto flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -386,7 +384,7 @@ function SkillCard({
               <span className="text-foreground group-hover:text-primary truncate text-[14.5px] font-bold transition-colors">
                 {skill.name}
               </span>
-              <span className="text-muted-foreground text-[12px] font-medium">
+              <span className="text-muted-foreground text-xs font-medium">
                 {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? 'year' : 'years'} exp
               </span>
             </div>
@@ -420,7 +418,7 @@ function SkillCard({
           <Badge
             variant="outline"
             className={cn(
-              'bg-background/50 h-5 px-2 text-[10px] font-medium',
+              'bg-background/50 h-5 px-2 text-xs font-medium',
               getSkillProficiencyBadgeClass(skill.proficiency)
             )}
           >
@@ -434,7 +432,7 @@ function SkillCard({
                 style={{ width: `${skill.proficiency}%` }}
               />
             </div>
-            <span className="text-muted-foreground text-[11px] font-semibold tabular-nums">
+            <span className="text-muted-foreground text-xs font-semibold tabular-nums">
               {skill.proficiency}%
             </span>
           </div>

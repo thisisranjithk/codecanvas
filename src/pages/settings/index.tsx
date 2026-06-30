@@ -62,7 +62,7 @@ function ProfileTab() {
         <Card className="border-border/60">
           <CardHeader className="px-4 pt-4 pb-3">
             <CardTitle className="text-sm">Profile Information</CardTitle>
-            <CardDescription className="text-[11px]">
+            <CardDescription className="text-xs">
               Update your personal details visible on your portfolio.
             </CardDescription>
           </CardHeader>
@@ -77,7 +77,7 @@ function ProfileTab() {
                 <Button variant="outline" size="sm" className="h-7 w-fit text-xs" type="button">
                   Change Avatar
                 </Button>
-                <p className="text-muted-foreground text-[10px]">PNG, JPG up to 2MB</p>
+                <p className="text-muted-foreground text-xs">PNG, JPG up to 2MB</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -146,7 +146,7 @@ function ProfileTab() {
         <Card className="border-border/60">
           <CardHeader className="px-4 pt-4 pb-3">
             <CardTitle className="text-sm">Social Links</CardTitle>
-            <CardDescription className="text-[11px]">
+            <CardDescription className="text-xs">
               Add links to your social profiles and personal sites.
             </CardDescription>
           </CardHeader>
@@ -155,14 +155,14 @@ function ProfileTab() {
               <div key={link.label} className="grid gap-1.5">
                 <Label className="text-xs">{link.label}</Label>
                 <div className="flex">
-                  <span className="text-muted-foreground bg-muted border-border/60 flex items-center rounded-l-md border border-r-0 px-2.5 text-[10px]">
+                  <span className="text-muted-foreground bg-muted border-border/60 flex items-center rounded-l-md border border-r-0 px-2.5 text-xs">
                     <Link className="mr-1 size-2.5" />
                     {link.prefix}
                   </span>
                   <Input {...register(link.field)} className="h-8 rounded-l-none text-xs" />
                 </div>
                 {errors[link.field] && (
-                  <p className="text-destructive text-[13px]">{errors[link.field]?.message}</p>
+                  <p className="text-destructive text-3">{errors[link.field]?.message}</p>
                 )}
               </div>
             ))}
@@ -216,7 +216,7 @@ function PortfolioTab() {
         <Card className="border-border/60">
           <CardHeader className="px-4 pt-4 pb-3">
             <CardTitle className="text-sm">Portfolio Visibility</CardTitle>
-            <CardDescription className="text-[11px]">
+            <CardDescription className="text-xs">
               Control what visitors can see on your public portfolio.
             </CardDescription>
           </CardHeader>
@@ -290,7 +290,7 @@ function NotificationsTab() {
             </div>
             <div className="flex flex-col gap-0.5">
               <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Coming Soon</p>
-              <p className="text-[11px] text-blue-600/80 dark:text-blue-400/80">
+              <p className="text-xs text-blue-600/80 dark:text-blue-400/80">
                 Notification preferences will be available in a future update.
               </p>
             </div>
@@ -301,7 +301,7 @@ function NotificationsTab() {
           <Card className="border-border/60">
             <CardHeader className="px-4 pt-4 pb-3">
               <CardTitle className="text-sm">Email Notifications</CardTitle>
-              <CardDescription className="text-[11px]">
+              <CardDescription className="text-xs">
                 Choose what emails you'd like to receive.
               </CardDescription>
             </CardHeader>
@@ -359,7 +359,7 @@ function SecurityTab() {
       <Card className="border-border/60">
         <CardHeader className="px-4 pt-4 pb-3">
           <CardTitle className="text-sm">Change Password</CardTitle>
-          <CardDescription className="text-[11px]">Update your account password.</CardDescription>
+          <CardDescription className="text-xs">Update your account password.</CardDescription>
         </CardHeader>
         <CardContent className="px-4 pb-4">
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -405,7 +405,7 @@ function SecurityTab() {
       <Card className="border-destructive/30">
         <CardHeader className="px-4 pt-4 pb-3">
           <CardTitle className="text-destructive text-sm">Danger Zone</CardTitle>
-          <CardDescription className="text-[11px]">
+          <CardDescription className="text-xs">
             Irreversible and destructive actions.
           </CardDescription>
         </CardHeader>
@@ -413,7 +413,7 @@ function SecurityTab() {
           <div className="border-destructive/20 bg-destructive/5 flex items-center justify-between rounded-lg border px-3.5 py-2.5">
             <div>
               <p className="text-xs font-medium">Delete Account</p>
-              <p className="text-muted-foreground text-[10px]">
+              <p className="text-muted-foreground text-xs">
                 Permanently delete your account and all portfolio data.
               </p>
             </div>
@@ -446,19 +446,19 @@ export function Settings() {
 
       <Tabs defaultValue="profile">
         <TabsList className="h-7">
-          <TabsTrigger value="profile" className="h-5 gap-1.5 px-2.5 text-[11px]">
+          <TabsTrigger value="profile" className="h-5 gap-1.5 px-2.5 text-xs">
             <User className="size-3" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="portfolio" className="h-5 gap-1.5 px-2.5 text-[11px]">
+          <TabsTrigger value="portfolio" className="h-5 gap-1.5 px-2.5 text-xs">
             <Globe className="size-3" />
             Portfolio
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="h-5 gap-1.5 px-2.5 text-[11px]">
+          <TabsTrigger value="notifications" className="h-5 gap-1.5 px-2.5 text-xs">
             <Bell className="size-3" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger value="security" className="h-5 gap-1.5 px-2.5 text-[11px]">
+          <TabsTrigger value="security" className="h-5 gap-1.5 px-2.5 text-xs">
             <Shield className="size-3" />
             Security
           </TabsTrigger>

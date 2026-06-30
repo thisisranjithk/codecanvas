@@ -16,7 +16,7 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
       <div className="flex flex-col gap-1.5">
         <h1 className="text-foreground text-2xl font-bold tracking-tight">{title}</h1>
         {description && (
-          <div className="text-muted-foreground flex items-center gap-1.5 text-[15px] font-medium">
+          <div className="text-muted-foreground flex items-center gap-1.5 text-base font-medium">
             {description}
           </div>
         )}

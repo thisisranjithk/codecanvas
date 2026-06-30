@@ -67,7 +67,7 @@ export function Certifications() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Certifications</h1>
-          <p className="text-muted-foreground mt-0.5 text-[15px]">
+          <p className="text-muted-foreground mt-0.5 text-base">
             {activeCerts.length} active · {expiredCerts.length} expired
           </p>
         </div>
@@ -91,7 +91,7 @@ export function Certifications() {
         <div className="flex flex-col gap-5">
           {activeCerts.length > 0 && (
             <div>
-              <h2 className="text-muted-foreground mb-2.5 text-[15px] font-semibold tracking-wider uppercase">
+              <h2 className="text-muted-foreground mb-2.5 text-base font-semibold tracking-wider uppercase">
                 Active ({activeCerts.length})
               </h2>
               <div className="grid gap-2.5 md:grid-cols-2">
@@ -108,7 +108,7 @@ export function Certifications() {
           )}
           {expiredCerts.length > 0 && (
             <div>
-              <h2 className="text-muted-foreground/60 mb-2.5 text-[15px] font-semibold tracking-wider uppercase">
+              <h2 className="text-muted-foreground/60 mb-2.5 text-base font-semibold tracking-wider uppercase">
                 Expired ({expiredCerts.length})
               </h2>
               <div className="grid gap-2.5 md:grid-cols-2">
@@ -203,7 +203,7 @@ function CertificationDialog({
           <DialogTitle className="text-lg">
             {certification ? 'Edit Certification' : 'Add Certification'}
           </DialogTitle>
-          <DialogDescription className="text-[15px]">
+          <DialogDescription className="text-base">
             {certification ? 'Update certification details.' : 'Add a new certification.'}
           </DialogDescription>
         </DialogHeader>
@@ -215,8 +215,8 @@ function CertificationDialog({
               error={errors.name}
               placeholder="e.g. AWS Certified Solutions Architect"
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Issuing Organization"
@@ -224,8 +224,8 @@ function CertificationDialog({
               error={errors.issuer}
               placeholder="e.g. Amazon Web Services"
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-3">
               <FormMonthPicker
@@ -234,16 +234,16 @@ function CertificationDialog({
                 control={control}
                 error={errors.issueDate}
                 required
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
               <FormMonthPicker
                 label="Expiry Date (optional)"
                 name="expiryDate"
                 control={control}
                 error={errors.expiryDate}
-                labelClassName="text-[15px]"
-                pickerClassName="w-full h-9 text-[15px]"
+                labelClassName="text-base"
+                pickerClassName="w-full h-9 text-base"
               />
             </div>
             <FormInput
@@ -251,16 +251,16 @@ function CertificationDialog({
               registration={register('credentialId')}
               error={errors.credentialId}
               placeholder="e.g. AWS-SAA-12345"
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Credential URL"
               registration={register('credentialUrl')}
               error={errors.credentialUrl}
               placeholder="https://..."
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="mt-4">
@@ -299,13 +299,13 @@ function CertCard({
             </div>
             <div className="mt-0.5 flex min-w-0 flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-foreground truncate text-[15px] leading-tight font-bold sm:text-base">
+                <h3 className="text-foreground truncate text-base leading-tight font-bold sm:text-base">
                   {cert.name}
                 </h3>
                 {isExpired ? (
                   <Badge
                     variant="outline"
-                    className="text-destructive border-destructive/20 bg-destructive/5 h-5 shrink-0 px-1.5 text-[10px] sm:text-xs"
+                    className="text-destructive border-destructive/20 bg-destructive/5 h-5 shrink-0 px-1.5 text-xs sm:text-xs"
                   >
                     <AlertCircle className="mr-1 size-3" />
                     Expired
@@ -313,18 +313,18 @@ function CertCard({
                 ) : (
                   <Badge
                     variant="secondary"
-                    className="text-success bg-success/10 hover:bg-success/20 h-5 shrink-0 border-transparent px-1.5 text-[10px] sm:text-xs"
+                    className="text-success bg-success/10 hover:bg-success/20 h-5 shrink-0 border-transparent px-1.5 text-xs sm:text-xs"
                   >
                     Active
                   </Badge>
                 )}
               </div>
 
-              <span className="text-primary/80 truncate text-[13px] font-medium sm:text-[14px]">
+              <span className="text-primary/80 text-3 truncate font-medium sm:text-sm">
                 {cert.issuer}
               </span>
 
-              <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-medium sm:text-[13px]">
+              <div className="text-muted-foreground sm:text-3 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
                 <span>Issued {formatDate(cert.issueDate)}</span>
                 {cert.expiryDate && (
                   <>
@@ -339,7 +339,7 @@ function CertCard({
               {(cert.credentialId || cert.credentialUrl) && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {cert.credentialId && (
-                    <span className="bg-muted/50 text-muted-foreground border-border/50 inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-[11px] sm:text-[12px]">
+                    <span className="bg-muted/50 text-muted-foreground border-border/50 inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs sm:text-xs">
                       ID: {cert.credentialId}
                     </span>
                   )}
@@ -348,7 +348,7 @@ function CertCard({
                       href={cert.credentialUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11.5px] font-medium transition-colors hover:underline sm:text-[12px]"
+                      className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11.5px] font-medium transition-colors hover:underline sm:text-xs"
                     >
                       Verify <ExternalLink className="size-3" />
                     </a>

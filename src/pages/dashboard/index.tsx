@@ -138,8 +138,8 @@ export function Dashboard() {
         <Card className="border-border/60 from-primary/10 via-background to-background relative overflow-hidden bg-gradient-to-br">
           {/* Decorative Background Elements */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="bg-primary/20 absolute -top-24 -right-24 size-64 rounded-full blur-[80px]" />
-            <div className="bg-secondary/20 absolute top-20 right-10 size-40 rounded-full blur-[60px]" />
+            <div className="bg-primary/20 blur-20 absolute -top-24 -right-24 size-64 rounded-full" />
+            <div className="bg-secondary/20 blur-14 absolute top-20 right-10 size-40 rounded-full" />
             <svg
               className="text-primary absolute top-0 right-0 h-full w-1/2 opacity-[0.03] dark:opacity-[0.05]"
               xmlns="http://www.w3.org/2000/svg"
@@ -163,11 +163,11 @@ export function Dashboard() {
           <CardContent className="relative z-10 flex flex-col gap-5 p-6">
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-1.5">
-                <span className="text-primary text-[13px] font-semibold tracking-wider uppercase">
+                <span className="text-primary text-3 font-semibold tracking-wider uppercase">
                   Welcome back
                 </span>
                 <h2 className="text-3xl font-bold tracking-tight">{mockUser.name}!</h2>
-                <p className="text-muted-foreground mt-1 max-w-[300px] text-[14px] leading-relaxed">
+                <p className="text-muted-foreground mt-1 max-w-[300px] text-sm leading-relaxed">
                   You have{' '}
                   <strong className="text-foreground font-semibold">
                     {mockStats.publishedProjects} published projects
@@ -184,7 +184,7 @@ export function Dashboard() {
               </div>
             </div>
             <Button
-              className="h-9 w-fit gap-2 rounded-lg text-[14px] font-medium shadow-md transition-all duration-300 hover:shadow-lg"
+              className="h-9 w-fit gap-2 rounded-lg text-sm font-medium shadow-md transition-all duration-300 hover:shadow-lg"
               asChild
             >
               <Link to="/projects">
@@ -197,7 +197,7 @@ export function Dashboard() {
         {/* Quick Actions */}
         <Card className="border-border/60">
           <CardHeader className="px-5 pt-4 pb-2">
-            <h3 className="text-[17px] font-semibold">Quick Actions</h3>
+            <h3 className="text-lg font-semibold">Quick Actions</h3>
           </CardHeader>
           <CardContent className="px-5 pb-5">
             <div className="grid grid-cols-3 gap-2.5">
@@ -212,7 +212,7 @@ export function Dashboard() {
                   >
                     <action.icon className="size-4" />
                   </div>
-                  <span className="text-[13px] leading-tight font-medium">{action.label}</span>
+                  <span className="text-3 leading-tight font-medium">{action.label}</span>
                 </Link>
               ))}
             </div>
@@ -227,12 +227,10 @@ export function Dashboard() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex flex-col gap-1">
-                  <span className="text-muted-foreground text-[13px] font-medium">
-                    {card.label}
-                  </span>
+                  <span className="text-muted-foreground text-3 font-medium">{card.label}</span>
                   <span className="text-2xl font-bold tracking-tight">{card.value}</span>
                   <span
-                    className={`flex items-center gap-0.5 text-[13px] font-medium ${card.changeUp ? 'text-success' : 'text-muted-foreground'}`}
+                    className={`text-3 flex items-center gap-0.5 font-medium ${card.changeUp ? 'text-success' : 'text-muted-foreground'}`}
                   >
                     {card.changeUp && <TrendingUp className="size-3.5" />}
                     {card.change}
@@ -241,7 +239,7 @@ export function Dashboard() {
                 <div
                   className={`flex size-10 items-center justify-center rounded-lg ${card.bgColor} ${card.color}`}
                 >
-                  <card.icon className="size-[18px]" />
+                  <card.icon className="size-4" />
                 </div>
               </div>
             </CardContent>
@@ -259,8 +257,8 @@ export function Dashboard() {
                 <Activity className="size-4" />
               </div>
               <div>
-                <h3 className="text-[16px] font-semibold tracking-tight">Recent Activity</h3>
-                <p className="text-muted-foreground text-[12px]">Your latest updates</p>
+                <h3 className="text-base font-semibold tracking-tight">Recent Activity</h3>
+                <p className="text-muted-foreground text-xs">Your latest updates</p>
               </div>
             </div>
           </CardHeader>
@@ -282,16 +280,16 @@ export function Dashboard() {
                     key={activity.id}
                     className="border-border/50 bg-card hover:bg-muted/40 flex flex-col gap-1.5 rounded-xl border p-3.5 transition-colors"
                   >
-                    <span className="text-foreground truncate text-[14px] font-semibold">
+                    <span className="text-foreground truncate text-sm font-semibold">
                       {activity.title}
                     </span>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span
-                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${badgeColor}`}
+                        className={`rounded-md px-2 py-0.5 text-xs font-bold tracking-wider uppercase ${badgeColor}`}
                       >
                         {activity.type.replace('_', ' ')}
                       </span>
-                      <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-[12px]">
+                      <span className="text-muted-foreground flex shrink-0 items-center gap-1.5 text-xs">
                         <Clock className="size-3" />
                         {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
                       </span>
@@ -311,8 +309,8 @@ export function Dashboard() {
                 <Star className="size-4" />
               </div>
               <div>
-                <h3 className="text-[16px] font-semibold tracking-tight">Featured Content</h3>
-                <p className="text-muted-foreground text-[12px]">Highlighting your best work</p>
+                <h3 className="text-base font-semibold tracking-tight">Featured Content</h3>
+                <p className="text-muted-foreground text-xs">Highlighting your best work</p>
               </div>
             </div>
           </CardHeader>
@@ -323,7 +321,7 @@ export function Dashboard() {
                   className="group flex cursor-pointer flex-col gap-2"
                   onClick={() => navigate({ to: '/projects' })}
                 >
-                  <span className="text-muted-foreground flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase">
+                  <span className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
                     <FolderKanban className="text-primary/70 size-3.5" /> Featured Project
                   </span>
                   <div className="border-border/60 bg-card hover:border-primary/30 flex items-center gap-3 rounded-xl border p-3 shadow-sm transition-all duration-300 hover:shadow-md">
@@ -331,10 +329,10 @@ export function Dashboard() {
                       <FolderKanban className="size-4" />
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="group-hover:text-primary truncate text-[14px] font-semibold transition-colors">
+                      <span className="group-hover:text-primary truncate text-sm font-semibold transition-colors">
                         {mockFeaturedContent.featuredProject.title}
                       </span>
-                      <p className="text-muted-foreground line-clamp-1 text-[12px]">
+                      <p className="text-muted-foreground line-clamp-1 text-xs">
                         {mockFeaturedContent.featuredProject.description ||
                           'A showcase of my recent work.'}
                       </p>
@@ -351,7 +349,7 @@ export function Dashboard() {
                   className="group flex cursor-pointer flex-col gap-2"
                   onClick={() => navigate({ to: '/blog' })}
                 >
-                  <span className="text-muted-foreground flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase">
+                  <span className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
                     <FileText className="text-success/70 size-3.5" /> Latest Post
                   </span>
                   <div className="border-border/60 bg-card hover:border-success/30 flex items-center gap-3 rounded-xl border p-3 shadow-sm transition-all duration-300 hover:shadow-md">
@@ -359,14 +357,14 @@ export function Dashboard() {
                       <FileText className="size-4" />
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="group-hover:text-success truncate text-[14px] font-semibold transition-colors">
+                      <span className="group-hover:text-success truncate text-sm font-semibold transition-colors">
                         {mockFeaturedContent.latestBlog.title}
                       </span>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="bg-muted text-muted-foreground rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase">
+                        <span className="bg-muted text-muted-foreground rounded-md px-2 py-0.5 text-xs font-semibold tracking-wider uppercase">
                           {mockFeaturedContent.latestBlog.category}
                         </span>
-                        <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-[11px]">
+                        <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
                           <Clock className="size-3" /> {mockFeaturedContent.latestBlog.readTime} min
                           read
                         </span>
@@ -384,7 +382,7 @@ export function Dashboard() {
                   className="group flex cursor-pointer flex-col gap-2"
                   onClick={() => navigate({ to: '/certifications' })}
                 >
-                  <span className="text-muted-foreground flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase">
+                  <span className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
                     <Award className="size-3.5 text-violet-500/70" /> Latest Certification
                   </span>
                   <div className="border-border/60 bg-card flex items-center gap-3 rounded-xl border p-3 shadow-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-md">
@@ -392,10 +390,10 @@ export function Dashboard() {
                       <Award className="size-4" />
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate text-[14px] font-semibold transition-colors group-hover:text-violet-500">
+                      <span className="truncate text-sm font-semibold transition-colors group-hover:text-violet-500">
                         {mockFeaturedContent.latestCertification.name}
                       </span>
-                      <span className="text-muted-foreground truncate text-[12px]">
+                      <span className="text-muted-foreground truncate text-xs">
                         {mockFeaturedContent.latestCertification.issuer}
                       </span>
                     </div>

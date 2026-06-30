@@ -32,7 +32,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <Badge
       variant="outline"
-      className={cn('h-5 px-1.5 text-[11px] font-medium capitalize', style, className)}
+      className={cn('h-5 px-1.5 text-xs font-medium capitalize', style, className)}
     >
       {status}
     </Badge>

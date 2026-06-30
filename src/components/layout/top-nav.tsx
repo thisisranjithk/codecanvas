@@ -2,7 +2,6 @@ import { Search, ChevronRight } from 'lucide-react';
 import { Link, useMatches } from '@tanstack/react-router';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ModeToggle } from '@/components/shared/mode-toggle';
 import {
   DropdownMenu,
@@ -64,7 +63,7 @@ export function TopNav() {
           onClick={() => window.dispatchEvent(new Event('open-global-search'))}
         >
           <Search className="size-4" />
-          <kbd className="border-border/60 bg-muted/50 text-muted-foreground pointer-events-none flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
+          <kbd className="border-border/60 bg-muted/50 text-muted-foreground pointer-events-none flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-xs font-medium opacity-100 select-none">
             <span className="text-xs">⌘</span>K
           </kbd>
         </Button>

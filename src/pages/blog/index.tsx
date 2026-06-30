@@ -129,7 +129,7 @@ export function Blog() {
         description={
           <div className="flex flex-col gap-0.5">
             <span>Manage and organize your blog posts</span>
-            <div className="flex items-center gap-1.5 text-[13px] font-medium">
+            <div className="text-3 flex items-center gap-1.5 font-medium">
               <span>{counts.all} posts</span>
               <span>•</span>
               <span className="text-emerald-500">{counts.published} published</span>
@@ -152,25 +152,25 @@ export function Blog() {
           <TabsList className="bg-muted/40 border-border/40 h-10 w-full justify-start border p-1 sm:w-auto">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-background h-8 rounded-md px-4 text-[13px] data-[state=active]:shadow-sm"
+              className="data-[state=active]:bg-background text-3 h-8 rounded-md px-4 data-[state=active]:shadow-sm"
             >
               All ({counts.all})
             </TabsTrigger>
             <TabsTrigger
               value="published"
-              className="data-[state=active]:bg-background h-8 rounded-md px-4 text-[13px] data-[state=active]:shadow-sm"
+              className="data-[state=active]:bg-background text-3 h-8 rounded-md px-4 data-[state=active]:shadow-sm"
             >
               Published ({counts.published})
             </TabsTrigger>
             <TabsTrigger
               value="draft"
-              className="data-[state=active]:bg-background h-8 rounded-md px-4 text-[13px] data-[state=active]:shadow-sm"
+              className="data-[state=active]:bg-background text-3 h-8 rounded-md px-4 data-[state=active]:shadow-sm"
             >
               Drafts ({counts.draft})
             </TabsTrigger>
             <TabsTrigger
               value="featured"
-              className="data-[state=active]:bg-background h-8 rounded-md px-4 text-[13px] data-[state=active]:shadow-sm"
+              className="data-[state=active]:bg-background text-3 h-8 rounded-md px-4 data-[state=active]:shadow-sm"
             >
               Featured ({counts.featured})
             </TabsTrigger>
@@ -184,7 +184,7 @@ export function Blog() {
               placeholder="Search posts..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-muted/20 border-border/60 h-10 pl-9 text-[13px] sm:w-64"
+              className="bg-muted/20 border-border/60 text-3 h-10 pl-9 sm:w-64"
             />
           </div>
         </div>
@@ -284,7 +284,7 @@ function BlogDialog({
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg">{blog ? 'Edit Post' : 'New Post'}</DialogTitle>
-          <DialogDescription className="text-[15px]">
+          <DialogDescription className="text-base">
             {blog ? 'Update post details.' : 'Create a new blog post.'}
           </DialogDescription>
         </DialogHeader>
@@ -296,8 +296,8 @@ function BlogDialog({
               error={errors.title}
               placeholder="Post title"
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormInput
@@ -306,16 +306,16 @@ function BlogDialog({
                 error={errors.slug}
                 placeholder="post-slug-here"
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="External Link (Optional)"
                 registration={register('link')}
                 error={errors.link}
                 placeholder="https://..."
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
             </div>
             <FormTextarea
@@ -325,8 +325,8 @@ function BlogDialog({
               placeholder="Short summary..."
               rows={3}
               required
-              labelClassName="text-[15px]"
-              textareaClassName="text-[15px]"
+              labelClassName="text-base"
+              textareaClassName="text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormInput
@@ -335,8 +335,8 @@ function BlogDialog({
                 error={errors.category}
                 placeholder="e.g. Engineering"
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Read Time (minutes)"
@@ -345,8 +345,8 @@ function BlogDialog({
                 type="number"
                 min={1}
                 required
-                labelClassName="text-[15px]"
-                inputClassName="h-9 text-[15px]"
+                labelClassName="text-base"
+                inputClassName="h-9 text-base"
               />
             </div>
             <FormInput
@@ -355,8 +355,8 @@ function BlogDialog({
               error={errors.tags}
               placeholder="React, TypeScript, ..."
               required
-              labelClassName="text-[15px]"
-              inputClassName="h-9 text-[15px]"
+              labelClassName="text-base"
+              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormSwitch
@@ -364,14 +364,14 @@ function BlogDialog({
                 name="featured"
                 control={control}
                 className="bg-muted/20"
-                labelClassName="text-[15px]"
+                labelClassName="text-base"
               />
               <FormSwitch
                 label="Published Status"
                 name="published"
                 control={control}
                 className="bg-muted/20"
-                labelClassName="text-[15px]"
+                labelClassName="text-base"
               />
             </div>
           </div>
@@ -381,11 +381,11 @@ function BlogDialog({
               size="sm"
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-9 text-[15px]"
+              className="h-9 text-base"
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9 text-[15px]">
+            <Button size="sm" type="submit" className="h-9 text-base">
               {blog ? 'Save Changes' : 'Create Post'}
             </Button>
           </DialogFooter>
@@ -449,20 +449,20 @@ function BlogCard({
                 {blog.featured && (
                   <Badge
                     variant="secondary"
-                    className="h-5 shrink-0 border-transparent bg-amber-500/10 px-1.5 text-[10px] text-amber-600 hover:bg-amber-500/20 sm:text-[11px]"
+                    className="h-5 shrink-0 border-transparent bg-amber-500/10 px-1.5 text-xs text-amber-600 hover:bg-amber-500/20 sm:text-xs"
                   >
                     <Star className="mr-1 size-3 fill-amber-600" /> Featured
                   </Badge>
                 )}
                 <Badge
                   variant="outline"
-                  className="bg-primary/5 text-primary border-primary/20 h-5 shrink-0 rounded-md px-2 text-[10px] font-medium sm:text-[11px]"
+                  className="bg-primary/5 text-primary border-primary/20 h-5 shrink-0 rounded-md px-2 text-xs font-medium sm:text-xs"
                 >
                   {blog.category}
                 </Badge>
                 <StatusBadge
                   status={`blog-${blog.status}`}
-                  className="h-5 shrink-0 px-2 text-[10px] tracking-wider uppercase sm:text-[11px]"
+                  className="h-5 shrink-0 px-2 text-xs tracking-wider uppercase sm:text-xs"
                 />
               </div>
 
@@ -485,7 +485,7 @@ function BlogCard({
               )}
 
               {/* Excerpt */}
-              <p className="text-muted-foreground mt-1 line-clamp-2 text-[13.5px] leading-relaxed sm:text-[14px]">
+              <p className="text-muted-foreground mt-1 line-clamp-2 text-[13.5px] leading-relaxed sm:text-sm">
                 {blog.excerpt}
               </p>
             </div>
@@ -534,7 +534,7 @@ function BlogCard({
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="bg-secondary/60 hover:bg-secondary/80 h-5 border-transparent px-2 py-0 text-[10px] font-medium sm:text-[11px]"
+                  className="bg-secondary/60 hover:bg-secondary/80 h-5 border-transparent px-2 py-0 text-xs font-medium sm:text-xs"
                 >
                   {tag}
                 </Badge>
@@ -542,7 +542,7 @@ function BlogCard({
             </div>
 
             {/* Meta: Date & Read Time */}
-            <div className="text-muted-foreground ml-auto flex shrink-0 items-center gap-2.5 text-[12px] font-medium sm:text-[13px]">
+            <div className="text-muted-foreground sm:text-3 ml-auto flex shrink-0 items-center gap-2.5 text-xs font-medium">
               <span>{formatPublishDate(blog.publishedAt)}</span>
               <span className="text-muted-foreground/30">•</span>
               <span className="flex items-center gap-1">

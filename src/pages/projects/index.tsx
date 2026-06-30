@@ -256,13 +256,13 @@ export function Projects() {
                     <Badge
                       key={tech}
                       variant="secondary"
-                      className="bg-secondary/60 h-5 px-1.5 text-[11px] font-normal"
+                      className="bg-secondary/60 h-5 px-1.5 text-xs font-normal"
                     >
                       {tech}
                     </Badge>
                   ))}
                   {project.technologies.length > 4 && (
-                    <Badge variant="outline" className="h-5 px-1.5 text-[11px] font-normal">
+                    <Badge variant="outline" className="h-5 px-1.5 text-xs font-normal">
                       +{project.technologies.length - 4}
                     </Badge>
                   )}
@@ -281,7 +281,7 @@ export function Projects() {
                         </a>
                       </Button>
                     )}
-                    <span className="text-muted-foreground/60 text-[11px]">
+                    <span className="text-muted-foreground/60 text-xs">
                       {formatDateTime(project.updatedAt)}
                     </span>
                   </div>
