@@ -1,7 +1,9 @@
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     Card,
     CardContent,
@@ -14,6 +16,19 @@ import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
 import { useNavigate } from "@tanstack/react-router"
+import {
+    Field,
+    FieldLabel,
+    FieldContent,
+    FieldError,
+} from "@/components/ui/field"
+
+const loginSchema = z.object({
+    email: z.string().email("Please enter a valid email address."),
+    password: z.string().min(1, "Password is required."),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 interface LoginProps {
     onNavigate?: (path: string) => void
@@ -109,18 +124,27 @@ function AnimatedIllustration() {
 }
 
 export function Login({ onNavigate }: LoginProps) {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const { login } = useAuth()
     const navigate = useNavigate()
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    })
+
+    const onSubmit = async (data: LoginFormValues) => {
         setIsLoading(true)
         try {
-            await login(email, password)
+            await login(data.email, data.password)
             toast.success("Successfully logged in.")
             navigate({ to: "/" })
             onNavigate?.("/")
@@ -159,26 +183,25 @@ export function Login({ onNavigate }: LoginProps) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <div className="relative">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                            <Field>
+                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <FieldContent className="relative">
                                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                     <Input
                                         id="email"
                                         type="email"
                                         placeholder="name@example.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
                                         className="pl-10"
-                                        required
+                                        {...register("email")}
                                     />
-                                </div>
-                            </div>
+                                </FieldContent>
+                                <FieldError errors={[errors.email]} />
+                            </Field>
 
-                            <div className="space-y-2">
+                            <Field>
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="password">Password</Label>
+                                    <FieldLabel htmlFor="password">Password</FieldLabel>
                                     <Button
                                         type="button"
                                         variant="link"
@@ -188,16 +211,14 @@ export function Login({ onNavigate }: LoginProps) {
                                         Forgot password?
                                     </Button>
                                 </div>
-                                <div className="relative">
+                                <FieldContent className="relative">
                                     <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                     <Input
                                         id="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Enter your password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
                                         className="pl-10 pr-10"
-                                        required
+                                        {...register("password")}
                                     />
                                     <Button
                                         type="button"
@@ -215,8 +236,9 @@ export function Login({ onNavigate }: LoginProps) {
                                             {showPassword ? "Hide password" : "Show password"}
                                         </span>
                                     </Button>
-                                </div>
-                            </div>
+                                </FieldContent>
+                                <FieldError errors={[errors.password]} />
+                            </Field>
 
                             <Button type="submit" className="w-full" disabled={isLoading}>
                                 {isLoading ? (
