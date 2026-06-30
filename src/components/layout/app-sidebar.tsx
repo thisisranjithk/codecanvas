@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, Layers } from 'lucide-react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import {
   Sidebar,
@@ -16,18 +16,26 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Layers } from 'lucide-react';
-import { mockUser } from '@/data/user';
 import { navItems } from '@/config/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 export function AppSidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const { setOpenMobile } = useSidebar();
+  const { user } = useAuth();
 
   useEffect(() => {
     setOpenMobile(false);
   }, [currentPath, setOpenMobile]);
+
+  const userInitials = user?.fullName
+    ? user.fullName
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+    : 'U';
 
   return (
     <Sidebar collapsible="icon">
@@ -104,23 +112,23 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              asChild
-              tooltip={mockUser.name}
-              className="hover:bg-sidebar-accent/50"
+              tooltip="Logout"
+              className="hover:bg-sidebar-accent/50 justify-between"
             >
-              <button className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <Avatar className="ring-sidebar-border size-7 shrink-0 ring-2">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                    {mockUser.avatar}
+                    {userInitials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col gap-0.5 text-left leading-none">
-                  <span className="truncate text-sm font-medium">{mockUser.name}</span>
+                <div className="flex flex-col gap-0.5 text-left leading-none group-data-[collapsible=icon]:hidden">
+                  <span className="truncate text-sm font-medium">{user?.fullName || 'User'}</span>
                   <span className="text-sidebar-foreground/60 truncate text-xs">
-                    {mockUser.email}
+                    {user?.email || 'user@example.com'}
                   </span>
                 </div>
-              </button>
+              </div>
+              {/* <LogOut className="size-4 text-muted-foreground group-data-[collapsible=icon]:hidden" /> */}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

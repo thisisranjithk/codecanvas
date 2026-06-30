@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "sonner"
+import { useNavigate } from "@tanstack/react-router"
 
 interface LoginProps {
     onNavigate?: (path: string) => void
@@ -110,14 +113,22 @@ export function Login({ onNavigate }: LoginProps) {
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const { login } = useAuth()
+    const navigate = useNavigate()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        // Simulate login
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-        setIsLoading(false)
-        onNavigate?.("/")
+        try {
+            await login(email, password)
+            toast.success("Successfully logged in.")
+            navigate({ to: "/" })
+            onNavigate?.("/")
+        } catch (error) {
+            toast.error("Invalid email or password.")
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (

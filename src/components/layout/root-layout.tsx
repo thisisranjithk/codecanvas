@@ -1,11 +1,41 @@
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, useRouterState, Navigate } from '@tanstack/react-router';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from './app-sidebar';
 import { TopNav } from './top-nav';
 import { Toaster } from '@/components/ui/sonner';
 import { GlobalSearch } from '@/components/shared/global-search';
+import { useAuth } from '@/hooks/use-auth';
 
 export function RootLayout() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const routerState = useRouterState();
+  const isLoginPage = routerState.location.pathname === '/login';
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated && !isLoginPage) {
+    return <Navigate to="/login" />;
+  }
+
+  if (isAuthenticated && isLoginPage) {
+    return <Navigate to="/" />;
+  }
+
+  if (isLoginPage) {
+    return (
+      <>
+        <Outlet />
+        <Toaster position="bottom-right" richColors />
+      </>
+    );
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

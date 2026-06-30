@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
 import { Link, useMatches } from '@tanstack/react-router';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -11,15 +12,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { mockUser } from '@/data/user';
+import { useAuth } from '@/hooks/use-auth';
+import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 export function TopNav() {
   const matches = useMatches();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const currentMatch = matches[matches.length - 1];
   const breadcrumbs =
     (currentMatch?.staticData?.breadcrumbs as { label: string; path?: string }[]) || [];
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Successfully logged out.');
+    navigate({ to: '/login' });
+  };
 
   return (
     <header className="border-border/60 bg-background/90 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b px-4 backdrop-blur">
@@ -94,13 +117,37 @@ export function TopNav() {
                 Settings
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>View Portfolio</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings" className="w-full cursor-pointer">
+                View Portfolio
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive cursor-pointer"
+              onSelect={() => setShowLogoutDialog(true)}
+            >
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sign Out</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to sign out of your account?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleLogout} variant="destructive">
+                Sign out
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </header>
   );
