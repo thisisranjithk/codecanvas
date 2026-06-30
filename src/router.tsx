@@ -9,7 +9,8 @@ import {
   Certifications,
   Blog,
   Settings,
-  Login
+  Login,
+  Register
 } from '@/pages';
 
 // Type for our route's static data
@@ -36,6 +37,15 @@ const loginRoute = createRoute({
   component: Login,
   staticData: {
     breadcrumbs: [{ label: 'Login', path: '/login' }],
+  } as RouteStaticData,
+});
+
+const registerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/register',
+  component: Register,
+  staticData: {
+    breadcrumbs: [{ label: 'Register', path: '/register' }],
   } as RouteStaticData,
 });
 
@@ -105,6 +115,7 @@ const settingsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
+  registerRoute,
   projectsRoute,
   skillsRoute,
   experienceRoute,

@@ -156,14 +156,14 @@ export function Login({ onNavigate }: LoginProps) {
     }
 
     return (
-        <div className="flex min-h-[calc(100vh-4rem)] w-full">
+        <div className="flex min-h-[calc(100vh-4rem)] w-full animate-auth-fade-in">
             {/* Left side - Illustration */}
-            <div className="hidden w-1/2 bg-gradient-to-br from-primary/5 via-background to-chart-1/5 lg:block dark:from-primary/10 dark:via-background dark:to-chart-1/10">
+            <div className="animate-slide-in-left hidden w-1/2 bg-gradient-to-br from-primary/5 via-background to-chart-1/5 lg:block dark:from-primary/10 dark:via-background dark:to-chart-1/10">
                 <AnimatedIllustration />
             </div>
 
             {/* Right side - Login form */}
-            <div className="flex w-full items-center justify-center px-4 py-12 lg:w-1/2 lg:px-8">
+            <div className="animate-slide-in-right flex w-full items-center justify-center px-4 py-12 lg:w-1/2 lg:px-8">
                 <Card className="w-full max-w-md border-0 bg-transparent shadow-none">
                     <CardHeader className="space-y-1 text-center">
                         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
@@ -186,15 +186,17 @@ export function Login({ onNavigate }: LoginProps) {
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             <Field>
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                                <FieldContent className="relative">
-                                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        className="pl-10"
-                                        {...register("email")}
-                                    />
+                                <FieldContent>
+                                    <div className="relative">
+                                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            placeholder="name@example.com"
+                                            className="pl-10"
+                                            {...register("email")}
+                                        />
+                                    </div>
                                 </FieldContent>
                                 <FieldError errors={[errors.email]} />
                             </Field>
@@ -211,31 +213,33 @@ export function Login({ onNavigate }: LoginProps) {
                                         Forgot password?
                                     </Button>
                                 </div>
-                                <FieldContent className="relative">
-                                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        id="password"
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Enter your password"
-                                        className="pl-10 pr-10"
-                                        {...register("password")}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                        ) : (
-                                            <Eye className="h-4 w-4 text-muted-foreground" />
-                                        )}
-                                        <span className="sr-only">
-                                            {showPassword ? "Hide password" : "Show password"}
-                                        </span>
-                                    </Button>
+                                <FieldContent>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            id="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Enter your password"
+                                            className="pl-10 pr-10"
+                                            {...register("password")}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                            ) : (
+                                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                            )}
+                                            <span className="sr-only">
+                                                {showPassword ? "Hide password" : "Show password"}
+                                            </span>
+                                        </Button>
+                                    </div>
                                 </FieldContent>
                                 <FieldError errors={[errors.password]} />
                             </Field>
@@ -294,7 +298,10 @@ export function Login({ onNavigate }: LoginProps) {
                             <Button
                                 variant="link"
                                 className="h-auto p-0 text-primary"
-                                onClick={() => { }}
+                                onClick={() => {
+                                    navigate({ to: "/register" })
+                                    onNavigate?.("/register")
+                                }}
                             >
                                 Sign up
                             </Button>

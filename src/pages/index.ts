@@ -7,3 +7,4 @@ export { Certifications } from './certifications';
 export { Blog } from './blog';
 export { Settings } from './settings';
 export { Login } from "./login"
+export { Register } from "./register"

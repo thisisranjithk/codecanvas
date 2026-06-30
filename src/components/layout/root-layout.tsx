@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 export function RootLayout() {
   const { isAuthenticated, isLoading } = useAuth();
   const routerState = useRouterState();
-  const isLoginPage = routerState.location.pathname === '/login';
+  const isAuthPage = routerState.location.pathname === '/login' || routerState.location.pathname === '/register';
 
   if (isLoading) {
     return (
@@ -19,15 +19,15 @@ export function RootLayout() {
     );
   }
 
-  if (!isAuthenticated && !isLoginPage) {
+  if (!isAuthenticated && !isAuthPage) {
     return <Navigate to="/login" />;
   }
 
-  if (isAuthenticated && isLoginPage) {
+  if (isAuthenticated && isAuthPage) {
     return <Navigate to="/" />;
   }
 
-  if (isLoginPage) {
+  if (isAuthPage) {
     return (
       <>
         <Outlet />
