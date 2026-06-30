@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from 'react';
 import {
   Plus,
   Search,
@@ -15,20 +15,20 @@ import {
   Cloud,
   PenTool,
   type LucideIcon,
-} from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+} from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -36,30 +36,23 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { mockSkills } from "@/data/skills";
-import {
-  getSkillProficiencyBadgeClass,
-  getSkillProficiencyLabel,
-} from "@/lib/utils";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/shared/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog";
-import {
-  FormInput,
-  FormSelect,
-  FormSlider,
-} from "@/components/shared/form-field";
-import { skillSchema, type SkillFormData } from "@/schemas";
+} from '@/components/ui/select';
+import { mockSkills } from '@/data/skills';
+import { getSkillProficiencyBadgeClass, getSkillProficiencyLabel } from '@/lib/utils';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { PageHeader } from '@/components/shared/page-header';
+import { EmptyState } from '@/components/shared/empty-state';
+import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
+import { FormInput, FormSelect, FormSlider } from '@/components/shared/form-field';
+import { skillSchema, type SkillFormData } from '@/schemas';
 
 type Skill = (typeof mockSkills)[0];
 
@@ -68,29 +61,25 @@ const categoryIcons: Record<string, LucideIcon> = {
   Frontend: Layers,
   Backend: Server,
   Databases: Database,
-  "Cloud / DevOps": Cloud,
+  'Cloud / DevOps': Cloud,
   Design: PenTool,
 };
 
 export function Skills() {
   const [skills, setSkills] = useState(mockSkills);
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  const categories = useMemo(
-    () => Array.from(new Set(mockSkills.map((s) => s.category))),
-    [],
-  );
+  const categories = useMemo(() => Array.from(new Set(mockSkills.map((s) => s.category))), []);
 
   const filtered = useMemo(() => {
     return skills.filter((s) => {
       const matchSearch = s.name.toLowerCase().includes(search.toLowerCase());
-      const matchCat =
-        categoryFilter === "all" || s.category === categoryFilter;
+      const matchCat = categoryFilter === 'all' || s.category === categoryFilter;
       return matchSearch && matchCat;
     });
   }, [skills, search, categoryFilter]);
@@ -124,13 +113,13 @@ export function Skills() {
   }
 
   return (
-    <div className="flex flex-col gap-5 p-6 animate-fade-in">
+    <div className="animate-fade-in flex flex-col gap-5 p-6">
       {/* Header */}
       <PageHeader
         title="Skills"
         description={`${skills.length} skills across ${categories.length} categories`}
         action={{
-          label: "Add Skill",
+          label: 'Add Skill',
           onClick: openNew,
           icon: <Plus className="size-4" />,
         }}
@@ -138,17 +127,17 @@ export function Skills() {
 
       {/* Filters */}
       <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-64">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 pointer-events-none" />
+        <div className="relative max-w-64 flex-1">
+          <Search className="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
           <Input
             placeholder="Search skills..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-9 text-sm"
+            className="h-9 pl-9 text-sm"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-44 h-9 text-sm">
+          <SelectTrigger className="h-9 w-44 text-sm">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
@@ -168,10 +157,10 @@ export function Skills() {
           icon={Code2}
           title="No skills found"
           action={{
-            label: "Clear filters",
+            label: 'Clear filters',
             onClick: () => {
-              setSearch("");
-              setCategoryFilter("all");
+              setSearch('');
+              setCategoryFilter('all');
             },
           }}
         />
@@ -181,8 +170,7 @@ export function Skills() {
             const Icon = categoryIcons[cat] ?? Code2;
             const isCollapsed = collapsed[cat];
             const avg = Math.round(
-              catSkills.reduce((sum, s) => sum + s.proficiency, 0) /
-              catSkills.length,
+              catSkills.reduce((sum, s) => sum + s.proficiency, 0) / catSkills.length
             );
 
             return (
@@ -190,30 +178,25 @@ export function Skills() {
                 {/* Section Header */}
                 <button
                   onClick={() => toggleCollapse(cat)}
-                  className="flex items-center gap-2 group py-1"
+                  className="group flex items-center gap-2 py-1"
                 >
                   {isCollapsed ? (
-                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+                    <ChevronRight className="text-muted-foreground/60 group-hover:text-foreground size-4 transition-colors" />
                   ) : (
-                    <ChevronDown className="size-4 text-muted-foreground/60 group-hover:text-foreground transition-colors" />
+                    <ChevronDown className="text-muted-foreground/60 group-hover:text-foreground size-4 transition-colors" />
                   )}
-                  <Icon className="size-4 text-muted-foreground/60" />
-                  <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+                  <Icon className="text-muted-foreground/60 size-4" />
+                  <h2 className="text-foreground text-[15px] font-semibold tracking-tight">
                     {cat}
                   </h2>
-                  <Badge
-                    variant="secondary"
-                    className="ml-1 text-[10px] h-4 px-1.5 bg-muted"
-                  >
+                  <Badge variant="secondary" className="bg-muted ml-1 h-4 px-1.5 text-[10px]">
                     {catSkills.length}
                   </Badge>
-                  <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs text-muted-foreground">
-                      Avg {avg}%
-                    </span>
-                    <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
+                  <div className="ml-auto flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="text-muted-foreground text-xs">Avg {avg}%</span>
+                    <div className="bg-muted h-1.5 w-16 overflow-hidden rounded-full">
                       <div
-                        className="h-full rounded-full bg-primary/40"
+                        className="bg-primary/40 h-full rounded-full"
                         style={{ width: `${avg}%` }}
                       />
                     </div>
@@ -222,7 +205,7 @@ export function Skills() {
 
                 {/* Skill Cards */}
                 {!isCollapsed && (
-                  <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 pl-2 sm:pl-6 pt-1">
+                  <div className="grid gap-3 pt-1 pl-2 sm:pl-6 lg:grid-cols-2 xl:grid-cols-3">
                     {catSkills.map((skill) => (
                       <SkillCard
                         key={skill.id}
@@ -283,8 +266,8 @@ function SkillDialog({
   } = useForm<SkillFormData>({
     resolver: zodResolver(skillSchema),
     defaultValues: {
-      name: "",
-      category: "Frontend",
+      name: '',
+      category: 'Frontend',
       proficiency: 80,
       yearsOfExperience: 0,
     },
@@ -293,8 +276,8 @@ function SkillDialog({
   useEffect(() => {
     if (open) {
       reset({
-        name: skill?.name ?? "",
-        category: skill?.category ?? "Frontend",
+        name: skill?.name ?? '',
+        category: skill?.category ?? 'Frontend',
         proficiency: skill?.proficiency ?? 80,
         yearsOfExperience: skill?.yearsOfExperience ?? 0,
       });
@@ -305,32 +288,28 @@ function SkillDialog({
 
   function onSubmit(_data: SkillFormData) {
     onOpenChange(false);
-    toast.success(skill ? "Skill updated" : "Skill added");
+    toast.success(skill ? 'Skill updated' : 'Skill added');
   }
 
   const categoryOptions = [
     ...categories.map((c) => ({ label: c, value: c })),
-    { label: "Other", value: "Other" },
+    { label: 'Other', value: 'Other' },
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-lg">
-            {skill ? "Edit Skill" : "Add Skill"}
-          </DialogTitle>
+          <DialogTitle className="text-lg">{skill ? 'Edit Skill' : 'Add Skill'}</DialogTitle>
           <DialogDescription className="text-sm">
-            {skill
-              ? "Update skill details."
-              : "Add a new skill to your portfolio."}
+            {skill ? 'Update skill details.' : 'Add a new skill to your portfolio.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid py-2">
             <FormInput
               label="Skill Name"
-              registration={register("name")}
+              registration={register('name')}
               error={errors.name}
               placeholder="e.g. TypeScript"
               required
@@ -355,7 +334,7 @@ function SkillDialog({
             />
             <FormInput
               label="Years of Experience"
-              registration={register("yearsOfExperience", {
+              registration={register('yearsOfExperience', {
                 valueAsNumber: true,
               })}
               error={errors.yearsOfExperience}
@@ -367,16 +346,11 @@ function SkillDialog({
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button size="sm" type="submit">
-              {skill ? "Save Changes" : "Add Skill"}
+              {skill ? 'Save Changes' : 'Add Skill'}
             </Button>
           </DialogFooter>
         </form>
@@ -397,23 +371,23 @@ function SkillCard({
   return (
     <Card
       className={cn(
-        "group border-border/60 transition-all duration-300",
-        "hover:shadow-sm hover:border-primary/20 bg-card/40 hover:bg-card/80",
+        'group border-border/60 transition-all duration-300',
+        'hover:border-primary/20 bg-card/40 hover:bg-card/80 hover:shadow-sm'
       )}
     >
-      <CardContent className="p-4 flex flex-col justify-between h-full gap-3">
+      <CardContent className="flex h-full flex-col justify-between gap-3 p-4">
         {/* Top: Icon + Name + Menu */}
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shadow-sm shrink-0">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="bg-primary/10 border-primary/20 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-sm">
               <Code2 className="size-5" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-[14.5px] font-bold truncate text-foreground group-hover:text-primary transition-colors">
+            <div className="flex min-w-0 flex-col">
+              <span className="text-foreground group-hover:text-primary truncate text-[14.5px] font-bold transition-colors">
                 {skill.name}
               </span>
-              <span className="text-[12px] text-muted-foreground font-medium">
-                {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? "year" : "years"} exp
+              <span className="text-muted-foreground text-[12px] font-medium">
+                {skill.yearsOfExperience} {skill.yearsOfExperience === 1 ? 'year' : 'years'} exp
               </span>
             </div>
           </div>
@@ -422,19 +396,19 @@ function SkillCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mt-1 -mr-2"
+                className="-mt-1 -mr-2 size-8 shrink-0 opacity-100 transition-opacity group-hover:opacity-100 sm:opacity-0"
               >
-                <MoreHorizontal className="size-4 text-muted-foreground" />
+                <MoreHorizontal className="text-muted-foreground size-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-36">
               <DropdownMenuItem onClick={() => onEdit(skill)}>
-                <Pencil className="size-3.5 mr-2" />
+                <Pencil className="mr-2 size-3.5" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive" onClick={() => onDelete(skill)}>
-                <Trash2 className="size-3.5 mr-2" />
+                <Trash2 className="mr-2 size-3.5" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -442,25 +416,25 @@ function SkillCard({
         </div>
 
         {/* Bottom: Proficiency Badge + Tiny minimal bar */}
-        <div className="flex items-center justify-between gap-3 mt-1 pt-2 border-t border-border/40">
+        <div className="border-border/40 mt-1 flex items-center justify-between gap-3 border-t pt-2">
           <Badge
             variant="outline"
             className={cn(
-              "text-[10px] font-medium h-5 px-2 bg-background/50",
-              getSkillProficiencyBadgeClass(skill.proficiency),
+              'bg-background/50 h-5 px-2 text-[10px] font-medium',
+              getSkillProficiencyBadgeClass(skill.proficiency)
             )}
           >
             {getSkillProficiencyLabel(skill.proficiency)}
           </Badge>
 
-          <div className="flex items-center gap-2 flex-1 justify-end">
-            <div className="h-1.5 flex-1 max-w-16 rounded-full bg-muted overflow-hidden">
+          <div className="flex flex-1 items-center justify-end gap-2">
+            <div className="bg-muted h-1.5 max-w-16 flex-1 overflow-hidden rounded-full">
               <div
-                className="h-full rounded-full transition-all duration-700 ease-out bg-primary/60 group-hover:bg-primary"
+                className="bg-primary/60 group-hover:bg-primary h-full rounded-full transition-all duration-700 ease-out"
                 style={{ width: `${skill.proficiency}%` }}
               />
             </div>
-            <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
+            <span className="text-muted-foreground text-[11px] font-semibold tabular-nums">
               {skill.proficiency}%
             </span>
           </div>

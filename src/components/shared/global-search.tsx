@@ -1,5 +1,5 @@
-import * as React from "react"
-import { useNavigate } from "@tanstack/react-router"
+import * as React from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import {
   CommandDialog,
   CommandEmpty,
@@ -8,19 +8,22 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
-import { Settings } from "lucide-react"
-import { navItems } from "@/config/navigation"
-import { useSearch } from "@/hooks/use-search"
+} from '@/components/ui/command';
+import { Settings } from 'lucide-react';
+import { navItems } from '@/config/navigation';
+import { useSearch } from '@/hooks/use-search';
 
 export function GlobalSearch() {
-  const { open, setOpen } = useSearch()
-  const navigate = useNavigate()
+  const { open, setOpen } = useSearch();
+  const navigate = useNavigate();
 
-  const runCommand = React.useCallback((command: () => unknown) => {
-    setOpen(false)
-    command()
-  }, [setOpen])
+  const runCommand = React.useCallback(
+    (command: () => unknown) => {
+      setOpen(false);
+      command();
+    },
+    [setOpen]
+  );
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
@@ -29,8 +32,8 @@ export function GlobalSearch() {
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
           {navItems.map((item) => (
-            <CommandItem 
-              key={item.path} 
+            <CommandItem
+              key={item.path}
               onSelect={() => runCommand(() => navigate({ to: item.path as any }))}
             >
               <item.icon className="mr-2 size-4" />
@@ -40,12 +43,12 @@ export function GlobalSearch() {
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Settings">
-          <CommandItem onSelect={() => runCommand(() => navigate({ to: "/settings" }))}>
+          <CommandItem onSelect={() => runCommand(() => navigate({ to: '/settings' }))}>
             <Settings className="mr-2 size-4" />
             <span>Settings</span>
           </CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>
-  )
+  );
 }

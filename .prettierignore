@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+public
+.git
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

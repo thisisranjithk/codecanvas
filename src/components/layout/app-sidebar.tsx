@@ -1,6 +1,6 @@
-import { useEffect } from "react"
-import { Settings } from "lucide-react"
-import { Link, useRouterState } from "@tanstack/react-router"
+import { useEffect } from 'react';
+import { Settings } from 'lucide-react';
+import { Link, useRouterState } from '@tanstack/react-router';
 import {
   Sidebar,
   SidebarContent,
@@ -14,34 +14,34 @@ import {
   SidebarRail,
   SidebarSeparator,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Layers } from "lucide-react"
-import { mockUser } from "@/data/user"
-import { navItems } from "@/config/navigation"
+} from '@/components/ui/sidebar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Layers } from 'lucide-react';
+import { mockUser } from '@/data/user';
+import { navItems } from '@/config/navigation';
 
 export function AppSidebar() {
-  const routerState = useRouterState()
-  const currentPath = routerState.location.pathname
-  const { setOpenMobile } = useSidebar()
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+  const { setOpenMobile } = useSidebar();
 
   useEffect(() => {
-    setOpenMobile(false)
-  }, [currentPath, setOpenMobile])
+    setOpenMobile(false);
+  }, [currentPath, setOpenMobile]);
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="h-16 justify-center border-b border-sidebar-border px-2.5 py-0">
+      <SidebarHeader className="border-sidebar-border h-16 justify-center border-b px-2.5 py-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="hover:bg-sidebar-accent/50" asChild>
               <Link to="/" className="flex items-center gap-2.5">
-                <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-bold shrink-0 shadow-sm shadow-primary/20">
+                <div className="bg-primary text-primary-foreground shadow-primary/20 flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold shadow-sm">
                   <Layers className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold text-[15px] tracking-tight">Portfolio CMS</span>
-                  <span className="text-xs text-sidebar-foreground/60">alexmorgan.dev</span>
+                  <span className="text-[15px] font-semibold tracking-tight">Portfolio CMS</span>
+                  <span className="text-sidebar-foreground/60 text-xs">alexmorgan.dev</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -49,12 +49,12 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="py-2 px-1">
+      <SidebarContent className="px-1 py-2">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive = currentPath === item.path
+                const isActive = currentPath === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
@@ -63,17 +63,17 @@ export function AppSidebar() {
                       tooltip={item.label}
                       className={
                         isActive
-                          ? "bg-primary/10 text-primary hover:bg-primary/15 [&>svg]:text-primary"
-                          : "hover:bg-sidebar-accent/50"
+                          ? 'bg-primary/10 text-primary hover:bg-primary/15 [&>svg]:text-primary'
+                          : 'hover:bg-sidebar-accent/50'
                       }
                     >
                       <Link to={item.path} className="relative flex items-center">
                         <item.icon className="size-[18px]" />
-                        <span className="font-medium text-sm">{item.label}</span>
+                        <span className="text-sm font-medium">{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                )
+                );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -82,36 +82,43 @@ export function AppSidebar() {
 
       <SidebarSeparator />
 
-      <SidebarFooter className="py-2 px-1">
+      <SidebarFooter className="px-1 py-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={currentPath === "/settings"}
+              isActive={currentPath === '/settings'}
               tooltip="Settings"
               className={
-                currentPath === "/settings"
-                  ? "bg-primary/10 text-primary hover:bg-primary/15 [&>svg]:text-primary"
-                  : "hover:bg-sidebar-accent/50"
+                currentPath === '/settings'
+                  ? 'bg-primary/10 text-primary hover:bg-primary/15 [&>svg]:text-primary'
+                  : 'hover:bg-sidebar-accent/50'
               }
             >
               <Link to="/settings" className="flex items-center">
                 <Settings className="size-[18px]" />
-                <span className="font-medium text-sm">Settings</span>
+                <span className="text-sm font-medium">Settings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild tooltip={mockUser.name} className="hover:bg-sidebar-accent/50">
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              tooltip={mockUser.name}
+              className="hover:bg-sidebar-accent/50"
+            >
               <button className="flex items-center gap-2">
-                <Avatar className="size-7 shrink-0 ring-2 ring-sidebar-border">
-                  <AvatarFallback className="text-xs bg-primary text-primary-foreground font-semibold">
+                <Avatar className="ring-sidebar-border size-7 shrink-0 ring-2">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                     {mockUser.avatar}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col gap-0.5 leading-none text-left">
-                  <span className="font-medium text-sm truncate">{mockUser.name}</span>
-                  <span className="text-xs text-sidebar-foreground/60 truncate">{mockUser.email}</span>
+                <div className="flex flex-col gap-0.5 text-left leading-none">
+                  <span className="truncate text-sm font-medium">{mockUser.name}</span>
+                  <span className="text-sidebar-foreground/60 truncate text-xs">
+                    {mockUser.email}
+                  </span>
                 </div>
               </button>
             </SidebarMenuButton>
@@ -120,5 +127,5 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

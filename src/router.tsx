@@ -1,5 +1,5 @@
-import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router"
-import { RootLayout } from "@/components/layout/root-layout"
+import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import { RootLayout } from '@/components/layout/root-layout';
 import {
   Dashboard,
   Projects,
@@ -9,88 +9,88 @@ import {
   Certifications,
   Blog,
   Settings,
-} from "@/pages"
+} from '@/pages';
 
 // Type for our route's static data
 export type RouteStaticData = {
-  breadcrumbs: { label: string; path?: string }[]
-}
+  breadcrumbs: { label: string; path?: string }[];
+};
 
 const rootRoute = createRootRoute({
   component: RootLayout,
-})
+});
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/",
+  path: '/',
   component: Dashboard,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard" }],
+    breadcrumbs: [{ label: 'Dashboard' }],
   } as RouteStaticData,
-})
+});
 
 const projectsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/projects",
+  path: '/projects',
   component: Projects,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Projects" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Projects' }],
   } as RouteStaticData,
-})
+});
 
 const skillsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/skills",
+  path: '/skills',
   component: Skills,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Skills" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Skills' }],
   } as RouteStaticData,
-})
+});
 
 const experienceRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/experience",
+  path: '/experience',
   component: Experience,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Experience" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Experience' }],
   } as RouteStaticData,
-})
+});
 
 const educationRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/education",
+  path: '/education',
   component: Education,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Education" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Education' }],
   } as RouteStaticData,
-})
+});
 
 const certificationsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/certifications",
+  path: '/certifications',
   component: Certifications,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Certifications" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Certifications' }],
   } as RouteStaticData,
-})
+});
 
 const blogRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/blog",
+  path: '/blog',
   component: Blog,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Blog" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Blog' }],
   } as RouteStaticData,
-})
+});
 
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/settings",
+  path: '/settings',
   component: Settings,
   staticData: {
-    breadcrumbs: [{ label: "Dashboard", path: "/" }, { label: "Settings" }],
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Settings' }],
   } as RouteStaticData,
-})
+});
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -101,15 +101,15 @@ const routeTree = rootRoute.addChildren([
   certificationsRoute,
   blogRoute,
   settingsRoute,
-])
+]);
 
-export const router = createRouter({ routeTree })
+export const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
   interface StaticDataRouteOption {
-    breadcrumbs?: { label: string; path?: string }[]
+    breadcrumbs?: { label: string; path?: string }[];
   }
 }

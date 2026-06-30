@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from 'react';
 import {
   Controller,
   type Control,
@@ -6,40 +6,46 @@ import {
   type Path,
   type FieldError,
   type UseFormRegisterReturn,
-} from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { MonthPicker } from "@/components/ui/month-picker"
-import { cn } from "@/lib/utils"
+} from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { MonthPicker } from '@/components/ui/month-picker';
+import { cn } from '@/lib/utils';
 
 function FormErrorMessage({ error, description }: { error?: FieldError; description?: string }) {
   return (
-    <div className="min-h-[20px] flex flex-col justify-start">
+    <div className="flex min-h-[20px] flex-col justify-start">
       {error?.message ? (
-        <p className="text-[13px] text-destructive animate-in fade-in-0 slide-in-from-top-1 duration-200">
+        <p className="text-destructive animate-in fade-in-0 slide-in-from-top-1 text-[13px] duration-200">
           {error.message}
         </p>
       ) : description ? (
-        <p className="text-[13px] text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground text-[13px]">{description}</p>
       ) : null}
     </div>
-  )
+  );
 }
 
 // ── Form Field Wrapper ──
 
 interface FormFieldWrapperProps {
-  label: string
-  error?: FieldError
-  description?: string
-  className?: string
-  labelClassName?: string
-  children: ReactNode
-  required?: boolean
+  label: string;
+  error?: FieldError;
+  description?: string;
+  className?: string;
+  labelClassName?: string;
+  children: ReactNode;
+  required?: boolean;
 }
 
 function FormFieldWrapper({
@@ -52,32 +58,32 @@ function FormFieldWrapper({
   required,
 }: FormFieldWrapperProps) {
   return (
-    <div className={cn("grid gap-2", className)}>
-      <Label className={cn("text-sm", labelClassName)}>
+    <div className={cn('grid gap-2', className)}>
+      <Label className={cn('text-sm', labelClassName)}>
         {label}
         {required && <span className="text-destructive ml-0.5">*</span>}
       </Label>
       {children}
       <FormErrorMessage error={error} description={description} />
     </div>
-  )
+  );
 }
 
 // ── FormInput ──
 
 interface FormInputProps {
-  label: string
-  registration: UseFormRegisterReturn
-  error?: FieldError
-  placeholder?: string
-  type?: string
-  className?: string
-  inputClassName?: string
-  description?: string
-  required?: boolean
-  min?: number
-  max?: number
-  labelClassName?: string
+  label: string;
+  registration: UseFormRegisterReturn;
+  error?: FieldError;
+  placeholder?: string;
+  type?: string;
+  className?: string;
+  inputClassName?: string;
+  description?: string;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  labelClassName?: string;
 }
 
 function FormInput({
@@ -85,7 +91,7 @@ function FormInput({
   registration,
   error,
   placeholder,
-  type = "text",
+  type = 'text',
   className,
   inputClassName,
   description,
@@ -110,25 +116,25 @@ function FormInput({
         min={min}
         max={max}
         aria-invalid={!!error}
-        className={cn("h-9 text-sm", inputClassName)}
+        className={cn('h-9 text-sm', inputClassName)}
       />
     </FormFieldWrapper>
-  )
+  );
 }
 
 // ── FormTextarea ──
 
 interface FormTextareaProps {
-  label: string
-  registration: UseFormRegisterReturn
-  error?: FieldError
-  placeholder?: string
-  rows?: number
-  className?: string
-  textareaClassName?: string
-  description?: string
-  required?: boolean
-  labelClassName?: string
+  label: string;
+  registration: UseFormRegisterReturn;
+  error?: FieldError;
+  placeholder?: string;
+  rows?: number;
+  className?: string;
+  textareaClassName?: string;
+  description?: string;
+  required?: boolean;
+  labelClassName?: string;
 }
 
 function FormTextarea({
@@ -157,26 +163,26 @@ function FormTextarea({
         placeholder={placeholder}
         rows={rows}
         aria-invalid={!!error}
-        className={cn("text-sm", textareaClassName)}
+        className={cn('text-sm', textareaClassName)}
       />
     </FormFieldWrapper>
-  )
+  );
 }
 
 // ── FormSelect ──
 
 interface FormSelectProps<T extends FieldValues> {
-  label: string
-  name: Path<T>
-  control: Control<T>
-  error?: FieldError
-  options: { label: string; value: string }[]
-  placeholder?: string
-  className?: string
-  selectClassName?: string
-  description?: string
-  required?: boolean
-  labelClassName?: string
+  label: string;
+  name: Path<T>;
+  control: Control<T>;
+  error?: FieldError;
+  options: { label: string; value: string }[];
+  placeholder?: string;
+  className?: string;
+  selectClassName?: string;
+  description?: string;
+  required?: boolean;
+  labelClassName?: string;
 }
 
 function FormSelect<T extends FieldValues>({
@@ -206,10 +212,7 @@ function FormSelect<T extends FieldValues>({
         control={control}
         render={({ field }) => (
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger
-              className={cn("h-9 text-sm", selectClassName)}
-              aria-invalid={!!error}
-            >
+            <SelectTrigger className={cn('h-9 text-sm', selectClassName)} aria-invalid={!!error}>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -223,18 +226,18 @@ function FormSelect<T extends FieldValues>({
         )}
       />
     </FormFieldWrapper>
-  )
+  );
 }
 
 // ── FormSwitch ──
 
 interface FormSwitchProps<T extends FieldValues> {
-  label: string
-  name: Path<T>
-  control: Control<T>
-  description?: string
-  className?: string
-  labelClassName?: string
+  label: string;
+  name: Path<T>;
+  control: Control<T>;
+  description?: string;
+  className?: string;
+  labelClassName?: string;
 }
 
 function FormSwitch<T extends FieldValues>({
@@ -250,36 +253,36 @@ function FormSwitch<T extends FieldValues>({
       name={name}
       control={control}
       render={({ field }) => (
-        <div className={cn("flex items-center justify-between rounded-lg border border-border/60 px-4 py-3", className)}>
+        <div
+          className={cn(
+            'border-border/60 flex items-center justify-between rounded-lg border px-4 py-3',
+            className
+          )}
+        >
           <div className="flex flex-col gap-0.5">
-            <Label className={cn("text-sm font-medium", labelClassName)}>{label}</Label>
-            {description && (
-              <p className="text-[13px] text-muted-foreground">{description}</p>
-            )}
+            <Label className={cn('text-sm font-medium', labelClassName)}>{label}</Label>
+            {description && <p className="text-muted-foreground text-[13px]">{description}</p>}
           </div>
-          <Switch
-            checked={field.value}
-            onCheckedChange={field.onChange}
-          />
+          <Switch checked={field.value} onCheckedChange={field.onChange} />
         </div>
       )}
     />
-  )
+  );
 }
 
 // ── FormSlider ──
 
 interface FormSliderProps<T extends FieldValues> {
-  label: string
-  name: Path<T>
-  control: Control<T>
-  error?: FieldError
-  min?: number
-  max?: number
-  step?: number
-  className?: string
-  labelClassName?: string
-  renderValue?: (value: number) => ReactNode
+  label: string;
+  name: Path<T>;
+  control: Control<T>;
+  error?: FieldError;
+  min?: number;
+  max?: number;
+  step?: number;
+  className?: string;
+  labelClassName?: string;
+  renderValue?: (value: number) => ReactNode;
 }
 
 function FormSlider<T extends FieldValues>({
@@ -299,13 +302,11 @@ function FormSlider<T extends FieldValues>({
       name={name}
       control={control}
       render={({ field }) => (
-        <div className={cn("grid gap-2", className)}>
+        <div className={cn('grid gap-2', className)}>
           <div className="flex items-center justify-between">
-            <Label className={cn("text-sm", labelClassName)}>{label}</Label>
+            <Label className={cn('text-sm', labelClassName)}>{label}</Label>
             {renderValue ? (
-              <span className="text-sm font-medium tabular-nums">
-                {renderValue(field.value)}
-              </span>
+              <span className="text-sm font-medium tabular-nums">{renderValue(field.value)}</span>
             ) : (
               <span className="text-sm font-medium tabular-nums">{field.value}</span>
             )}
@@ -321,23 +322,23 @@ function FormSlider<T extends FieldValues>({
         </div>
       )}
     />
-  )
+  );
 }
 
 // ── FormMonthPicker ──
 
 interface FormMonthPickerProps<T extends FieldValues> {
-  label: string
-  name: Path<T>
-  control: Control<T>
-  error?: FieldError
-  placeholder?: string
-  disabled?: boolean
-  className?: string
-  pickerClassName?: string
-  description?: string
-  required?: boolean
-  labelClassName?: string
+  label: string;
+  name: Path<T>;
+  control: Control<T>;
+  error?: FieldError;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+  pickerClassName?: string;
+  description?: string;
+  required?: boolean;
+  labelClassName?: string;
 }
 
 function FormMonthPicker<T extends FieldValues>({
@@ -371,12 +372,12 @@ function FormMonthPicker<T extends FieldValues>({
             onChange={(date) => field.onChange(date)}
             placeholder={placeholder}
             disabled={disabled}
-            className={cn("w-full h-9", pickerClassName)}
+            className={cn('h-9 w-full', pickerClassName)}
           />
         )}
       />
     </FormFieldWrapper>
-  )
+  );
 }
 
 export {
@@ -388,4 +389,4 @@ export {
   FormSwitch,
   FormSlider,
   FormMonthPicker,
-}
+};

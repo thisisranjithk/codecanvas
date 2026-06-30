@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,22 +6,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 
 interface ConfirmDeleteDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  title?: string
-  itemName?: React.ReactNode
-  description?: React.ReactNode
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title?: string;
+  itemName?: React.ReactNode;
+  description?: React.ReactNode;
 }
 
 export function ConfirmDeleteDialog({
   isOpen,
   onClose,
   onConfirm,
-  title = "Delete Item",
+  title = 'Delete Item',
   itemName,
   description,
 }: ConfirmDeleteDialogProps) {
@@ -38,7 +38,7 @@ export function ConfirmDeleteDialog({
                 Delete <strong>"{itemName}"</strong>? This cannot be undone.
               </>
             ) : (
-              "Are you sure you want to delete this? This cannot be undone."
+              'Are you sure you want to delete this? This cannot be undone.'
             )}
           </DialogDescription>
         </DialogHeader>
@@ -52,5 +52,5 @@ export function ConfirmDeleteDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

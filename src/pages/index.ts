@@ -1,8 +1,8 @@
-export { Dashboard } from "./dashboard"
-export { Projects } from "./projects"
-export { Skills } from "./skills"
-export { Experience } from "./experience"
-export { Education } from "./education"
-export { Certifications } from "./certifications"
-export { Blog } from "./blog"
-export { Settings } from "./settings"
+export { Dashboard } from './dashboard';
+export { Projects } from './projects';
+export { Skills } from './skills';
+export { Experience } from './experience';
+export { Education } from './education';
+export { Certifications } from './certifications';
+export { Blog } from './blog';
+export { Settings } from './settings';
