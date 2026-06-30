@@ -13,3 +13,14 @@ export interface LoginResponse {
 export interface MeResponse {
   user: User;
 }
+
+export interface RegisterRequest {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  user: User;
+}

@@ -31,7 +31,8 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigate } from "@tanstack/react-router"
-
+import { toast } from "sonner"
+import { useRegister } from "@/hooks/api/auth"
 interface RegisterProps {
     onNavigate?: (path: string) => void
 }
@@ -371,14 +372,25 @@ export function Register({ onNavigate }: RegisterProps) {
     const { level } = useMemo(() => getStrength(passwordValue), [passwordValue])
     const isPasswordValid = level === "good" || level === "strong"
 
+    const registerMutation = useRegister()
+
     const onSubmit = async (data: RegisterFormValues) => {
-        console.log(data, "register form data")
         if (!isPasswordValid) return
         setIsLoading(true)
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-        setIsLoading(false)
-        navigate({ to: "/" })
-        onNavigate?.("/")
+        try {
+            await registerMutation.mutateAsync(data)
+            toast.success("Account created successfully. Please sign in.")
+            navigate({ to: "/login" })
+            onNavigate?.("/login")
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "An unexpected error occurred."
+            toast.error(message)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (

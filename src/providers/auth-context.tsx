@@ -1,5 +1,5 @@
 import { createContext, useCallback, type ReactNode } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { router } from '@/router';
 import { useLogin, useMe } from '@/hooks/api/auth';
 import { authStorage } from '@/lib/auth-storage';
 import { queryClient } from '@/api';
@@ -16,7 +16,6 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const navigate = useNavigate();
   const { data: meData, isLoading: isMeLoading } = useMe();
   const loginMutation = useLogin();
 
@@ -35,9 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     authStorage.removeToken();
+    queryClient.setQueryData(['auth', 'me'], null);
     queryClient.clear();
-    navigate({ to: '/login' });
-  }, [navigate]);
+    setTimeout(() => {
+      router.navigate({ to: '/login' });
+    }, 0);
+  }, []);
 
   return (
     <AuthContext.Provider

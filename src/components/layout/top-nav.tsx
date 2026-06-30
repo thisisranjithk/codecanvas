@@ -24,15 +24,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { mockUser } from '@/data/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
+import { useMe } from '@/hooks/api/auth';
 
 export function TopNav() {
   const matches = useMatches();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { data } = useMe()
+  const user = data?.data?.user;
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const currentMatch = matches[matches.length - 1];
   const breadcrumbs =
@@ -99,7 +101,7 @@ export function TopNav() {
             <Button variant="ghost" size="icon" className="hover:bg-accent size-8 rounded-full">
               <Avatar className="ring-border size-7 ring-1">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                  {mockUser.fullName.split(' ').map((n) => n[0]).join('').toUpperCase()}
+                  {user?.fullName.split(' ').map((n) => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -107,8 +109,8 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold">{mockUser.fullName}</span>
-                <span className="text-muted-foreground text-xs">{mockUser.email}</span>
+                <span className="text-sm font-semibold">{user?.fullName || "User"}</span>
+                <span className="text-muted-foreground text-xs">{user?.email || "user@example.com"}</span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

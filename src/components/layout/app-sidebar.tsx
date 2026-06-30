@@ -49,7 +49,6 @@ export function AppSidebar() {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="text-base font-semibold tracking-tight">Portfolio CMS</span>
-                  <span className="text-sidebar-foreground/60 text-xs">alexmorgan.dev</span>
                 </div>
               </Link>
             </SidebarMenuButton>
