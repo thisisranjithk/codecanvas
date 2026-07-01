@@ -9,12 +9,13 @@ import { useAuth } from '@/hooks/use-auth';
 export function RootLayout() {
   const { isAuthenticated, isLoading } = useAuth();
   const routerState = useRouterState();
-  const isAuthPage = routerState.location.pathname === '/login' || routerState.location.pathname === '/register';
+  const isAuthPage =
+    routerState.location.pathname === '/login' || routerState.location.pathname === '/register';
 
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
       </div>
     );
   }

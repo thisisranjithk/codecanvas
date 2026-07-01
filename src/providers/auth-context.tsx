@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authStorage.setToken(response.data.accessToken);
       await queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
-    [loginMutation],
+    [loginMutation]
   );
 
   const logout = useCallback(() => {
@@ -42,9 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated, isLoading, login, logout }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

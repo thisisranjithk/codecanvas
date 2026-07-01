@@ -21,7 +21,9 @@ export function ErrorState({
         <AlertTriangle className="size-6" />
       </div>
       <p className="text-foreground text-base font-medium">{title}</p>
-      {description && <p className="text-muted-foreground max-w-sm text-center text-sm">{description}</p>}
+      {description && (
+        <p className="text-muted-foreground max-w-sm text-center text-sm">{description}</p>
+      )}
       {onRetry && (
         <Button size="sm" variant="outline" onClick={onRetry} className="mt-2">
           <RefreshCcw className="mr-2 size-4" />

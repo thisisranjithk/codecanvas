@@ -15,7 +15,7 @@ export function setupInterceptors(client: AxiosInstance): void {
 
       return config;
     },
-    (error: unknown) => Promise.reject(error),
+    (error: unknown) => Promise.reject(error)
   );
 
   // ── Response Interceptor ─────────────────────────────────────────────
@@ -26,6 +26,6 @@ export function setupInterceptors(client: AxiosInstance): void {
       // Example: if 401 && !isRetry → attempt refresh → replay original request.
 
       return Promise.reject(ApiError.fromAxiosError(error));
-    },
+    }
   );
 }

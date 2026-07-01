@@ -31,10 +31,10 @@ export function AppSidebar() {
 
   const userInitials = user?.fullName
     ? user.fullName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
     : 'U';
 
   return (

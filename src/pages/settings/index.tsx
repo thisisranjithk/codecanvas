@@ -71,7 +71,11 @@ function ProfileTab() {
             <div className="flex items-center gap-3">
               <Avatar className="ring-border size-14 ring-2">
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                  {user?.fullName?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'U'}
+                  {user?.fullName
+                    ?.split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">

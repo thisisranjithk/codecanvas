@@ -13,8 +13,7 @@ export const queryKeys = {
   projects: {
     all: () => ['projects'] as const,
     lists: () => [...queryKeys.projects.all(), 'list'] as const,
-    list: (filters?: Record<string, unknown>) =>
-      [...queryKeys.projects.lists(), filters] as const,
+    list: (filters?: Record<string, unknown>) => [...queryKeys.projects.lists(), filters] as const,
     details: () => [...queryKeys.projects.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.projects.details(), id] as const,
   },
@@ -22,8 +21,7 @@ export const queryKeys = {
   skills: {
     all: () => ['skills'] as const,
     lists: () => [...queryKeys.skills.all(), 'list'] as const,
-    list: (filters?: Record<string, unknown>) =>
-      [...queryKeys.skills.lists(), filters] as const,
+    list: (filters?: Record<string, unknown>) => [...queryKeys.skills.lists(), filters] as const,
     details: () => [...queryKeys.skills.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.skills.details(), id] as const,
   },
@@ -68,8 +66,7 @@ export const queryKeys = {
   blogs: {
     all: () => ['blogs'] as const,
     lists: () => [...queryKeys.blogs.all(), 'list'] as const,
-    list: (filters?: Record<string, unknown>) =>
-      [...queryKeys.blogs.lists(), filters] as const,
+    list: (filters?: Record<string, unknown>) => [...queryKeys.blogs.lists(), filters] as const,
     details: () => [...queryKeys.blogs.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.blogs.details(), id] as const,
   },
@@ -86,14 +83,11 @@ export const queryKeys = {
 
   portfolio: {
     all: () => ['portfolio'] as const,
-    homepage: (username: string) =>
-      [...queryKeys.portfolio.all(), username] as const,
-    projects: (username: string) =>
-      [...queryKeys.portfolio.all(), username, 'projects'] as const,
+    homepage: (username: string) => [...queryKeys.portfolio.all(), username] as const,
+    projects: (username: string) => [...queryKeys.portfolio.all(), username, 'projects'] as const,
     projectDetail: (username: string, id: string) =>
       [...queryKeys.portfolio.all(), username, 'projects', id] as const,
-    blogs: (username: string) =>
-      [...queryKeys.portfolio.all(), username, 'blogs'] as const,
+    blogs: (username: string) => [...queryKeys.portfolio.all(), username, 'blogs'] as const,
     blogDetail: (username: string, slug: string) =>
       [...queryKeys.portfolio.all(), username, 'blogs', slug] as const,
   },

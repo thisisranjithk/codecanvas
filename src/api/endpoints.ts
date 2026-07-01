@@ -84,11 +84,8 @@ export const API_ENDPOINTS = {
   PORTFOLIO: {
     HOMEPAGE: (username: string) => `/portfolio/${username}`,
     PROJECTS: (username: string) => `/portfolio/${username}/projects`,
-    PROJECT_DETAIL: (username: string, id: string) =>
-      `/portfolio/${username}/projects/${id}`,
+    PROJECT_DETAIL: (username: string, id: string) => `/portfolio/${username}/projects/${id}`,
     BLOGS: (username: string) => `/portfolio/${username}/blogs`,
-    BLOG_DETAIL: (username: string, slug: string) =>
-      `/portfolio/${username}/blogs/${slug}`,
+    BLOG_DETAIL: (username: string, slug: string) => `/portfolio/${username}/blogs/${slug}`,
   },
-
 } as const;

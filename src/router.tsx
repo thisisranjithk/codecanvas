@@ -10,7 +10,7 @@ import {
   Blog,
   Settings,
   Login,
-  Register
+  Register,
 } from '@/pages';
 
 // Type for our route's static data

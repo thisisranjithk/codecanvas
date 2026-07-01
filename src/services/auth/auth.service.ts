@@ -1,5 +1,12 @@
 import { apiClient, API_ENDPOINTS } from '@/api';
-import type { ApiResponse, LoginRequest, LoginResponse, MeResponse, RegisterRequest, RegisterResponse } from '@/types';
+import type {
+  ApiResponse,
+  LoginRequest,
+  LoginResponse,
+  MeResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '@/types';
 
 export const authService = {
   login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
