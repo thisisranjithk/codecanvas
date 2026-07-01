@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useCategoryDropdown } from '@/hooks/api/category';
 import {
   Plus,
   Search,
@@ -74,7 +75,12 @@ export function Skills() {
   const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  const categories = useMemo(() => Array.from(new Set(mockSkills.map((s) => s.category))), []);
+  const { data: categoryDropdown } = useCategoryDropdown('SKILL');
+
+  const categories = useMemo(
+    () => categoryDropdown?.map((c) => c.name) || [],
+    [categoryDropdown]
+  );
 
   const filtered = useMemo(() => {
     return skills.filter((s) => {
@@ -85,12 +91,14 @@ export function Skills() {
   }, [skills, search, categoryFilter]);
 
   const grouped = useMemo(() => {
-    return categories.reduce<Record<string, Skill[]>>((acc, cat) => {
-      const inCategory = filtered.filter((s) => s.category === cat);
-      if (inCategory.length > 0) acc[cat] = inCategory;
+    return filtered.reduce<Record<string, Skill[]>>((acc, skill) => {
+      if (!acc[skill.category]) {
+        acc[skill.category] = [];
+      }
+      acc[skill.category].push(skill);
       return acc;
     }, {});
-  }, [categories, filtered]);
+  }, [filtered]);
 
   function handleDelete(skill: Skill) {
     setSkills((prev) => prev.filter((s) => s.id !== skill.id));

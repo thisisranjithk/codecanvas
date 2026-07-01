@@ -31,7 +31,7 @@ export const queryKeys = {
     lists: () => [...queryKeys.categories.all(), 'list'] as const,
     list: (filters?: Record<string, unknown>) =>
       [...queryKeys.categories.lists(), filters] as const,
-    dropdown: () => [...queryKeys.categories.all(), 'dropdown'] as const,
+    dropdown: (type: string) => [...queryKeys.categories.all(), 'dropdown', type] as const,
     details: () => [...queryKeys.categories.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.categories.details(), id] as const,
   },
