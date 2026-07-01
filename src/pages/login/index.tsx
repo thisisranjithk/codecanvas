@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
@@ -205,7 +205,7 @@ export function Login({ onNavigate }: LoginProps) {
                     type="button"
                     variant="link"
                     className="text-primary h-auto p-0 text-xs"
-                    onClick={() => {}}
+                    onClick={() => { }}
                   >
                     Forgot password?
                   </Button>
@@ -242,15 +242,8 @@ export function Login({ onNavigate }: LoginProps) {
                 <FieldError errors={[errors.password]} />
               </Field>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign in'
-                )}
+              <Button type="submit" className="w-full" isLoading={isLoading}>
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
 

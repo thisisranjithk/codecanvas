@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useCategoryDropdown } from '@/hooks/api/category';
+import { useSkills, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/hooks/api/skill';
 import {
   Plus,
   Search,
@@ -15,6 +16,7 @@ import {
   Database,
   Cloud,
   PenTool,
+  Loader2,
   type LucideIcon,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -45,7 +47,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { mockSkills } from '@/data/skills';
 import { getSkillProficiencyBadgeClass, getSkillProficiencyLabel } from '@/lib/utils';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -54,8 +55,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { FormInput, FormSelect, FormSlider } from '@/components/shared/form-field';
 import { skillSchema, type SkillFormData } from '@/schemas';
-
-type Skill = (typeof mockSkills)[0];
+import type { Skill } from '@/types/skill.types';
 
 const categoryIcons: Record<string, LucideIcon> = {
   Languages: Terminal,
@@ -67,7 +67,13 @@ const categoryIcons: Record<string, LucideIcon> = {
 };
 
 export function Skills() {
-  const [skills, setSkills] = useState(mockSkills);
+  const { data: skills = [], isLoading: isLoadingSkills } = useSkills();
+  const { data: categoryDropdown } = useCategoryDropdown('SKILL');
+
+  const createSkill = useCreateSkill();
+  const updateSkill = useUpdateSkill();
+  const deleteSkill = useDeleteSkill();
+
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,35 +81,38 @@ export function Skills() {
   const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
-  const { data: categoryDropdown } = useCategoryDropdown('SKILL');
-
-  const categories = useMemo(
-    () => categoryDropdown?.map((c) => c.name) || [],
-    [categoryDropdown]
-  );
+  const categories = useMemo(() => categoryDropdown || [], [categoryDropdown]);
 
   const filtered = useMemo(() => {
     return skills.filter((s) => {
       const matchSearch = s.name.toLowerCase().includes(search.toLowerCase());
-      const matchCat = categoryFilter === 'all' || s.category === categoryFilter;
+      const catName = s.category?.name || 'Uncategorized';
+      const matchCat = categoryFilter === 'all' || catName === categoryFilter;
       return matchSearch && matchCat;
     });
   }, [skills, search, categoryFilter]);
 
   const grouped = useMemo(() => {
     return filtered.reduce<Record<string, Skill[]>>((acc, skill) => {
-      if (!acc[skill.category]) {
-        acc[skill.category] = [];
+      const catName = skill.category?.name || 'Uncategorized';
+      if (!acc[catName]) {
+        acc[catName] = [];
       }
-      acc[skill.category].push(skill);
+      acc[catName].push(skill);
       return acc;
     }, {});
   }, [filtered]);
 
   function handleDelete(skill: Skill) {
-    setSkills((prev) => prev.filter((s) => s.id !== skill.id));
-    setDeleteDialog(null);
-    toast.success(`"${skill.name}" removed`);
+    deleteSkill.mutate(skill.id, {
+      onSuccess: () => {
+        setDeleteDialog(null);
+        toast.success(`"${skill.name}" removed`);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || 'Failed to delete skill');
+      },
+    });
   }
 
   function openEdit(skill: Skill) {
@@ -118,6 +127,14 @@ export function Skills() {
 
   function toggleCollapse(cat: string) {
     setCollapsed((prev) => ({ ...prev, [cat]: !prev[cat] }));
+  }
+
+  if (isLoadingSkills) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <Loader2 className="text-primary size-8 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -151,8 +168,8 @@ export function Skills() {
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
+              <SelectItem key={c.id} value={c.name}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -234,6 +251,8 @@ export function Skills() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         categories={categories}
+        createMutation={createSkill}
+        updateMutation={updateSkill}
       />
 
       {/* Delete Dialog */}
@@ -247,6 +266,7 @@ export function Skills() {
             Remove <strong>"{deleteDialog?.name}"</strong> from your portfolio?
           </>
         }
+        isLoading={deleteSkill.isPending}
       />
     </div>
   );
@@ -257,11 +277,15 @@ function SkillDialog({
   open,
   onOpenChange,
   categories,
+  createMutation,
+  updateMutation,
 }: {
   skill: Skill | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categories: string[];
+  categories: { id: string; name: string }[];
+  createMutation: ReturnType<typeof useCreateSkill>;
+  updateMutation: ReturnType<typeof useUpdateSkill>;
 }) {
   const {
     register,
@@ -273,7 +297,7 @@ function SkillDialog({
     resolver: zodResolver(skillSchema),
     defaultValues: {
       name: '',
-      category: 'Frontend',
+      categoryId: '',
       proficiency: 80,
       yearsOfExperience: 0,
     },
@@ -283,27 +307,46 @@ function SkillDialog({
     if (open) {
       reset({
         name: skill?.name ?? '',
-        category: skill?.category ?? 'Frontend',
+        categoryId: skill?.categoryId ?? '',
         proficiency: skill?.proficiency ?? 80,
         yearsOfExperience: skill?.yearsOfExperience ?? 0,
       });
     }
   }, [open, skill, reset]);
 
-  // const proficiencyValue = watch("proficiency")
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
-  function onSubmit(_data: SkillFormData) {
-    onOpenChange(false);
-    toast.success(skill ? 'Skill updated' : 'Skill added');
+  function onSubmit(data: SkillFormData) {
+    if (skill) {
+      updateMutation.mutate(
+        { id: skill.id, data },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            toast.success('Skill updated');
+          },
+          onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to update skill');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(data, {
+        onSuccess: () => {
+          onOpenChange(false);
+          toast.success('Skill added');
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Failed to add skill');
+        },
+      });
+    }
   }
 
-  const categoryOptions = [
-    ...categories.map((c) => ({ label: c, value: c })),
-    { label: 'Other', value: 'Other' },
-  ];
+  const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg">{skill ? 'Edit Skill' : 'Add Skill'}</DialogTitle>
@@ -322,9 +365,10 @@ function SkillDialog({
             />
             <FormSelect
               label="Category"
-              name="category"
+              name="categoryId"
               control={control}
-              error={errors.category}
+              error={errors.categoryId}
+              placeholder="Select Category"
               options={categoryOptions}
               required
             />
@@ -352,10 +396,17 @@ function SkillDialog({
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
               Cancel
             </Button>
-            <Button size="sm" type="submit">
+            <Button size="sm" type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
               {skill ? 'Save Changes' : 'Add Skill'}
             </Button>
           </DialogFooter>

@@ -12,7 +12,6 @@ import {
   EyeOff,
   Mail,
   Lock,
-  Loader2,
   User,
   AtSign,
   CheckCircle2,
@@ -547,16 +546,10 @@ export function Register({ onNavigate }: RegisterProps) {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading || (passwordValue.length > 0 && !isPasswordValid)}
+                disabled={passwordValue.length > 0 && !isPasswordValid}
+                isLoading={isLoading}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  'Create account'
-                )}
+                {isLoading ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
 

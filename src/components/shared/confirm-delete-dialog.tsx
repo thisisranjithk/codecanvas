@@ -15,6 +15,7 @@ interface ConfirmDeleteDialogProps {
   title?: string;
   itemName?: React.ReactNode;
   description?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export function ConfirmDeleteDialog({
@@ -24,6 +25,7 @@ export function ConfirmDeleteDialog({
   title = 'Delete Item',
   itemName,
   description,
+  isLoading = false,
 }: ConfirmDeleteDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -43,10 +45,10 @@ export function ConfirmDeleteDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button variant="destructive" size="sm" onClick={onConfirm}>
+          <Button variant="destructive" size="sm" onClick={onConfirm} isLoading={isLoading}>
             Delete
           </Button>
         </DialogFooter>

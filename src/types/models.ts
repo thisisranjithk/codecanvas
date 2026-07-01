@@ -25,14 +25,7 @@ export interface Project {
   views: number;
 }
 
-export interface Skill {
-  id: string;
-  name: string;
-  category: string;
-  proficiency: number;
-  yearsOfExperience: number;
-  icon: string;
-}
+
 
 export interface Experience {
   id: string;
@@ -91,50 +84,4 @@ export interface BlogPost {
   publishedAt: string | null;
   updatedAt: string;
   coverImage: string;
-}
-
-export interface Stats {
-  totalProjects: number;
-  publishedProjects: number;
-  totalBlogs: number;
-  publishedBlogs: number;
-  totalSkills: number;
-  totalViews: number;
-  thisMonthViews: number;
-  viewsGrowth: number;
-}
-
-export interface ProfileChecklistItem {
-  label: string;
-  done: boolean;
-}
-
-export interface ProfileCompletion {
-  percentage: number;
-  checklist: ProfileChecklistItem[];
-}
-
-export interface ActivityFeedItem {
-  id: string;
-  type: string;
-  text: string;
-  time: string;
-  icon: string;
-}
-
-export interface MonthlyView {
-  month: string;
-  views: number;
-  visitors: number;
-}
-
-export interface CategoryCount {
-  name: string;
-  count: number;
-}
-
-export interface ChartData {
-  monthlyViews: MonthlyView[];
-  projectCategories: CategoryCount[];
-  blogTags: CategoryCount[];
 }

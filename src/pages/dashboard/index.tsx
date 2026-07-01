@@ -14,7 +14,6 @@ import {
   Activity,
   Star,
   Clock,
-  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -23,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useDashboard } from '@/hooks/api/dashboard/use-dashboard';
 import { ErrorState } from '@/components/shared/error-state';
+import { Loader } from '@/components/ui/loader';
 
 const getWelcomeMessage = (projects: number, blogs: number) => {
   const total = projects + blogs;
@@ -164,11 +164,7 @@ export function Dashboard() {
   ];
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 className="text-primary size-8 animate-spin" />
-      </div>
-    );
+    return <Loader variant="section" text="Loading dashboard..." />;
   }
 
   if (isError || !data) {
