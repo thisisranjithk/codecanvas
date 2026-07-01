@@ -452,6 +452,7 @@ export function Register({ onNavigate }: RegisterProps) {
                       <Input
                         id="fullName"
                         type="text"
+                        autoComplete="name"
                         placeholder="Alex Morgan"
                         className="pl-10"
                         {...register('fullName')}
@@ -469,6 +470,7 @@ export function Register({ onNavigate }: RegisterProps) {
                       <Input
                         id="username"
                         type="text"
+                        autoComplete="off"
                         placeholder="alexmorgan"
                         className="pl-10"
                         {...register('username', {
@@ -492,6 +494,7 @@ export function Register({ onNavigate }: RegisterProps) {
                     <Input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="name@example.com"
                       className="pl-10"
                       {...register('email')}
@@ -510,6 +513,7 @@ export function Register({ onNavigate }: RegisterProps) {
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
                       placeholder="Create a strong password"
                       className="pr-10 pl-10"
                       {...register('password')}

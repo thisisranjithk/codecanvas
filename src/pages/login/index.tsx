@@ -188,6 +188,7 @@ export function Login({ onNavigate }: LoginProps) {
                     <Input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="name@example.com"
                       className="pl-10"
                       {...register('email')}
@@ -215,6 +216,7 @@ export function Login({ onNavigate }: LoginProps) {
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
                       placeholder="Enter your password"
                       className="pr-10 pl-10"
                       {...register('password')}
