@@ -261,7 +261,7 @@ function FormSwitch<T extends FieldValues>({
         >
           <div className="flex flex-col gap-0.5">
             <Label className={cn('text-sm font-medium', labelClassName)}>{label}</Label>
-            {description && <p className="text-muted-foreground text-3">{description}</p>}
+            {description && <p className="text-muted-foreground text-xs text-3">{description}</p>}
           </div>
           <Switch checked={field.value} onCheckedChange={field.onChange} />
         </div>

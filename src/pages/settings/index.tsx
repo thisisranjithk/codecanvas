@@ -1,4 +1,6 @@
 import { Save, Globe, User, Bell, Shield, Link, Info } from 'lucide-react';
+import { useEffect } from 'react';
+import { useProfile, useCreateProfile, useUpdateProfile, useUpdatePortfolioSettings } from '@/hooks/api/profile';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,30 +27,63 @@ import {
 
 function ProfileTab() {
   const { user } = useAuth();
+  const { data: profileResponse, isLoading } = useProfile();
+  const profile = profileResponse?.data;
+  const createProfile = useCreateProfile();
+  const updateProfile = useUpdateProfile();
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.fullName || '',
       email: user?.email || '',
-      headline: 'Senior Software Engineer & Open Source Contributor',
-      bio: "I'm a software engineer with 6+ years of experience building high-performance web applications. Currently at Vercel, previously at Stripe and Linear.",
-      location: 'San Francisco, CA',
+      headline: '',
+      bio: '',
+      location: '',
       timezone: 'america-la',
-      github: 'alexmorgan',
-      linkedin: 'alexmorgan',
-      twitter: 'alexmorgan',
-      website: 'alexmorgan.dev',
+      github: '',
+      linkedin: '',
+      twitter: '',
+      website: '',
     },
   });
 
-  function onSubmit(_data: ProfileFormData) {
-    toast.success('Profile settings saved');
+  useEffect(() => {
+    if (profile) {
+      reset({
+        name: profile.name || user?.fullName || '',
+        email: profile.email || user?.email || '',
+        headline: profile.headline || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        timezone: profile.timezone || 'america-la',
+        github: profile.github || '',
+        linkedin: profile.linkedin || '',
+        twitter: profile.twitter || '',
+        website: profile.website || '',
+      });
+    }
+  }, [profile, reset, user]);
+
+  function onSubmit(data: ProfileFormData) {
+    if (profile) {
+      updateProfile.mutate(data, {
+        onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to update profile')
+      });
+    } else {
+      createProfile.mutate(data, {
+        onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to create profile')
+      });
+    }
   }
+
+  const isPending = createProfile.isPending || updateProfile.isPending;
 
   const socialLinks = [
     { label: 'GitHub', field: 'github' as const, prefix: 'github.com/' },
@@ -175,9 +210,9 @@ function ProfileTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5">
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading}>
             <Save className="size-3.5" />
-            Save Profile
+            {isPending ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
       </div>
@@ -188,7 +223,11 @@ function ProfileTab() {
 // ── Portfolio Tab ──
 
 function PortfolioTab() {
-  const { control, handleSubmit } = useForm<PortfolioFormData>({
+  const { data: profileResponse, isLoading } = useProfile();
+  const settings = profileResponse?.data;
+  const updateSettings = useUpdatePortfolioSettings();
+
+  const { control, handleSubmit, reset } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema),
     defaultValues: {
       portfolioPublic: true,
@@ -197,9 +236,29 @@ function PortfolioTab() {
     },
   });
 
-  function onSubmit(_data: PortfolioFormData) {
-    toast.success('Portfolio settings saved');
+  useEffect(() => {
+    if (settings) {
+      reset({
+        portfolioPublic: settings.portfolioVisibility === 'PUBLIC',
+        showEmail: settings.showEmail,
+        openToWork: settings.openToWork,
+      });
+    }
+  }, [settings, reset]);
+
+  function onSubmit(data: PortfolioFormData) {
+    const payload = {
+      portfolioVisibility: data.portfolioPublic ? 'PUBLIC' : 'PRIVATE',
+      showEmail: data.showEmail,
+      openToWork: data.openToWork,
+    };
+    
+    updateSettings.mutate(payload, {
+      onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to save settings')
+    });
   }
+
+  const isPending = updateSettings.isPending;
 
   const visibilityItems = [
     {
@@ -241,9 +300,9 @@ function PortfolioTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5">
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading}>
             <Save className="size-3.5" />
-            Save Changes
+            {isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
