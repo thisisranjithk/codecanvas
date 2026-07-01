@@ -31,10 +31,10 @@ export function AppSidebar() {
 
   const userInitials = user?.fullName
     ? user.fullName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
     : 'U';
 
   return (
@@ -48,7 +48,7 @@ export function AppSidebar() {
                   <Layers className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="text-base font-semibold tracking-tight">Portfolio CMS</span>
+                  <span className="text-base font-semibold tracking-tight">CodeCanvas</span>
                 </div>
               </Link>
             </SidebarMenuButton>
