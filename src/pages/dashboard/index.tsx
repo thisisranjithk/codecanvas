@@ -423,7 +423,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <span className="truncate text-sm font-semibold transition-colors group-hover:text-violet-500">
-                        {data.featuredContent.latestCertification}
+                        {data.featuredContent.latestCertification.name}
                       </span>
                     </div>
                     <div className="flex size-7 shrink-0 -translate-x-2 items-center justify-center rounded-full bg-violet-500/5 text-violet-500 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:bg-violet-500/10 group-hover:opacity-100">

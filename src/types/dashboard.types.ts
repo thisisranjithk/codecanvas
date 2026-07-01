@@ -16,11 +16,12 @@ export interface DashboardActivity {
   title: string;
   timestamp: string;
 }
+import type { Certification } from './certification.types';
 
 export interface DashboardFeaturedContent {
   featuredProject: string | null;
   latestBlog: string | null;
-  latestCertification: string | null;
+  latestCertification: Certification | null;
 }
 
 export interface DashboardData {

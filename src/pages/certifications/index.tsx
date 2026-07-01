@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import {
   Plus,
   Pencil,
@@ -28,25 +29,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockCertifications } from '@/data/certifications';
 import { formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
 import { FormInput, FormMonthPicker } from '@/components/shared/form-field';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { certificationSchema, type CertificationFormData } from '@/schemas';
-
-type Certification = (typeof mockCertifications)[0];
+import { useCertifications, useCreateCertification, useDeleteCertification, useUpdateCertification } from '@/hooks/api/certification';
+import { Loader } from '@/components/ui/loader';
+import { ErrorState } from '@/components/shared/error-state';
+import type { Certification } from '@/types/certification.types';
 
 export function Certifications() {
-  const [certs, setCerts] = useState(mockCertifications);
+  const { data: certs = [], isLoading, isError, error, refetch } = useCertifications();
+  const createMutation = useCreateCertification();
+  const updateMutation = useUpdateCertification();
+  const deleteMutation = useDeleteCertification();
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCert, setEditingCert] = useState<Certification | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Certification | null>(null);
 
   function handleDelete(cert: Certification) {
-    setCerts((prev) => prev.filter((c) => c.id !== cert.id));
-    setDeleteDialog(null);
-    toast.success('Certification removed');
+    deleteMutation.mutate(cert.id, {
+      onSuccess: () => {
+        setDeleteDialog(null);
+        toast.success('Certification removed');
+      },
+    });
   }
 
   function openEdit(cert: Certification) {
@@ -59,8 +67,29 @@ export function Certifications() {
     setDialogOpen(true);
   }
 
-  const activeCerts = certs.filter((c) => c.status === 'active');
-  const expiredCerts = certs.filter((c) => c.status === 'expired');
+  const isExpired = (cert: Certification) => {
+    if (cert.expiryDate && new Date(cert.expiryDate) < new Date()) return true;
+    return false;
+  };
+
+  const activeCerts = certs.filter((c) => !isExpired(c));
+  const expiredCerts = certs.filter((c) => isExpired(c));
+
+  if (isLoading) {
+    return <Loader variant="section" text="Loading certifications..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load certifications"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in flex flex-col gap-5 p-6">
@@ -131,6 +160,8 @@ export function Certifications() {
         certification={editingCert}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        createMutation={createMutation}
+        updateMutation={updateMutation}
       />
 
       {/* Delete Dialog */}
@@ -138,6 +169,7 @@ export function Certifications() {
         isOpen={!!deleteDialog}
         onClose={() => setDeleteDialog(null)}
         onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+        isLoading={deleteMutation.isPending}
         title="Delete Certification"
         description={
           <>
@@ -153,10 +185,14 @@ function CertificationDialog({
   certification,
   open,
   onOpenChange,
+  createMutation,
+  updateMutation,
 }: {
   certification: Certification | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  createMutation: ReturnType<typeof useCreateCertification>;
+  updateMutation: ReturnType<typeof useUpdateCertification>;
 }) {
   const {
     register,
@@ -172,7 +208,7 @@ function CertificationDialog({
       issueDate: undefined as unknown as Date,
       expiryDate: null,
       credentialId: '',
-      credentialUrl: '',
+      verificationUrl: '',
     },
   });
 
@@ -186,15 +222,39 @@ function CertificationDialog({
           : (undefined as unknown as Date),
         expiryDate: certification?.expiryDate ? new Date(certification.expiryDate) : null,
         credentialId: certification?.credentialId ?? '',
-        credentialUrl: certification?.credentialUrl ?? '',
+        verificationUrl: certification?.verificationUrl ?? '',
       });
     }
   }, [open, certification, reset]);
 
-  function onSubmit(_data: CertificationFormData) {
-    onOpenChange(false);
-    toast.success(certification ? 'Certification updated' : 'Certification added');
+  function onSubmit(data: CertificationFormData) {
+    const payload = {
+      ...data,
+      issueDate: data.issueDate.toISOString(),
+      expiryDate: data.expiryDate ? data.expiryDate.toISOString() : null,
+    };
+
+    if (certification) {
+      updateMutation.mutate(
+        { id: certification.id, data: payload },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+            toast.success('Certification updated');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          onOpenChange(false);
+          toast.success('Certification added');
+        },
+      });
+    }
   }
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -251,23 +311,24 @@ function CertificationDialog({
               registration={register('credentialId')}
               error={errors.credentialId}
               placeholder="e.g. AWS-SAA-12345"
+              required
               labelClassName="text-base"
               inputClassName="h-9 text-base"
             />
             <FormInput
               label="Credential URL"
-              registration={register('credentialUrl')}
-              error={errors.credentialUrl}
+              registration={register('verificationUrl')}
+              error={errors.verificationUrl}
               placeholder="https://..."
               labelClassName="text-base"
               inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button size="sm" type="submit">
+            <Button size="sm" type="submit" isLoading={isPending}>
               {certification ? 'Save Changes' : 'Add'}
             </Button>
           </DialogFooter>
@@ -286,7 +347,8 @@ function CertCard({
   onEdit: (cert: Certification) => void;
   onDelete: (cert: Certification) => void;
 }) {
-  const isExpired = cert.status === 'expired';
+  const isExpired =
+    (cert.expiryDate && new Date(cert.expiryDate) < new Date());
   return (
     <Card
       className={`card-hover border-border/60 group overflow-hidden ${isExpired ? 'opacity-60 grayscale-[30%]' : ''}`}
@@ -295,7 +357,7 @@ function CertCard({
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3 sm:gap-4">
             <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border shadow-sm sm:size-12">
-              {cert.logo || <Award className="size-5" />}
+              <Award className="size-5" />
             </div>
             <div className="mt-0.5 flex min-w-0 flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -336,16 +398,16 @@ function CertCard({
                 )}
               </div>
 
-              {(cert.credentialId || cert.credentialUrl) && (
+              {(cert.credentialId || cert.verificationUrl) && (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {cert.credentialId && (
                     <span className="bg-muted/50 text-muted-foreground border-border/50 inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-xs sm:text-xs">
                       ID: {cert.credentialId}
                     </span>
                   )}
-                  {cert.credentialUrl && (
+                  {cert.verificationUrl && (
                     <a
-                      href={cert.credentialUrl}
+                      href={cert.verificationUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11.5px] font-medium transition-colors hover:underline sm:text-xs"

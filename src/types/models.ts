@@ -56,17 +56,7 @@ export interface Education {
   logo: string;
 }
 
-export interface Certification {
-  id: string;
-  name: string;
-  issuer: string;
-  issueDate: string;
-  expiryDate: string | null;
-  credentialId: string;
-  credentialUrl: string;
-  status: string;
-  logo: string;
-}
+
 
 export interface BlogPost {
   id: string;
