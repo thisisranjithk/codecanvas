@@ -16,7 +16,6 @@ import {
   Database,
   Cloud,
   PenTool,
-  Loader2,
   type LucideIcon,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -57,6 +56,7 @@ import { FormInput, FormSelect, FormSlider } from '@/components/shared/form-fiel
 import { skillSchema, type SkillFormData } from '@/schemas';
 import type { Skill } from '@/types/skill.types';
 import { ErrorState } from '@/components/shared/error-state';
+import { Loader } from '@/components/ui/loader';
 
 const categoryIcons: Record<string, LucideIcon> = {
   Languages: Terminal,
@@ -131,11 +131,7 @@ export function Skills() {
   }
 
   if (isLoadingSkills) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <Loader2 className="text-primary size-8 animate-spin" />
-      </div>
-    );
+    return <Loader variant="section" text="Loading certifications..." />;
   }
 
   if (isError) {
@@ -436,7 +432,6 @@ function SkillDialog({
               Cancel
             </Button>
             <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
-              {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
               {editMode ? 'Save Changes' : 'Add Skill'}
             </Button>
           </DialogFooter>
