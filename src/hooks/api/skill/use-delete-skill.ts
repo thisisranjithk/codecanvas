@@ -8,7 +8,7 @@ export function useDeleteSkill() {
     mutationFn: (id: string) => skillService.deleteSkill(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.skills.lists() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
     },
   });
 }

@@ -42,19 +42,6 @@ export interface Experience {
   logo: string;
 }
 
-export interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string | null;
-  gpa: string;
-  location: string;
-  activities: string[];
-  description: string;
-  logo: string;
-}
 
 
 

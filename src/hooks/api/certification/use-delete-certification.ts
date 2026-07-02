@@ -8,7 +8,7 @@ export function useDeleteCertification() {
     mutationFn: (id: string) => certificationService.deleteCertification(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.certifications.lists() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
     },
   });
 }

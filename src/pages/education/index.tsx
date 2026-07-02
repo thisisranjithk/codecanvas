@@ -28,36 +28,67 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockEducation } from '@/data/education';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import { FormInput, FormTextarea, FormMonthPicker } from '@/components/shared/form-field';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { getEducationActivityIcon } from '@/lib/utils';
 import { educationSchema, type EducationFormData } from '@/schemas';
-
-type Education = (typeof mockEducation)[0];
+import { ErrorState } from '@/components/shared/error-state';
+import {
+  useEducations,
+  useEducation,
+  useCreateEducation,
+  useUpdateEducation,
+  useDeleteEducation
+} from '@/hooks/api/education';
+import type { Education, CreateEducationRequest } from '@/types/education.types';
+import { Loader } from '@/components/ui/loader';
 
 export function Education() {
-  const [educations, setEducations] = useState(mockEducation);
+  const { data: educations = [], isLoading, isError, error, refetch } = useEducations();
+  const deleteMutation = useDeleteEducation();
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingEdu, setEditingEdu] = useState<Education | null>(null);
+  const [editingEduId, setEditingEduId] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Education | null>(null);
 
   function handleDelete(edu: Education) {
-    setEducations((prev) => prev.filter((e) => e.id !== edu.id));
-    setDeleteDialog(null);
-    toast.success('Education entry removed');
+    deleteMutation.mutate(edu.id, {
+      onSuccess: (data) => {
+        setDeleteDialog(null);
+        toast.success(data.message || 'Education deleted successfully');
+      },
+      onError: (err: any) => {
+        toast.error(err.response?.data?.message || 'Failed to delete education');
+      }
+    });
   }
 
   function openEdit(edu: Education) {
-    setEditingEdu(edu);
+    setEditingEduId(edu.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingEdu(null);
+    setEditingEduId(null);
     setDialogOpen(true);
+  }
+
+  if (isLoading) {
+    return <Loader variant="section" text="Loading educations..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load education"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
   }
 
   return (
@@ -93,14 +124,14 @@ export function Education() {
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                       <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
-                        {edu.logo || <GraduationCap className="size-5" />}
+                        <GraduationCap className="size-5" />
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
                         <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
                           {edu.institution}
                         </h2>
                         <p className="text-primary text-3 truncate font-semibold sm:text-sm">
-                          {edu.degree} in {edu.field}
+                          {edu.degree} in {edu.fieldOfStudy}
                         </p>
                       </div>
                     </div>
@@ -138,7 +169,7 @@ export function Education() {
                   <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
-                      {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
+                      {formatDate(edu.startDate)} — {edu.endDate ? formatDate(edu.endDate) : 'Present'}
                     </span>
 
                     {edu.location && (
@@ -201,7 +232,12 @@ export function Education() {
       )}
 
       {/* Edit/New Dialog */}
-      <EducationDialog education={editingEdu} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <EducationDialog
+        educationId={editingEduId}
+        editMode={!!editingEduId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -214,32 +250,39 @@ export function Education() {
             Remove <strong>"{deleteDialog?.institution}"</strong>?
           </>
         }
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );
 }
 
 function EducationDialog({
-  education,
+  educationId,
+  editMode,
   open,
   onOpenChange,
 }: {
-  education: Education | null;
+  educationId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { data: fetchedEdu, isFetching } = useEducation(open ? (educationId || '') : '');
+  const createMutation = useCreateEducation();
+  const updateMutation = useUpdateEducation();
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<EducationFormData>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
       institution: '',
       degree: '',
-      field: '',
+      fieldOfStudy: '',
       startDate: undefined as unknown as Date,
       endDate: null,
       gpa: '',
@@ -251,36 +294,89 @@ function EducationDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        institution: education?.institution ?? '',
-        degree: education?.degree ?? '',
-        field: education?.field ?? '',
-        startDate: education?.startDate
-          ? new Date(education.startDate)
-          : (undefined as unknown as Date),
-        endDate: education?.endDate ? new Date(education.endDate) : null,
-        gpa: education?.gpa ?? '',
-        location: education?.location ?? '',
-        description: education?.description ?? '',
-        activities: education?.activities.join(', ') ?? '',
+      if (editMode && fetchedEdu) {
+        reset({
+          institution: fetchedEdu.institution ?? '',
+          degree: fetchedEdu.degree ?? '',
+          fieldOfStudy: fetchedEdu.fieldOfStudy ?? '',
+          startDate: fetchedEdu.startDate
+            ? new Date(fetchedEdu.startDate)
+            : (undefined as unknown as Date),
+          endDate: fetchedEdu.endDate ? new Date(fetchedEdu.endDate) : null,
+          gpa: fetchedEdu.gpa ?? '',
+          location: fetchedEdu.location ?? '',
+          description: fetchedEdu.description ?? '',
+          activities: fetchedEdu.activities?.join(', ') ?? '',
+        });
+      } else if (!editMode) {
+        reset({
+          institution: '',
+          degree: '',
+          fieldOfStudy: '',
+          startDate: undefined as unknown as Date,
+          endDate: null,
+          gpa: '',
+          location: '',
+          description: '',
+          activities: '',
+        });
+      }
+    }
+  }, [open, editMode, fetchedEdu, reset]);
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetching;
+
+  function onSubmit(data: EducationFormData) {
+    const payload: CreateEducationRequest = {
+      institution: data.institution,
+      degree: data.degree,
+      fieldOfStudy: data.fieldOfStudy,
+      startDate: data.startDate.toISOString(),
+      endDate: data.endDate ? data.endDate.toISOString() : null,
+      gpa: data.gpa,
+      location: data.location,
+      description: data.description,
+      activities: data.activities
+        ? data.activities.split(',').map((s) => s.trim()).filter(Boolean)
+        : [],
+      displayOrder: fetchedEdu?.displayOrder || 0,
+    };
+
+    if (editMode && educationId) {
+      updateMutation.mutate(
+        { id: educationId, data: payload },
+        {
+          onSuccess: (data) => {
+            onOpenChange(false);
+            toast.success(data.message || 'Education updated successfully');
+          },
+          onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to update education');
+          }
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: (data) => {
+          onOpenChange(false);
+          toast.success(data.message || 'Education added successfully');
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Failed to add education');
+        }
       });
     }
-  }, [open, education, reset]);
-
-  function onSubmit(_data: EducationFormData) {
-    onOpenChange(false);
-    toast.success(education ? 'Education updated' : 'Education added');
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg">
-            {education ? 'Edit Education' : 'Add Education'}
+            {editMode ? 'Edit Education' : 'Add Education'}
           </DialogTitle>
           <DialogDescription className="text-base">
-            {education ? 'Update education details.' : 'Add an education entry.'}
+            {editMode ? 'Update education details.' : 'Add an education entry.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -306,8 +402,8 @@ function EducationDialog({
               />
               <FormInput
                 label="Field of Study"
-                registration={register('field')}
-                error={errors.field}
+                registration={register('fieldOfStudy')}
+                error={errors.fieldOfStudy}
                 placeholder="e.g. Computer Science"
                 required
                 labelClassName="text-base"
@@ -375,11 +471,12 @@ function EducationDialog({
               type="button"
               onClick={() => onOpenChange(false)}
               className="h-9"
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9">
-              {education ? 'Save Changes' : 'Add Education'}
+            <Button size="sm" type="submit" className="h-9" disabled={isPending || (editMode && !isDirty)}>
+              {editMode ? 'Save Changes' : 'Add Education'}
             </Button>
           </DialogFooter>
         </form>
