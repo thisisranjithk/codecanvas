@@ -399,7 +399,7 @@ function ExperienceDialog({
           <DialogTitle className="text-lg">
             {editMode ? 'Edit Experience' : 'Add Experience'}
           </DialogTitle>
-          <DialogDescription className="text-base">
+          <DialogDescription className="text-sm">
             {editMode ? 'Update position details.' : 'Add a work experience entry.'}
           </DialogDescription>
         </DialogHeader>
@@ -411,8 +411,6 @@ function ExperienceDialog({
               error={errors.company}
               placeholder="TechCorp Pvt. Ltd."
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Role / Title"
@@ -420,8 +418,6 @@ function ExperienceDialog({
               error={errors.role}
               placeholder="Frontend Developer"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -431,10 +427,9 @@ function ExperienceDialog({
                 control={control}
                 error={errors.employmentTypeId}
                 options={employmentTypeOptions}
-                placeholder='Select Employment Type'
+                placeholder="Select Employment Type"
                 required
-                labelClassName="text-base"
-                selectClassName="h-9 text-base w-full"
+                selectClassName="w-full"
               />
               <FormInput
                 label="Location"
@@ -442,8 +437,7 @@ function ExperienceDialog({
                 error={errors.location}
                 placeholder="Bengaluru, India"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base w-full"
+                inputClassName="w-full"
               />
             </div>
 
@@ -454,8 +448,7 @@ function ExperienceDialog({
                 control={control}
                 error={errors.startDate}
                 required
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                pickerClassName="w-full"
               />
               <FormMonthPicker
                 label="End Date"
@@ -463,8 +456,7 @@ function ExperienceDialog({
                 control={control}
                 error={errors.endDate}
                 disabled={isCurrent || isPending}
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                pickerClassName="w-full"
               />
             </div>
 
@@ -474,7 +466,6 @@ function ExperienceDialog({
               control={control}
               description="This will hide the end date"
               className="bg-muted/20 mb-4"
-              labelClassName="text-base"
             />
 
             <FormTextarea
@@ -483,8 +474,6 @@ function ExperienceDialog({
               error={errors.description}
               placeholder="Brief summary of your role..."
               rows={2}
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
 
             <FormTextarea
@@ -493,8 +482,6 @@ function ExperienceDialog({
               placeholder="List your responsibilities (one per line)..."
               rows={4}
               description="Press Enter to separate each responsibility bullet point."
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
 
             <FormInput
@@ -502,8 +489,6 @@ function ExperienceDialog({
               registration={register('technologies')}
               placeholder="React, Next.js, Tailwind CSS..."
               description="Separate each technology with a comma."
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="pt-2">
@@ -512,12 +497,11 @@ function ExperienceDialog({
               size="sm"
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-9 text-base"
               disabled={isPending}
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9 text-base" disabled={isPending || (editMode && !isDirty)}>
+            <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
               {editMode ? 'Save Changes' : 'Add Experience'}
             </Button>
           </DialogFooter>

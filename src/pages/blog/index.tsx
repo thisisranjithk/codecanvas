@@ -296,8 +296,6 @@ function BlogDialog({
               error={errors.title}
               placeholder="Post title"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormInput
@@ -306,16 +304,12 @@ function BlogDialog({
                 error={errors.slug}
                 placeholder="post-slug-here"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="External Link (Optional)"
                 registration={register('link')}
                 error={errors.link}
                 placeholder="https://..."
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
             </div>
             <FormTextarea
@@ -325,8 +319,6 @@ function BlogDialog({
               placeholder="Short summary..."
               rows={3}
               required
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormInput
@@ -335,8 +327,6 @@ function BlogDialog({
                 error={errors.category}
                 placeholder="e.g. Engineering"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Read Time (minutes)"
@@ -345,8 +335,6 @@ function BlogDialog({
                 type="number"
                 min={1}
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
             </div>
             <FormInput
@@ -355,8 +343,6 @@ function BlogDialog({
               error={errors.tags}
               placeholder="React, TypeScript, ..."
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-4">
               <FormSwitch
@@ -364,14 +350,12 @@ function BlogDialog({
                 name="featured"
                 control={control}
                 className="bg-muted/20"
-                labelClassName="text-base"
               />
               <FormSwitch
                 label="Published Status"
                 name="published"
                 control={control}
                 className="bg-muted/20"
-                labelClassName="text-base"
               />
             </div>
           </div>

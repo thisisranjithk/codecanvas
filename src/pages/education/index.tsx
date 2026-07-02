@@ -387,8 +387,6 @@ function EducationDialog({
               error={errors.institution}
               placeholder="e.g. Carnegie Mellon University"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-3">
               <FormInput
@@ -397,8 +395,6 @@ function EducationDialog({
                 error={errors.degree}
                 placeholder="e.g. Bachelor of Science"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Field of Study"
@@ -406,8 +402,6 @@ function EducationDialog({
                 error={errors.fieldOfStudy}
                 placeholder="e.g. Computer Science"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -416,17 +410,13 @@ function EducationDialog({
                 name="startDate"
                 control={control}
                 error={errors.startDate}
-                required
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                required pickerClassName="w-full"
               />
               <FormMonthPicker
                 label="End Date"
                 name="endDate"
                 control={control}
-                error={errors.endDate}
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                error={errors.endDate} pickerClassName="w-full"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -435,16 +425,12 @@ function EducationDialog({
                 registration={register('gpa')}
                 error={errors.gpa}
                 placeholder="e.g. 3.8"
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
               <FormInput
                 label="Location"
                 registration={register('location')}
                 error={errors.location}
                 placeholder="e.g. Pittsburgh, PA"
-                labelClassName="text-base"
-                inputClassName="h-9 text-base"
               />
             </div>
             <FormTextarea
@@ -453,15 +439,11 @@ function EducationDialog({
               error={errors.description}
               placeholder="Describe your studies, thesis, or focus areas..."
               rows={3}
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
             <FormInput
               label="Activities (comma-separated)"
               registration={register('activities')}
               placeholder="ACM Chapter, Hackathon Organizer, ..."
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="pt-2">

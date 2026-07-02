@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  TrendingUp,
   FolderKanban,
   BookOpen,
   Zap,
@@ -263,16 +262,15 @@ export function Dashboard() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {statCards.map((card) => (
-          <Card key={card.label} className="card-hover border-border/60">
+          <Card key={card.label} className="card-hover border-border/60 py-2">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <span className="text-muted-foreground text-3 font-medium">{card.label}</span>
                   <span className="text-2xl font-bold tracking-tight">{card.value}</span>
                   <span
                     className={`text-3 flex items-center gap-0.5 font-medium ${card.changeUp ? 'text-success' : 'text-muted-foreground'}`}
                   >
-                    {card.changeUp && <TrendingUp className="size-3.5" />}
                   </span>
                 </div>
                 <div

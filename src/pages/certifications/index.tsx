@@ -293,8 +293,6 @@ function CertificationDialog({
               error={errors.name}
               placeholder="e.g. AWS Certified Solutions Architect"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Issuing Organization"
@@ -302,8 +300,6 @@ function CertificationDialog({
               error={errors.issuer}
               placeholder="e.g. Amazon Web Services"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <div className="grid grid-cols-2 gap-3">
               <FormMonthPicker
@@ -311,17 +307,13 @@ function CertificationDialog({
                 name="issueDate"
                 control={control}
                 error={errors.issueDate}
-                required
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                required pickerClassName="w-full"
               />
               <FormMonthPicker
                 label="Expiry Date (optional)"
                 name="expiryDate"
                 control={control}
-                error={errors.expiryDate}
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                error={errors.expiryDate} pickerClassName="w-full"
               />
             </div>
             <FormInput
@@ -330,16 +322,12 @@ function CertificationDialog({
               error={errors.credentialId}
               placeholder="e.g. AWS-SAA-12345"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Credential URL"
               registration={register('verificationUrl')}
               error={errors.verificationUrl}
               placeholder="https://..."
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="mt-4">
