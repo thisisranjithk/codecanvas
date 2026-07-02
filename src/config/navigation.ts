@@ -7,6 +7,7 @@ import {
   Award,
   BookOpen,
   type LucideIcon,
+  Code2,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -23,4 +24,5 @@ export const navItems: NavItem[] = [
   { label: 'Projects', icon: FolderKanban, path: '/projects' },
   { label: 'Certifications', icon: Award, path: '/certifications' },
   { label: 'Blog', icon: BookOpen, path: '/blog' },
+  { label: 'Developer', icon: Code2, path: '/developer' },
 ];

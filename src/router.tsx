@@ -12,6 +12,7 @@ import {
   Login,
   Register,
 } from '@/pages';
+import { Developer } from './pages/developer';
 
 // Type for our route's static data
 export type RouteStaticData = {
@@ -103,6 +104,15 @@ const blogRoute = createRoute({
   } as RouteStaticData,
 });
 
+const developerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/developer',
+  component: Developer,
+  staticData: {
+    breadcrumbs: [{ label: 'Dashboard', path: '/' }, { label: 'Developer' }],
+  } as RouteStaticData,
+});
+
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings',
@@ -122,6 +132,7 @@ const routeTree = rootRoute.addChildren([
   educationRoute,
   certificationsRoute,
   blogRoute,
+  developerRoute,
   settingsRoute,
 ]);
 
