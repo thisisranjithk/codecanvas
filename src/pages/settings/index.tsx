@@ -1,6 +1,11 @@
 import { Save, Globe, User, Bell, Shield, Link, Info } from 'lucide-react';
 import { useEffect } from 'react';
-import { useProfile, useCreateProfile, useUpdateProfile, useUpdatePortfolioSettings } from '@/hooks/api/profile';
+import {
+  useProfile,
+  useCreateProfile,
+  useUpdateProfile,
+  useUpdatePortfolioSettings,
+} from '@/hooks/api/profile';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +42,7 @@ function ProfileTab() {
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -73,13 +78,9 @@ function ProfileTab() {
 
   function onSubmit(data: ProfileFormData) {
     if (profile) {
-      updateProfile.mutate(data, {
-        onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to update profile')
-      });
+      updateProfile.mutate(data);
     } else {
-      createProfile.mutate(data, {
-        onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to create profile')
-      });
+      createProfile.mutate(data);
     }
   }
 
@@ -210,7 +211,7 @@ function ProfileTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading}>
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading || !isDirty}>
             <Save className="size-3.5" />
             {isPending ? 'Saving...' : 'Save Profile'}
           </Button>
@@ -227,12 +228,12 @@ function PortfolioTab() {
   const settings = profileResponse?.data;
   const updateSettings = useUpdatePortfolioSettings();
 
-  const { control, handleSubmit, reset } = useForm<PortfolioFormData>({
+  const { control, handleSubmit, reset, formState: { isDirty } } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema),
     defaultValues: {
-      portfolioPublic: true,
+      portfolioPublic: false,
       showEmail: false,
-      openToWork: true,
+      openToWork: false,
     },
   });
 
@@ -252,10 +253,8 @@ function PortfolioTab() {
       showEmail: data.showEmail,
       openToWork: data.openToWork,
     };
-    
-    updateSettings.mutate(payload, {
-      onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to save settings')
-    });
+
+    updateSettings.mutate(payload);
   }
 
   const isPending = updateSettings.isPending;
@@ -300,7 +299,7 @@ function PortfolioTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading}>
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading || !isDirty}>
             <Save className="size-3.5" />
             {isPending ? 'Saving...' : 'Save Changes'}
           </Button>

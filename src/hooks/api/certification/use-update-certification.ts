@@ -8,11 +8,9 @@ export function useUpdateCertification() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCertificationRequest }) =>
       certificationService.updateCertification(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData(queryKeys.certifications.detail(variables.id), response.data);
       queryClient.invalidateQueries({ queryKey: queryKeys.certifications.lists() });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.certifications.detail(variables.id),
-      });
     },
   });
 }

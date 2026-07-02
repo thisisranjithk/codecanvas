@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 export function useCreateProfile() {
   return useMutation({
     mutationFn: profileService.createProfile,
-    onSuccess: () => {
-      toast.success('Profile created successfully');
+    onSuccess: (data) => {
+      toast.success(data.message || 'Profile created successfully');
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all() });
     },
+    onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to create profile'),
   });
 }

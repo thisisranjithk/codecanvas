@@ -7,9 +7,11 @@ import { toast } from 'sonner';
 export function useUpdatePortfolioSettings() {
   return useMutation({
     mutationFn: profileService.updatePortfolioSettings,
-    onSuccess: () => {
-      toast.success('Portfolio settings updated successfully');
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.get() });
+    onSuccess: (data) => {
+      toast.success(data.message || 'Portfolio settings updated successfully');
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.profile.get()] });
     },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : 'Failed to save settings'),
   });
 }

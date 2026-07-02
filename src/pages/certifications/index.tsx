@@ -33,7 +33,7 @@ import { formatDate } from '@/lib/utils';
 import { FormInput, FormMonthPicker } from '@/components/shared/form-field';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { certificationSchema, type CertificationFormData } from '@/schemas';
-import { useCertifications, useCreateCertification, useDeleteCertification, useUpdateCertification } from '@/hooks/api/certification';
+import { useCertifications, useCertification, useCreateCertification, useDeleteCertification, useUpdateCertification } from '@/hooks/api/certification';
 import { Loader } from '@/components/ui/loader';
 import { ErrorState } from '@/components/shared/error-state';
 import type { Certification } from '@/types/certification.types';
@@ -45,7 +45,7 @@ export function Certifications() {
   const deleteMutation = useDeleteCertification();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingCert, setEditingCert] = useState<Certification | null>(null);
+  const [editingCertId, setEditingCertId] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Certification | null>(null);
 
   function handleDelete(cert: Certification) {
@@ -58,12 +58,12 @@ export function Certifications() {
   }
 
   function openEdit(cert: Certification) {
-    setEditingCert(cert);
+    setEditingCertId(cert.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingCert(null);
+    setEditingCertId(null);
     setDialogOpen(true);
   }
 
@@ -157,7 +157,8 @@ export function Certifications() {
 
       {/* Edit/New Dialog */}
       <CertificationDialog
-        certification={editingCert}
+        certificationId={editingCertId}
+        editMode={!!editingCertId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         createMutation={createMutation}
@@ -182,24 +183,28 @@ export function Certifications() {
 }
 
 function CertificationDialog({
-  certification,
+  certificationId,
+  editMode,
   open,
   onOpenChange,
   createMutation,
   updateMutation,
 }: {
-  certification: Certification | null;
+  certificationId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   createMutation: ReturnType<typeof useCreateCertification>;
   updateMutation: ReturnType<typeof useUpdateCertification>;
 }) {
+  const { data: fetchedCert, isFetching: isFetchingCert } = useCertification(open ? (certificationId || '') : '');
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<CertificationFormData>({
     resolver: zodResolver(certificationSchema),
     defaultValues: {
@@ -214,18 +219,31 @@ function CertificationDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        name: certification?.name ?? '',
-        issuer: certification?.issuer ?? '',
-        issueDate: certification?.issueDate
-          ? new Date(certification.issueDate)
-          : (undefined as unknown as Date),
-        expiryDate: certification?.expiryDate ? new Date(certification.expiryDate) : null,
-        credentialId: certification?.credentialId ?? '',
-        verificationUrl: certification?.verificationUrl ?? '',
-      });
+      if (editMode) {
+        if (fetchedCert) {
+          reset({
+            name: fetchedCert.name ?? '',
+            issuer: fetchedCert.issuer ?? '',
+            issueDate: fetchedCert.issueDate
+              ? new Date(fetchedCert.issueDate)
+              : (undefined as unknown as Date),
+            expiryDate: fetchedCert.expiryDate ? new Date(fetchedCert.expiryDate) : null,
+            credentialId: fetchedCert.credentialId ?? '',
+            verificationUrl: fetchedCert.verificationUrl ?? '',
+          });
+        }
+      } else {
+        reset({
+          name: '',
+          issuer: '',
+          issueDate: undefined as unknown as Date,
+          expiryDate: null,
+          credentialId: '',
+          verificationUrl: '',
+        });
+      }
     }
-  }, [open, certification, reset]);
+  }, [open, editMode, fetchedCert, reset]);
 
   function onSubmit(data: CertificationFormData) {
     const payload = {
@@ -234,9 +252,9 @@ function CertificationDialog({
       expiryDate: data.expiryDate ? data.expiryDate.toISOString() : null,
     };
 
-    if (certification) {
+    if (editMode && certificationId) {
       updateMutation.mutate(
-        { id: certification.id, data: payload },
+        { id: certificationId, data: payload },
         {
           onSuccess: () => {
             onOpenChange(false);
@@ -254,17 +272,17 @@ function CertificationDialog({
     }
   }
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingCert;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg">
-            {certification ? 'Edit Certification' : 'Add Certification'}
+            {editMode ? 'Edit Certification' : 'Add Certification'}
           </DialogTitle>
           <DialogDescription className="text-base">
-            {certification ? 'Update certification details.' : 'Add a new certification.'}
+            {editMode ? 'Update certification details.' : 'Add a new certification.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -328,8 +346,8 @@ function CertificationDialog({
             <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button size="sm" type="submit" isLoading={isPending}>
-              {certification ? 'Save Changes' : 'Add'}
+            <Button size="sm" type="submit" isLoading={isPending} disabled={editMode && !isDirty}>
+              {editMode ? 'Save Changes' : 'Add'}
             </Button>
           </DialogFooter>
         </form>

@@ -311,7 +311,7 @@ export function Dashboard() {
                   badgeColor = 'bg-primary/10 text-primary';
                 else if (activity.type.includes('BLOG')) badgeColor = 'bg-success/10 text-success';
                 else if (activity.type.includes('SKILL')) badgeColor = 'bg-warning/10 text-warning';
-                else if (activity.type.includes('CERTIFICATE'))
+                else if (activity.type.includes('CERTIFICATION'))
                   badgeColor = 'bg-violet-500/10 text-violet-500';
 
                 return (

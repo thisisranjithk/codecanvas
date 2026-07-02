@@ -9,6 +9,7 @@ export function useCreateSkill() {
     mutationFn: (data: CreateSkillRequest) => skillService.createSkill(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.skills.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all() });
     },
   });
 }

@@ -10,6 +10,7 @@ export function useCreateCertification() {
       certificationService.createCertification(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.certifications.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all() });
     },
   });
 }

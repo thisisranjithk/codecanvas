@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useCategoryDropdown } from '@/hooks/api/category';
-import { useSkills, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/hooks/api/skill';
+import { useSkills, useSkill, useCreateSkill, useUpdateSkill, useDeleteSkill } from '@/hooks/api/skill';
 import {
   Plus,
   Search,
@@ -56,6 +56,7 @@ import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { FormInput, FormSelect, FormSlider } from '@/components/shared/form-field';
 import { skillSchema, type SkillFormData } from '@/schemas';
 import type { Skill } from '@/types/skill.types';
+import { ErrorState } from '@/components/shared/error-state';
 
 const categoryIcons: Record<string, LucideIcon> = {
   Languages: Terminal,
@@ -67,7 +68,7 @@ const categoryIcons: Record<string, LucideIcon> = {
 };
 
 export function Skills() {
-  const { data: skills = [], isLoading: isLoadingSkills } = useSkills();
+  const { data: skills = [], isLoading: isLoadingSkills, isError, error, refetch } = useSkills();
   const { data: categoryDropdown } = useCategoryDropdown('SKILL');
 
   const createSkill = useCreateSkill();
@@ -77,7 +78,7 @@ export function Skills() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Skill | null>(null);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
@@ -105,9 +106,9 @@ export function Skills() {
 
   function handleDelete(skill: Skill) {
     deleteSkill.mutate(skill.id, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         setDeleteDialog(null);
-        toast.success(`"${skill.name}" removed`);
+        toast.success(data.message || `"${skill.name}" skill deleted successfully`);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || 'Failed to delete skill');
@@ -116,12 +117,12 @@ export function Skills() {
   }
 
   function openEdit(skill: Skill) {
-    setEditingSkill(skill);
+    setEditingSkillId(skill.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingSkill(null);
+    setEditingSkillId(null);
     setDialogOpen(true);
   }
 
@@ -133,6 +134,18 @@ export function Skills() {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
         <Loader2 className="text-primary size-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load skills"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
@@ -247,7 +260,8 @@ export function Skills() {
 
       {/* Edit/New Dialog */}
       <SkillDialog
-        skill={editingSkill}
+        skillId={editingSkillId}
+        editMode={!!editingSkillId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         categories={categories}
@@ -273,26 +287,30 @@ export function Skills() {
 }
 
 function SkillDialog({
-  skill,
+  skillId,
+  editMode,
   open,
   onOpenChange,
   categories,
   createMutation,
   updateMutation,
 }: {
-  skill: Skill | null;
+  skillId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories: { id: string; name: string }[];
   createMutation: ReturnType<typeof useCreateSkill>;
   updateMutation: ReturnType<typeof useUpdateSkill>;
 }) {
+  const { data: fetchedSkill, isFetching: isFetchingSkill } = useSkill(open ? (skillId || '') : '');
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<SkillFormData>({
     resolver: zodResolver(skillSchema),
     defaultValues: {
@@ -305,25 +323,37 @@ function SkillDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        name: skill?.name ?? '',
-        categoryId: skill?.categoryId ?? '',
-        proficiency: skill?.proficiency ?? 80,
-        yearsOfExperience: skill?.yearsOfExperience ?? 0,
-      });
+      if (editMode) {
+        if (fetchedSkill) {
+          reset({
+            name: fetchedSkill.name ?? '',
+            categoryId: fetchedSkill.categoryId ?? '',
+            proficiency: fetchedSkill.proficiency ?? 80,
+            yearsOfExperience: fetchedSkill.yearsOfExperience ?? 0,
+          });
+        }
+      } else {
+        // Reset for new skill
+        reset({
+          name: '',
+          categoryId: '',
+          proficiency: 80,
+          yearsOfExperience: 0,
+        });
+      }
     }
-  }, [open, skill, reset]);
+  }, [open, editMode, fetchedSkill, reset]);
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingSkill;
 
   function onSubmit(data: SkillFormData) {
-    if (skill) {
+    if (editMode && skillId) {
       updateMutation.mutate(
-        { id: skill.id, data },
+        { id: skillId, data },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             onOpenChange(false);
-            toast.success('Skill updated');
+            toast.success(data.message || 'Skill updated successfully');
           },
           onError: (error: any) => {
             toast.error(error.response?.data?.message || 'Failed to update skill');
@@ -332,9 +362,9 @@ function SkillDialog({
       );
     } else {
       createMutation.mutate(data, {
-        onSuccess: () => {
+        onSuccess: (data) => {
           onOpenChange(false);
-          toast.success('Skill added');
+          toast.success(data.message || 'Skill added successfully');
         },
         onError: (error: any) => {
           toast.error(error.response?.data?.message || 'Failed to add skill');
@@ -349,9 +379,9 @@ function SkillDialog({
     <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-lg">{skill ? 'Edit Skill' : 'Add Skill'}</DialogTitle>
+          <DialogTitle className="text-lg">{editMode ? 'Edit Skill' : 'Add Skill'}</DialogTitle>
           <DialogDescription className="text-sm">
-            {skill ? 'Update skill details.' : 'Add a new skill to your portfolio.'}
+            {editMode ? 'Update skill details.' : 'Add a new skill to your portfolio.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -405,9 +435,9 @@ function SkillDialog({
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" disabled={isPending}>
+            <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
               {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-              {skill ? 'Save Changes' : 'Add Skill'}
+              {editMode ? 'Save Changes' : 'Add Skill'}
             </Button>
           </DialogFooter>
         </form>

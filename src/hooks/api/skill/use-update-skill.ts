@@ -8,9 +8,9 @@ export function useUpdateSkill() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateSkillRequest }) =>
       skillService.updateSkill(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData(queryKeys.skills.detail(variables.id), response.data);
       queryClient.invalidateQueries({ queryKey: queryKeys.skills.lists() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.skills.detail(variables.id) });
     },
   });
 }

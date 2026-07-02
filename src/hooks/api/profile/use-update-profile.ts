@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 export function useUpdateProfile() {
   return useMutation({
     mutationFn: profileService.updateProfile,
-    onSuccess: () => {
-      toast.success('Profile updated successfully');
+    onSuccess: (data) => {
+      toast.success(data.message || 'Profile updated successfully');
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all() });
     },
+    onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to update profile'),
   });
 }
