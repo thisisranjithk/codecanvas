@@ -6,7 +6,7 @@ export const skillSchema = z.object({
   proficiency: z.number().min(0, 'Minimum is 0').max(100, 'Maximum is 100'),
   yearsOfExperience: z
     .number({ error: 'Must be a valid number' })
-    .min(0, 'Must be 0 or more')
+    .min(1, 'Must be greater then 0')
     .max(30, 'Maximum is 30 years'),
 });
 

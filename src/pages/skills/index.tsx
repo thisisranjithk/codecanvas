@@ -418,6 +418,7 @@ function SkillDialog({
               type="number"
               min={0}
               max={30}
+              step="any"
               required
             />
           </div>

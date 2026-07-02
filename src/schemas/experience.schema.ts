@@ -3,7 +3,7 @@ import { z } from 'zod';
 const experienceBaseSchema = z.object({
   company: z.string().min(1, 'Company is required').max(200),
   role: z.string().min(1, 'Role is required').max(200),
-  type: z.string().min(1, 'Employment type is required'),
+  employmentTypeId: z.string().min(1, 'Employment type is required'),
   location: z.string().min(1, 'Location is required').max(200),
   startDate: z.date({ error: 'Start date is required' }),
   endDate: z.date({ error: 'Invalid date' }).nullable(),

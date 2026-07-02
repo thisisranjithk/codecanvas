@@ -25,26 +25,6 @@ export interface Project {
   views: number;
 }
 
-
-
-export interface Experience {
-  id: string;
-  company: string;
-  role: string;
-  type: string;
-  location: string;
-  startDate: string;
-  endDate: string | null;
-  current: boolean;
-  description: string;
-  responsibilities: string[];
-  technologies: string[];
-  logo: string;
-}
-
-
-
-
 export interface BlogPost {
   id: string;
   title: string;

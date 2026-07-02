@@ -20,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockExperience } from '@/data/experience';
 import { formatDate, getEmploymentDuration } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
@@ -34,29 +33,58 @@ import {
   FormMonthPicker,
 } from '@/components/shared/form-field';
 import { experienceSchema, type ExperienceFormData } from '@/schemas';
-
-type Experience = (typeof mockExperience)[0];
+import { useExperiences, useExperience, useCreateExperience, useUpdateExperience, useDeleteExperience } from '@/hooks/api/experience';
+import { useCategoryDropdown } from '@/hooks/api/category';
+import type { Experience as ExperienceType } from '@/types';
+import { Loader } from '@/components/ui/loader';
+import { ErrorState } from '@/components/shared/error-state';
 
 export function Experience() {
-  const [experiences, setExperiences] = useState(mockExperience);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingExp, setEditingExp] = useState<Experience | null>(null);
-  const [deleteDialog, setDeleteDialog] = useState<Experience | null>(null);
+  const { data: response, isLoading, isError, error, refetch } = useExperiences();
+  const experiences = response?.data || [];
 
-  function handleDelete(exp: Experience) {
-    setExperiences((prev) => prev.filter((e) => e.id !== exp.id));
-    setDeleteDialog(null);
-    toast.success(`"${exp.role} at ${exp.company}" removed`);
+  const deleteMutation = useDeleteExperience();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingExpId, setEditingExpId] = useState<string | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<ExperienceType | null>(null);
+
+  function handleDelete(exp: ExperienceType) {
+    deleteMutation.mutate(exp.id, {
+      onSuccess: () => {
+        setDeleteDialog(null);
+        toast.success(`"${exp.role} at ${exp.company}" removed`);
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || 'Failed to delete experience');
+      },
+    });
   }
 
-  function openEdit(exp: Experience) {
-    setEditingExp(exp);
+  function openEdit(exp: ExperienceType) {
+    setEditingExpId(exp.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingExp(null);
+    setEditingExpId(null);
     setDialogOpen(true);
+  }
+
+  if (isLoading) {
+    return <Loader variant="section" text="Loading certifications..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load certifications"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
   }
 
   return (
@@ -83,7 +111,7 @@ export function Experience() {
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                       <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
-                        {exp.logo}
+                        <Briefcase className="size-5" />
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
                         <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
@@ -100,7 +128,7 @@ export function Experience() {
                         variant="secondary"
                         className="bg-primary/10 text-primary hover:bg-primary/10 hidden h-6 rounded-md border-transparent px-2.5 text-xs font-medium sm:flex"
                       >
-                        {getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)}
+                        {getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)}
                       </Badge>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -135,9 +163,9 @@ export function Experience() {
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
                       {formatDate(exp.startDate)} —{' '}
-                      {exp.current ? 'Present' : formatDate(exp.endDate)}
+                      {exp.isCurrent ? 'Present' : (exp.endDate ? formatDate(exp.endDate) : '')}
                       <span className="ml-1 sm:hidden">
-                        ({getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)})
+                        ({getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)})
                       </span>
                     </span>
                     <span className="text-muted-foreground/30 hidden sm:inline">•</span>
@@ -148,7 +176,7 @@ export function Experience() {
                     <span className="text-muted-foreground/30 hidden sm:inline">•</span>
                     <span className="flex items-center gap-1.5">
                       <Briefcase className="size-3.5 opacity-70" />
-                      {exp.type}
+                      {exp.employmentType?.name || 'Full-time'}
                     </span>
                   </div>
 
@@ -214,7 +242,7 @@ export function Experience() {
       )}
 
       {/* Edit/New Dialog */}
-      <ExperienceDialog experience={editingExp} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ExperienceDialog experienceId={editingExpId} editMode={!!editingExpId} open={dialogOpen} onOpenChange={setDialogOpen} />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -231,33 +259,45 @@ export function Experience() {
             ?
           </>
         }
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );
 }
 
 function ExperienceDialog({
-  experience,
+  experienceId,
+  editMode,
   open,
   onOpenChange,
 }: {
-  experience: Experience | null;
+  experienceId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { data: fetchedExperience, isFetching: isFetchingExperience } = useExperience(open ? (experienceId || '') : '');
+  const { data: dropdownResponse } = useCategoryDropdown('EMPLOYMENT_TYPE');
+  const employmentTypes = dropdownResponse || [];
+
+  const createMutation = useCreateExperience();
+  const updateMutation = useUpdateExperience();
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingExperience;
+
   const {
     register,
     control,
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ExperienceFormData>({
     resolver: zodResolver(experienceSchema),
     defaultValues: {
       company: '',
       role: '',
-      type: 'Full-time',
+      employmentTypeId: '',
       location: '',
       startDate: undefined as unknown as Date,
       endDate: null,
@@ -270,47 +310,97 @@ function ExperienceDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        company: experience?.company ?? '',
-        role: experience?.role ?? '',
-        type: experience?.type ?? 'Full-time',
-        location: experience?.location ?? '',
-        startDate: experience?.startDate
-          ? new Date(experience.startDate)
-          : (undefined as unknown as Date),
-        endDate: experience?.endDate ? new Date(experience.endDate) : null,
-        current: experience?.current ?? false,
-        description: experience?.description ?? '',
-        responsibilities: experience?.responsibilities?.join('\n') ?? '',
-        technologies: experience?.technologies.join(', ') ?? '',
-      });
+      if (editMode) {
+        if (fetchedExperience?.data) {
+          const expData = fetchedExperience.data;
+          reset({
+            company: expData.company ?? '',
+            role: expData.role ?? '',
+            employmentTypeId: expData.employmentTypeId ?? '',
+            location: expData.location ?? '',
+            startDate: expData.startDate
+              ? new Date(expData.startDate)
+              : (undefined as unknown as Date),
+            endDate: expData.endDate ? new Date(expData.endDate) : null,
+            current: expData.isCurrent ?? false,
+            description: expData.description ?? '',
+            responsibilities: expData.responsibilities?.join('\n') ?? '',
+            technologies: expData.technologies?.join(', ') ?? '',
+          });
+        }
+      } else {
+        reset({
+          company: '',
+          role: '',
+          employmentTypeId: '',
+          location: '',
+          startDate: undefined as unknown as Date,
+          endDate: null,
+          current: false,
+          description: '',
+          responsibilities: '',
+          technologies: '',
+        });
+      }
     }
-  }, [open, experience, reset]);
+  }, [open, editMode, fetchedExperience, reset]);
 
   const isCurrent = watch('current');
 
-  function onSubmit(_data: ExperienceFormData) {
-    onOpenChange(false);
-    toast.success(experience ? 'Experience updated' : 'Experience added');
+  function onSubmit(data: ExperienceFormData) {
+    const payload = {
+      ...data,
+      startDate: data.startDate.toISOString(),
+      endDate: data.current ? null : (data.endDate ? data.endDate.toISOString() : null),
+      isCurrent: data.current,
+      responsibilities: data.responsibilities
+        ? data.responsibilities.split('\n').map((r) => r.trim()).filter(Boolean)
+        : [],
+      technologies: data.technologies
+        ? data.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+        : [],
+    };
+
+    if (editMode && experienceId) {
+      updateMutation.mutate(
+        { id: experienceId, data: payload },
+        {
+          onSuccess: (data) => {
+            onOpenChange(false);
+            toast.success(data.message || 'Experience updated successfully');
+          },
+          onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Failed to update experience');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: (data) => {
+          onOpenChange(false);
+          toast.success(data.message || 'Experience added successfully');
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || 'Failed to create experience');
+        },
+      });
+    }
   }
 
-  const employmentTypes = [
-    { label: 'Full-time', value: 'Full-time' },
-    { label: 'Part-time', value: 'Part-time' },
-    { label: 'Contract', value: 'Contract' },
-    { label: 'Freelance', value: 'Freelance' },
-    { label: 'Internship', value: 'Internship' },
-  ];
+  const employmentTypeOptions = employmentTypes.map((type) => ({
+    label: type.name,
+    value: type.id,
+  }));
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={isPending ? undefined : onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg">
-            {experience ? 'Edit Experience' : 'Add Experience'}
+            {editMode ? 'Edit Experience' : 'Add Experience'}
           </DialogTitle>
           <DialogDescription className="text-base">
-            {experience ? 'Update position details.' : 'Add a work experience entry.'}
+            {editMode ? 'Update position details.' : 'Add a work experience entry.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -337,10 +427,11 @@ function ExperienceDialog({
             <div className="grid grid-cols-2 gap-4">
               <FormSelect
                 label="Employment Type"
-                name="type"
+                name="employmentTypeId"
                 control={control}
-                error={errors.type}
-                options={employmentTypes}
+                error={errors.employmentTypeId}
+                options={employmentTypeOptions}
+                placeholder='Select Employment Type'
                 required
                 labelClassName="text-base"
                 selectClassName="h-9 text-base w-full"
@@ -371,7 +462,7 @@ function ExperienceDialog({
                 name="endDate"
                 control={control}
                 error={errors.endDate}
-                disabled={isCurrent}
+                disabled={isCurrent || isPending}
                 labelClassName="text-base"
                 pickerClassName="w-full h-9 text-base"
               />
@@ -422,11 +513,12 @@ function ExperienceDialog({
               type="button"
               onClick={() => onOpenChange(false)}
               className="h-9 text-base"
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9 text-base">
-              {experience ? 'Save Changes' : 'Add Experience'}
+            <Button size="sm" type="submit" className="h-9 text-base" disabled={isPending || (editMode && !isDirty)}>
+              {editMode ? 'Save Changes' : 'Add Experience'}
             </Button>
           </DialogFooter>
         </form>

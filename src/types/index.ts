@@ -6,3 +6,4 @@ export * from './profile.types';
 export * from './skill.types';
 export * from './certification.types';
 export * from './education.types';
+export * from './experience.types';

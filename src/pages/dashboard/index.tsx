@@ -240,7 +240,7 @@ export function Dashboard() {
             <h3 className="text-lg font-semibold">Quick Actions</h3>
           </CardHeader>
           <CardContent className="px-5 pb-5">
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-3">
               {quickActions.map((action) => (
                 <Link
                   key={action.label}
@@ -252,7 +252,7 @@ export function Dashboard() {
                   >
                     <action.icon className="size-4" />
                   </div>
-                  <span className="text-3 leading-tight font-medium">{action.label}</span>
+                  <span className="text-3 leading-tight text-sm mt-2 font-medium">{action.label}</span>
                 </Link>
               ))}
             </div>
