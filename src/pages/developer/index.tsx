@@ -368,7 +368,7 @@ function SectionHeader({ id, icon: Icon, title, description }: {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                     <Icon className="h-4 w-4 text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold tracking-tight text-foreground">{title}</h2>
+                <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
             </div>
             {description && (
                 <p className="text-sm leading-7 text-muted-foreground mt-1 mb-4">{description}</p>
@@ -458,7 +458,7 @@ export function Developer(_props: { onNavigate?: (path: string) => void }) {
     return (
         <div className="min-h-full">
             {/* ── Main content ── */}
-            <main className="max-w-4xl mx-auto px-6 py-8 pb-20 space-y-12">
+            <main className="max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12">
                 {/* Page hero */}
                 <div className="rounded-xl border border-border/60 bg-gradient-to-br from-primary/5 via-background to-chart-1/5 p-6 dark:from-primary/10 dark:to-chart-1/10">
                     <div className="flex items-start gap-4">
@@ -466,7 +466,7 @@ export function Developer(_props: { onNavigate?: (path: string) => void }) {
                             <Code2 className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                            <h1 className="text-xl font-bold tracking-tight text-foreground">
                                 Developer Portal
                             </h1>
                             <p className="mt-1.5 text-sm leading-7 text-muted-foreground max-w-2xl">

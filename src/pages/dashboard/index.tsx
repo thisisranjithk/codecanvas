@@ -28,7 +28,7 @@ const getWelcomeMessage = (projects: number, blogs: number) => {
 
   if (total === 0) {
     return (
-      <p className="text-muted-foreground mt-1 max-w-[400px] text-sm leading-relaxed">
+      <p className="text-muted-foreground mt-1 max-w-100 text-sm leading-relaxed">
         Welcome to your portfolio! Start by adding some projects or writing a blog post to showcase your skills.
       </p>
     );
@@ -36,7 +36,7 @@ const getWelcomeMessage = (projects: number, blogs: number) => {
 
   if (projects > 0 && blogs === 0) {
     return (
-      <p className="text-muted-foreground mt-1 max-w-[400px] text-sm leading-relaxed">
+      <p className="text-muted-foreground mt-1 max-w-100 text-sm leading-relaxed">
         Great start! You have{' '}
         <strong className="text-foreground font-semibold">
           {projects} published {projects === 1 ? 'project' : 'projects'}
@@ -48,7 +48,7 @@ const getWelcomeMessage = (projects: number, blogs: number) => {
 
   if (projects === 0 && blogs > 0) {
     return (
-      <p className="text-muted-foreground mt-1 max-w-[400px] text-sm leading-relaxed">
+      <p className="text-muted-foreground mt-1 max-w-100 text-sm leading-relaxed">
         You're a great writer! You have{' '}
         <strong className="text-foreground font-semibold">
           {blogs} published {blogs === 1 ? 'blog' : 'blogs'}
@@ -60,7 +60,7 @@ const getWelcomeMessage = (projects: number, blogs: number) => {
 
   if (total > 0 && total <= 5) {
     return (
-      <p className="text-muted-foreground mt-1 max-w-[400px] text-sm leading-relaxed">
+      <p className="text-muted-foreground mt-1 max-w-100 text-sm leading-relaxed">
         You're building momentum! You have{' '}
         <strong className="text-foreground font-semibold">
           {projects} {projects === 1 ? 'project' : 'projects'}
@@ -75,7 +75,7 @@ const getWelcomeMessage = (projects: number, blogs: number) => {
   }
 
   return (
-    <p className="text-muted-foreground mt-1 max-w-[400px] text-sm leading-relaxed">
+    <p className="text-muted-foreground mt-1 max-w-100 text-sm leading-relaxed">
       Incredible work! You have an impressive portfolio with{' '}
       <strong className="text-foreground font-semibold">
         {projects} {projects === 1 ? 'project' : 'projects'}
@@ -181,7 +181,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-6 p-6">
+    <main className="animate-fade-in px-6 py-8 pb-20 space-y-12 w-full">
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Welcome Banner */}
         <Card className="border-border/60 from-primary/10 via-background to-background relative overflow-hidden bg-gradient-to-br">
@@ -212,10 +212,10 @@ export function Dashboard() {
           <CardContent className="relative z-10 flex flex-col gap-5 p-6">
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-1.5">
-                <span className="text-primary text-3 font-semibold tracking-wider uppercase">
+                <span className="text-primary text-xs font-semibold tracking-wider uppercase">
                   Welcome back
                 </span>
-                <h2 className="text-3xl font-bold tracking-tight">{user?.fullName || 'User'}!</h2>
+                <h2 className="text-xl font-bold tracking-tight">{user?.fullName || 'User'}!</h2>
                 {getWelcomeMessage(data.stats.publishedProjects, data.stats.publishedBlogs)}
               </div>
               <div className="bg-primary text-primary-foreground shadow-primary/25 flex size-12 shrink-0 rotate-3 items-center justify-center rounded-2xl shadow-lg transition-transform duration-300 hover:rotate-0">
@@ -236,7 +236,7 @@ export function Dashboard() {
         {/* Quick Actions */}
         <Card className="border-border/60">
           <CardHeader className="px-5 pt-4 pb-2">
-            <h3 className="text-lg font-semibold">Quick Actions</h3>
+            <h3 className="text-sm font-semibold">Quick Actions</h3>
           </CardHeader>
           <CardContent className="px-5 pb-5">
             <div className="grid grid-cols-3 gap-3">
@@ -251,7 +251,7 @@ export function Dashboard() {
                   >
                     <action.icon className="size-4" />
                   </div>
-                  <span className="text-3 leading-tight text-sm mt-2 font-medium">{action.label}</span>
+                  <span className="leading-tight text-sm mt-2 font-medium">{action.label}</span>
                 </Link>
               ))}
             </div>
@@ -266,10 +266,10 @@ export function Dashboard() {
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-muted-foreground text-3 font-medium">{card.label}</span>
-                  <span className="text-2xl font-bold tracking-tight">{card.value}</span>
+                  <span className="text-muted-foreground text-xs font-medium">{card.label}</span>
+                  <span className="text-xl font-bold tracking-tight">{card.value}</span>
                   <span
-                    className={`text-3 flex items-center gap-0.5 font-medium ${card.changeUp ? 'text-success' : 'text-muted-foreground'}`}
+                    className={`text-xs flex items-center gap-0.5 font-medium ${card.changeUp ? 'text-success' : 'text-muted-foreground'}`}
                   >
                   </span>
                 </div>
@@ -287,14 +287,14 @@ export function Dashboard() {
       {/* Bottom Row: Recent Activity + Featured Content */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Activity */}
-        <Card className="border-border/60 flex h-[420px] flex-col overflow-hidden p-0">
+        <Card className="border-border/60 flex h-105 flex-col overflow-hidden p-0">
           <CardHeader className="border-border/40 bg-muted/20 flex shrink-0 flex-row items-center justify-between border-b px-5 pt-4 pb-3">
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
                 <Activity className="size-4" />
               </div>
               <div>
-                <h3 className="text-base font-semibold tracking-tight">Recent Activity</h3>
+                <h3 className="text-sm font-semibold tracking-tight">Recent Activity</h3>
                 <p className="text-muted-foreground text-xs">Your latest updates</p>
               </div>
             </div>
@@ -345,14 +345,14 @@ export function Dashboard() {
         </Card>
 
         {/* Featured Content */}
-        <Card className="border-border/60 from-background via-background to-muted/10 flex h-[420px] flex-col overflow-hidden bg-gradient-to-br p-0">
+        <Card className="border-border/60 from-background via-background to-muted/10 flex h-105 flex-col overflow-hidden bg-gradient-to-br p-0">
           <CardHeader className="border-border/40 flex shrink-0 flex-row items-center justify-between border-b px-5 pt-4 pb-3">
             <div className="flex items-center gap-3">
               <div className="bg-warning/10 text-warning flex size-8 items-center justify-center rounded-lg">
                 <Star className="size-4" />
               </div>
               <div>
-                <h3 className="text-base font-semibold tracking-tight">Featured Content</h3>
+                <h3 className="text-sm font-semibold tracking-tight">Featured Content</h3>
                 <p className="text-muted-foreground text-xs">Highlighting your best work</p>
               </div>
             </div>
@@ -442,6 +442,6 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }

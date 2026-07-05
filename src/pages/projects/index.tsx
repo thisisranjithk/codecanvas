@@ -105,7 +105,7 @@ export function Projects() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-5 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       {/* Header */}
       <PageHeader
         title="Projects"
@@ -190,7 +190,7 @@ export function Projects() {
                       {project.featured && (
                         <Star className="text-warning fill-warning size-3.5 shrink-0" />
                       )}
-                      <span className="truncate text-base leading-tight font-semibold">
+                      <span className="truncate text-sm leading-tight font-semibold">
                         {project.title}
                       </span>
                     </div>
@@ -247,7 +247,7 @@ export function Projects() {
                   </div>
                 </div>
 
-                <p className="text-muted-foreground line-clamp-2 flex-1 text-xs leading-relaxed">
+                <p className="text-muted-foreground line-clamp-2 flex-1 text-sm leading-relaxed">
                   {project.description}
                 </p>
 
@@ -303,7 +303,7 @@ export function Projects() {
         title="Delete Project"
         itemName={deleteDialog?.title}
       />
-    </div>
+    </main>
   );
 }
 

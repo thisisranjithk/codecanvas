@@ -88,7 +88,7 @@ export function Experience() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-6 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       <PageHeader
         title="Experience"
         description={`${experiences.length} positions`}
@@ -114,10 +114,10 @@ export function Experience() {
                         <Briefcase className="size-5" />
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
+                        <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
                           {exp.company}
                         </h2>
-                        <p className="text-primary text-3 truncate font-semibold sm:text-sm">
+                        <p className="text-primary text-sm truncate font-semibold sm:text-sm">
                           {exp.role}
                         </p>
                       </div>
@@ -159,7 +159,7 @@ export function Experience() {
                   </div>
 
                   {/* Metadata Row */}
-                  <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
+                  <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
                       {formatDate(exp.startDate)} —{' '}
@@ -182,7 +182,7 @@ export function Experience() {
 
                   {/* Description Text */}
                   {exp.description && (
-                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-16 sm:text-sm">
+                    <p className="text-muted-foreground max-w-4xl text-sm leading-relaxed sm:pl-16">
                       {exp.description}
                     </p>
                   )}
@@ -205,7 +205,7 @@ export function Experience() {
                         {exp.responsibilities.map((item, i) => (
                           <li
                             key={i}
-                            className="text-foreground/90 text-3 flex items-start gap-2.5 sm:text-[13.5px]"
+                            className="text-foreground/90 text-sm flex items-start gap-2.5"
                           >
                             <span className="bg-primary/60 mt-1.5 size-1 shrink-0 rounded-full" />
                             <span className="leading-relaxed">{item}</span>
@@ -261,7 +261,7 @@ export function Experience() {
         }
         isLoading={deleteMutation.isPending}
       />
-    </div>
+    </main>
   );
 }
 

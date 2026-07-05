@@ -499,10 +499,10 @@ function SecurityTab() {
 
 export function Settings() {
   return (
-    <div className="animate-fade-in flex flex-col gap-4 p-5">
+    <main className="animate-fade-in px-6 py-8 pb-20 space-y-12 w-full">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground mt-0.5 text-xs">
+        <p className="text-muted-foreground mt-0.5 text-sm">
           Manage your portfolio configuration and preferences.
         </p>
       </div>
@@ -543,6 +543,6 @@ export function Settings() {
           <SecurityTab />
         </TabsContent>
       </Tabs>
-    </div>
+    </main>
   );
 }

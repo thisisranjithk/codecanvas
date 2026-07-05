@@ -92,11 +92,11 @@ export function Certifications() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-5 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Certifications</h1>
-          <p className="text-muted-foreground mt-0.5 text-base">
+          <h1 className="text-xl font-semibold tracking-tight">Certifications</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
             {activeCerts.length} active · {expiredCerts.length} expired
           </p>
         </div>
@@ -111,7 +111,7 @@ export function Certifications() {
           <div className="bg-muted flex size-12 items-center justify-center rounded-xl">
             <Award className="text-muted-foreground size-5" />
           </div>
-          <p className="text-base font-medium">No certifications added</p>
+          <p className="text-sm font-medium">No certifications added</p>
           <Button size="sm" onClick={openNew}>
             Add certification
           </Button>
@@ -120,7 +120,7 @@ export function Certifications() {
         <div className="flex flex-col gap-5">
           {activeCerts.length > 0 && (
             <div>
-              <h2 className="text-muted-foreground mb-2.5 text-base font-semibold tracking-wider uppercase">
+              <h2 className="text-muted-foreground mb-2.5 text-sm font-semibold tracking-wider uppercase">
                 Active ({activeCerts.length})
               </h2>
               <div className="grid gap-2.5 md:grid-cols-2">
@@ -137,7 +137,7 @@ export function Certifications() {
           )}
           {expiredCerts.length > 0 && (
             <div>
-              <h2 className="text-muted-foreground/60 mb-2.5 text-base font-semibold tracking-wider uppercase">
+              <h2 className="text-muted-foreground/60 mb-2.5 text-sm font-semibold tracking-wider uppercase">
                 Expired ({expiredCerts.length})
               </h2>
               <div className="grid gap-2.5 md:grid-cols-2">
@@ -178,7 +178,7 @@ export function Certifications() {
           </>
         }
       />
-    </div>
+    </main>
   );
 }
 
@@ -357,7 +357,7 @@ function CertCard({
     (cert.expiryDate && new Date(cert.expiryDate) < new Date());
   return (
     <Card
-      className={`card-hover border-border/60 group overflow-hidden ${isExpired ? 'opacity-60 grayscale-[30%]' : ''}`}
+      className={`card-hover border-border/60 group overflow-hidden ${isExpired ? 'opacity-60 grayscale-30' : ''}`}
     >
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
@@ -367,7 +367,7 @@ function CertCard({
             </div>
             <div className="mt-0.5 flex min-w-0 flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-foreground truncate text-base leading-tight font-bold sm:text-base">
+                <h3 className="text-foreground truncate text-sm leading-tight font-bold sm:text-sm">
                   {cert.name}
                 </h3>
                 {isExpired ? (
@@ -388,11 +388,11 @@ function CertCard({
                 )}
               </div>
 
-              <span className="text-primary/80 text-3 truncate font-medium sm:text-sm">
+              <span className="text-primary/80 text-sm truncate font-medium sm:text-sm">
                 {cert.issuer}
               </span>
 
-              <div className="text-muted-foreground sm:text-3 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
+              <div className="text-muted-foreground sm:text-xs mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
                 <span>Issued {formatDate(cert.issueDate)}</span>
                 {cert.expiryDate && (
                   <>
@@ -416,7 +416,7 @@ function CertCard({
                       href={cert.verificationUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11.5px] font-medium transition-colors hover:underline sm:text-xs"
+                      className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
                     >
                       Verify <ExternalLink className="size-3" />
                     </a>

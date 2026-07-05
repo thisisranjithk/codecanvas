@@ -92,11 +92,11 @@ export function Education() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-6 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Education</h1>
-          <p className="text-muted-foreground mt-0.5 text-base">{educations.length} entries</p>
+          <h1 className="text-xl font-semibold tracking-tight">Education</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">{educations.length} entries</p>
         </div>
         <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
           <Plus className="size-4" />
@@ -109,7 +109,7 @@ export function Education() {
           <div className="bg-muted flex size-12 items-center justify-center rounded-xl">
             <GraduationCap className="text-muted-foreground size-5" />
           </div>
-          <p className="text-base font-medium">No education added</p>
+          <p className="text-sm font-medium">No education added</p>
           <Button size="sm" onClick={openNew}>
             Add education
           </Button>
@@ -127,10 +127,10 @@ export function Education() {
                         <GraduationCap className="size-5" />
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
+                        <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
                           {edu.institution}
                         </h2>
-                        <p className="text-primary text-3 truncate font-semibold sm:text-sm">
+                        <p className="text-primary text-sm truncate font-semibold sm:text-sm">
                           {edu.degree} in {edu.fieldOfStudy}
                         </p>
                       </div>
@@ -166,7 +166,7 @@ export function Education() {
                   </div>
 
                   {/* Metadata Row */}
-                  <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
+                  <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
                       {formatDate(edu.startDate)} — {edu.endDate ? formatDate(edu.endDate) : 'Present'}
@@ -195,7 +195,7 @@ export function Education() {
 
                   {/* Description Text */}
                   {edu.description && (
-                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-16 sm:text-sm">
+                    <p className="text-muted-foreground max-w-4xl text-sm leading-relaxed sm:pl-16">
                       {edu.description}
                     </p>
                   )}
@@ -216,7 +216,7 @@ export function Education() {
                       {edu.activities.map((act) => (
                         <div
                           key={act}
-                          className="border-border/60 bg-muted/20 hover:bg-muted/40 sm:text-3 flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium shadow-sm transition-colors"
+                          className="border-border/60 bg-muted/20 hover:bg-muted/40 sm:text-xs flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium shadow-sm transition-colors"
                         >
                           {getEducationActivityIcon(act)}
                           <span>{act}</span>
@@ -252,7 +252,7 @@ export function Education() {
         }
         isLoading={deleteMutation.isPending}
       />
-    </div>
+    </main>
   );
 }
 

@@ -147,7 +147,7 @@ export function Skills() {
   }
 
   return (
-    <div className="animate-fade-in flex flex-col gap-5 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-6 w-full">
       {/* Header */}
       <PageHeader
         title="Skills"
@@ -220,7 +220,7 @@ export function Skills() {
                     <ChevronDown className="text-muted-foreground/60 group-hover:text-foreground size-4 transition-colors" />
                   )}
                   <Icon className="text-muted-foreground/60 size-4" />
-                  <h2 className="text-foreground text-base font-semibold tracking-tight">{cat}</h2>
+                  <h2 className="text-foreground text-sm font-semibold tracking-tight">{cat}</h2>
                   <Badge variant="secondary" className="bg-muted ml-1 h-4 px-1.5 text-xs">
                     {catSkills.length}
                   </Badge>
@@ -278,7 +278,7 @@ export function Skills() {
         }
         isLoading={deleteSkill.isPending}
       />
-    </div>
+    </main>
   );
 }
 
@@ -466,7 +466,7 @@ function SkillCard({
               <Code2 className="size-5" />
             </div>
             <div className="flex min-w-0 flex-col">
-              <span className="text-foreground group-hover:text-primary truncate text-[14.5px] font-bold transition-colors">
+              <span className="text-foreground group-hover:text-primary truncate text-sm font-bold transition-colors">
                 {skill.name}
               </span>
               <span className="text-muted-foreground text-xs font-medium">
