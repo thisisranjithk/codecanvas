@@ -166,125 +166,128 @@ export function Projects() {
           }}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((project) => (
             <Card
               key={project.id}
-              className="card-hover border-border/60 group overflow-hidden py-0"
+              className="card-hover border-border/60 group overflow-hidden"
             >
-              {/* Color bar */}
-              <div
-                className={`h-0.5 w-full ${
-                  project.status === 'published'
-                    ? 'bg-success'
-                    : project.status === 'draft'
-                      ? 'bg-warning'
-                      : 'bg-muted-foreground/30'
-                }`}
-              />
-              <CardContent className="flex flex-col gap-3 p-4">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <div className="flex items-center gap-1.5">
-                      {project.featured && (
-                        <Star className="text-warning fill-warning size-3.5 shrink-0" />
-                      )}
-                      <span className="truncate text-sm leading-tight font-semibold">
-                        {project.title}
-                      </span>
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-4 flex-1">
+                    <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border shadow-sm sm:size-12">
+                      <Code2 className="size-5" />
                     </div>
-                    <span className="text-muted-foreground text-xs">{project.category}</span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <StatusBadge status={project.status} />
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => openEdit(project)}>
-                          <Pencil className="size-3.5" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleFeatured(project.id)}>
-                          <Star className="size-3.5" />
-                          {project.featured ? 'Unfeature' : 'Feature'}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleStatusChange(
-                              project.id,
-                              project.status === 'published' ? 'draft' : 'published'
-                            )
-                          }
-                        >
-                          {project.status === 'published' ? 'Unpublish' : 'Publish'}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleStatusChange(project.id, 'archived')}
-                        >
-                          <Archive className="size-3.5" />
-                          Archive
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => setDeleteDialog(project)}
-                        >
-                          <Trash2 className="size-3.5" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
+                    
+                    <div className="mt-0.5 flex min-w-0 flex-col gap-1 w-full">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-foreground truncate text-sm leading-tight font-bold sm:text-sm">
+                          {project.title}
+                        </h3>
+                        {project.featured && (
+                          <Star className="text-warning fill-warning size-3.5 shrink-0" />
+                        )}
+                        <StatusBadge status={project.status} />
+                      </div>
+                      
+                      <span className="text-primary/80 text-sm truncate font-medium sm:text-sm">
+                        {project.category}
+                      </span>
+                      
+                      <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed mt-1">
+                        {project.description}
+                      </p>
 
-                <p className="text-muted-foreground line-clamp-2 flex-1 text-sm leading-relaxed">
-                  {project.description}
-                </p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {project.technologies.slice(0, 4).map((tech) => (
+                          <Badge
+                            key={tech}
+                            variant="secondary"
+                            className="bg-secondary/60 hover:bg-secondary/80 h-6 border-transparent px-2.5 text-xs font-normal sm:text-xs"
+                          >
+                            {tech}
+                          </Badge>
+                        ))}
+                        {project.technologies.length > 4 && (
+                          <Badge variant="secondary" className="bg-secondary/60 h-6 border-transparent px-2.5 text-xs font-normal sm:text-xs">
+                            +{project.technologies.length - 4}
+                          </Badge>
+                        )}
+                      </div>
 
-                <div className="flex flex-wrap gap-1">
-                  {project.technologies.slice(0, 4).map((tech) => (
-                    <Badge
-                      key={tech}
-                      variant="secondary"
-                      className="bg-secondary/60 h-5 px-1.5 text-xs font-normal"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                  {project.technologies.length > 4 && (
-                    <Badge variant="outline" className="h-5 px-1.5 text-xs font-normal">
-                      +{project.technologies.length - 4}
-                    </Badge>
-                  )}
-                </div>
+                      <div className="bg-border/50 my-2.5 h-px w-full" />
 
-                <div className="border-border/40 flex items-center justify-between border-t pt-2">
-                  <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                    <Eye className="size-3.5" />
-                    {formatNumber(project.views)}
+                      <div className="flex items-center justify-between">
+                        <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+                          <Eye className="size-3.5 opacity-70" />
+                          {formatNumber(project.views)} views
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
+                            >
+                              GitHub <ExternalLink className="size-3" />
+                            </a>
+                          )}
+                          <span className="text-muted-foreground/30 hidden sm:inline">•</span>
+                          <span className="text-muted-foreground text-xs font-medium">
+                            {formatDateTime(project.updatedAt)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    {project.githubUrl && (
-                      <Button variant="ghost" size="icon" className="size-7" asChild>
-                        <a href={project.githubUrl} target="_blank" rel="noreferrer">
-                          <ExternalLink className="size-3.5" />
-                        </a>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-foreground -mr-2 size-8 shrink-0 opacity-100 transition-opacity group-hover:opacity-100 sm:opacity-0"
+                      >
+                        <MoreHorizontal className="size-4" />
                       </Button>
-                    )}
-                    <span className="text-muted-foreground/60 text-xs">
-                      {formatDateTime(project.updatedAt)}
-                    </span>
-                  </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => openEdit(project)}>
+                        <Pencil className="size-3.5" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleToggleFeatured(project.id)}>
+                        <Star className="size-3.5" />
+                        {project.featured ? 'Unfeature' : 'Feature'}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleStatusChange(
+                            project.id,
+                            project.status === 'published' ? 'draft' : 'published'
+                          )
+                        }
+                      >
+                        {project.status === 'published' ? 'Unpublish' : 'Publish'}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusChange(project.id, 'archived')}
+                      >
+                        <Archive className="size-3.5" />
+                        Archive
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => setDeleteDialog(project)}
+                      >
+                        <Trash2 className="size-3.5" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>
