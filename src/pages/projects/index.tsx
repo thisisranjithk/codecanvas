@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useProjects, useProject, useCreateProject, useUpdateProject, useDeleteProject } from '@/hooks/api/project';
+import { useCategoryDropdown } from '@/hooks/api/category/use-category-dropdown';
 import {
   Plus,
   Search,
@@ -39,69 +41,89 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockProjects } from '@/data/projects';
+import { Loader } from '@/components/ui/loader';
 import { formatDateTime, formatNumber } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
+import { ErrorState } from '@/components/shared/error-state';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
 import { projectSchema, type ProjectFormData } from '@/schemas';
-
-type Project = (typeof mockProjects)[0];
+import type { Project } from '@/types/project.types';
 
 export function Projects() {
-  const [projects, setProjects] = useState(mockProjects);
+  const { data: projects = [], isLoading, isError, error, refetch } = useProjects();
+  const { data: categoryData, isLoading: isCategoryLoading } = useCategoryDropdown('PROJECT');
+
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
+  const deleteProject = useDeleteProject();
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<Project | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
-  const categories = useMemo(() => Array.from(new Set(mockProjects.map((p) => p.category))), []);
+  const categoryOptions = useMemo(
+    () => (categoryData ?? []).map((c) => ({ label: c.name, value: c.id })),
+    [categoryData]
+  );
 
   const filtered = useMemo(() => {
-    return projects
+    const list = Array.isArray(projects) ? projects : [];
+    return list
       .filter((p) => {
         const matchSearch =
           p.title.toLowerCase().includes(search.toLowerCase()) ||
           p.description.toLowerCase().includes(search.toLowerCase()) ||
           p.technologies.some((t) => t.toLowerCase().includes(search.toLowerCase()));
         const matchStatus = statusFilter === 'all' || p.status === statusFilter;
-        const matchCategory = categoryFilter === 'all' || p.category === categoryFilter;
+        const matchCategory = categoryFilter === 'all' || p.categoryId === categoryFilter;
         return matchSearch && matchStatus && matchCategory;
       })
-      .sort((a, b) => {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-      });
+      .sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
   }, [projects, search, statusFilter, categoryFilter]);
 
   function handleDelete(project: Project) {
-    setProjects((prev) => prev.filter((p) => p.id !== project.id));
-    setDeleteDialog(null);
-    toast.success(`"${project.title}" deleted`);
-  }
-
-  function handleToggleFeatured(id: string) {
-    setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, featured: !p.featured } : p)));
-    toast.success('Featured updated');
-  }
-
-  function handleStatusChange(id: string, status: string) {
-    setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
-    toast.success('Status updated');
+    deleteProject.mutate(project.id, {
+      onSuccess: (data) => {
+        setDeleteDialog(null);
+        toast.success(data.message || `"${project.title}" deleted`);
+      },
+      onError: (err: any) => {
+        toast.error(err.response?.data?.message || 'Failed to delete project');
+      },
+    });
   }
 
   function openEdit(project: Project) {
-    setEditingProject(project);
+    setEditingProjectId(project.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingProject(null);
+    setEditingProjectId(null);
     setDialogOpen(true);
+  }
+
+  if (isLoading) {
+    return <Loader variant="section" text="Loading projects..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load projects"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
   }
 
   return (
@@ -109,7 +131,7 @@ export function Projects() {
       {/* Header */}
       <PageHeader
         title="Projects"
-        description={`${projects.length} projects · ${projects.filter((p) => p.status === 'published').length} published`}
+        description={`${projects.length} projects · ${projects.filter((p) => p.status === 'PUBLISHED').length} published`}
         action={{ label: 'New Project', onClick: openNew, icon: <Plus className="size-4" /> }}
       />
 
@@ -130,20 +152,20 @@ export function Projects() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
+            <SelectItem value="PUBLISHED">Published</SelectItem>
+            <SelectItem value="DRAFT">Draft</SelectItem>
+            <SelectItem value="ARCHIVED">Archived</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter} disabled={isCategoryLoading}>
           <SelectTrigger className="h-9 w-36 text-sm">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={isCategoryLoading ? 'Loading…' : 'Category'} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
+            {categoryOptions.map((c) => (
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -178,7 +200,7 @@ export function Projects() {
                     <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border shadow-sm sm:size-12">
                       <Code2 className="size-5" />
                     </div>
-                    
+
                     <div className="mt-0.5 flex min-w-0 flex-col gap-1 w-full">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-foreground truncate text-sm leading-tight font-bold sm:text-sm">
@@ -189,11 +211,11 @@ export function Projects() {
                         )}
                         <StatusBadge status={project.status} />
                       </div>
-                      
+
                       <span className="text-primary/80 text-sm truncate font-medium sm:text-sm">
-                        {project.category}
+                        {project.category?.name ?? ''}
                       </span>
-                      
+
                       <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed mt-1">
                         {project.description}
                       </p>
@@ -220,7 +242,7 @@ export function Projects() {
                       <div className="flex items-center justify-between">
                         <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
                           <Eye className="size-3.5 opacity-70" />
-                          {formatNumber(project.views)} views
+                          {formatNumber(project.views ?? 0)} views
                         </div>
                         <div className="flex items-center gap-2">
                           {project.githubUrl && (
@@ -235,7 +257,7 @@ export function Projects() {
                           )}
                           <span className="text-muted-foreground/30 hidden sm:inline">•</span>
                           <span className="text-muted-foreground text-xs font-medium">
-                            {formatDateTime(project.updatedAt)}
+                            {formatDateTime(project.updatedAt ?? '')}
                           </span>
                         </div>
                       </div>
@@ -257,26 +279,10 @@ export function Projects() {
                         <Pencil className="size-3.5" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleToggleFeatured(project.id)}>
-                        <Star className="size-3.5" />
-                        {project.featured ? 'Unfeature' : 'Feature'}
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusChange(
-                            project.id,
-                            project.status === 'published' ? 'draft' : 'published'
-                          )
-                        }
-                      >
-                        {project.status === 'published' ? 'Unpublish' : 'Publish'}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleStatusChange(project.id, 'archived')}
-                      >
+                      <DropdownMenuItem onClick={() => openEdit(project)}>
                         <Archive className="size-3.5" />
-                        Archive
+                        Change Status
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -296,7 +302,16 @@ export function Projects() {
       )}
 
       {/* Edit / New Dialog */}
-      <ProjectDialog project={editingProject} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ProjectDialog
+        projectId={editingProjectId}
+        editMode={!!editingProjectId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        categoryOptions={categoryOptions}
+        isCategoryLoading={isCategoryLoading}
+        createMutation={createProject}
+        updateMutation={updateProject}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDeleteDialog
@@ -304,6 +319,12 @@ export function Projects() {
         onClose={() => setDeleteDialog(null)}
         onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
         title="Delete Project"
+        description={
+          <>
+            Delete <strong>"{deleteDialog?.title}"</strong> from your portfolio?
+          </>
+        }
+        isLoading={deleteProject.isPending}
         itemName={deleteDialog?.title}
       />
     </main>
@@ -311,27 +332,41 @@ export function Projects() {
 }
 
 function ProjectDialog({
-  project,
+  projectId,
+  editMode,
   open,
   onOpenChange,
+  categoryOptions,
+  isCategoryLoading,
+  createMutation,
+  updateMutation,
 }: {
-  project: Project | null;
+  projectId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  categoryOptions: { label: string; value: string }[];
+  isCategoryLoading: boolean;
+  createMutation: ReturnType<typeof useCreateProject>;
+  updateMutation: ReturnType<typeof useUpdateProject>;
 }) {
+  const { data: fetchedProject, isFetching: isFetchingProject } = useProject(
+    open ? (projectId || '') : ''
+  );
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: '',
       description: '',
-      category: '',
-      status: 'draft',
+      categoryId: '',
+      status: 'DRAFT',
       technologies: '',
       liveUrl: '',
       githubUrl: '',
@@ -341,31 +376,82 @@ function ProjectDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        title: project?.title ?? '',
-        description: project?.description ?? '',
-        category: project?.category ?? '',
-        status: (project?.status as ProjectFormData['status']) ?? 'draft',
-        technologies: project?.technologies.join(', ') ?? '',
-        liveUrl: project?.liveUrl ?? '',
-        githubUrl: project?.githubUrl ?? '',
-        featured: project?.featured ?? false,
+      if (editMode && fetchedProject) {
+        reset({
+          title: fetchedProject.title ?? '',
+          description: fetchedProject.description ?? '',
+          categoryId: fetchedProject.categoryId ?? '',
+          status: fetchedProject.status ?? 'DRAFT',
+          technologies: fetchedProject.technologies.join(', '),
+          liveUrl: fetchedProject.liveUrl ?? '',
+          githubUrl: fetchedProject.githubUrl ?? '',
+          featured: fetchedProject.featured ?? false,
+        });
+      } else if (!editMode) {
+        reset({
+          title: '',
+          description: '',
+          categoryId: '',
+          status: 'DRAFT',
+          technologies: '',
+          liveUrl: '',
+          githubUrl: '',
+          featured: false,
+        });
+      }
+    }
+  }, [open, editMode, fetchedProject, reset]);
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingProject;
+
+  function parseTechnologies(raw: string): string[] {
+    return raw
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+
+  function onSubmit(data: ProjectFormData) {
+    const payload = {
+      ...data,
+      technologies: parseTechnologies(data.technologies),
+      liveUrl: data.liveUrl || null,
+      githubUrl: data.githubUrl || null,
+    };
+
+    if (editMode && projectId) {
+      updateMutation.mutate(
+        { id: projectId, data: payload },
+        {
+          onSuccess: (res) => {
+            onOpenChange(false);
+            toast.success(res.message || 'Project updated successfully');
+          },
+          onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Failed to update project');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: (res) => {
+          onOpenChange(false);
+          toast.success(res.message || 'Project created successfully');
+        },
+        onError: (err: any) => {
+          toast.error(err.response?.data?.message || 'Failed to create project');
+        },
       });
     }
-  }, [open, project, reset]);
-
-  function onSubmit(_data: ProjectFormData) {
-    onOpenChange(false);
-    toast.success(project ? 'Project updated' : 'Project created');
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-lg">{project ? 'Edit Project' : 'New Project'}</DialogTitle>
+          <DialogTitle className="text-lg">{editMode ? 'Edit Project' : 'New Project'}</DialogTitle>
           <DialogDescription className="text-sm">
-            {project ? 'Update project details.' : 'Fill in details to create a new project.'}
+            {editMode ? 'Update project details.' : 'Fill in details to create a new project.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -386,12 +472,15 @@ function ProjectDialog({
               required
             />
             <div className="grid grid-cols-2 gap-3">
-              <FormInput
+              <FormSelect
                 label="Category"
-                registration={register('category')}
-                error={errors.category}
-                placeholder="e.g. Full Stack"
+                name="categoryId"
+                control={control}
+                error={errors.categoryId}
+                options={categoryOptions}
+                placeholder={isCategoryLoading ? 'Loading…' : 'Select category'}
                 required
+                selectClassName={isCategoryLoading ? 'opacity-60' : undefined}
               />
               <FormSelect
                 label="Status"
@@ -399,9 +488,9 @@ function ProjectDialog({
                 control={control}
                 error={errors.status}
                 options={[
-                  { label: 'Draft', value: 'draft' },
-                  { label: 'Published', value: 'published' },
-                  { label: 'Archived', value: 'archived' },
+                  { label: 'Draft', value: 'DRAFT' },
+                  { label: 'Published', value: 'PUBLISHED' },
+                  { label: 'Archived', value: 'ARCHIVED' },
                 ]}
                 required
               />
@@ -435,11 +524,17 @@ function ProjectDialog({
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
               Cancel
             </Button>
-            <Button size="sm" type="submit">
-              {project ? 'Save Changes' : 'Create'}
+            <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
+              {editMode ? 'Save Changes' : 'Create'}
             </Button>
           </DialogFooter>
         </form>

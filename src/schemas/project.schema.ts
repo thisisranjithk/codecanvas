@@ -1,18 +1,17 @@
 import { z } from 'zod';
 
 export const projectSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),
+  title: z.string().min(3, 'Title must be at least 3 characters').max(255, 'Title must be 255 characters or less'),
   description: z
     .string()
-    .min(1, 'Description is required')
-    .max(1000, 'Description must be 1000 characters or less'),
-  category: z.string().min(1, 'Category is required'),
-  status: z.enum(['draft', 'published', 'archived'], {
+    .min(10, 'Description must be at least 10 characters'),
+  categoryId: z.string().min(1, 'Category is required'),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'], {
     message: 'Status is required',
   }),
   technologies: z.string().min(1, 'Add at least one technology'),
-  liveUrl: z.string().url('Must be a valid URL').or(z.literal('')),
-  githubUrl: z.string().url('Must be a valid URL').or(z.literal('')),
+  liveUrl: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
+  githubUrl: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
   featured: z.boolean(),
 });
 
