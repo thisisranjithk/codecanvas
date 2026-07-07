@@ -87,8 +87,8 @@ export function Skills() {
   const filtered = useMemo(() => {
     return skills.filter((s) => {
       const matchSearch = s.name.toLowerCase().includes(search.toLowerCase());
-      const catName = s.category?.name || 'Uncategorized';
-      const matchCat = categoryFilter === 'all' || catName === categoryFilter;
+      const catId = s.categoryId || s.category?.id || 'uncategorized';
+      const matchCat = categoryFilter === 'all' || catId === categoryFilter;
       return matchSearch && matchCat;
     });
   }, [skills, search, categoryFilter]);
@@ -177,7 +177,7 @@ export function Skills() {
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {categories.map((c) => (
-              <SelectItem key={c.id} value={c.name}>
+              <SelectItem key={c.id} value={c.id}>
                 {c.name}
               </SelectItem>
             ))}
