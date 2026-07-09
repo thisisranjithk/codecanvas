@@ -1,3 +1,7 @@
+import type { Certification } from './certification.types';
+import type { Project } from './project.types';
+
+
 export interface DashboardStats {
   projects: number;
   publishedProjects: number;
@@ -16,11 +20,10 @@ export interface DashboardActivity {
   title: string;
   timestamp: string;
 }
-import type { Certification } from './certification.types';
 
 export interface DashboardFeaturedContent {
-  featuredProject: string | null;
-  latestBlog: string | null;
+  featuredProject: Project | null;
+  latestBlog: { id: string; title: string } | null;
   latestCertification: Certification | null;
 }
 

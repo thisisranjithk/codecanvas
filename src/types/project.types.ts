@@ -1,5 +1,15 @@
 export type ProjectStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
+export interface ProjectsQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  categoryId?: string;
+  status?: string;
+}
+
 export interface Project {
   id: string;
   title: string;

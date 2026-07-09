@@ -44,6 +44,7 @@ import {
 } from '@/hooks/api/education';
 import type { Education, CreateEducationRequest } from '@/types/education.types';
 import { Loader } from '@/components/ui/loader';
+import { ExpandableText } from '@/components/shared/expandable-text';
 
 export function Education() {
   const { data: educations = [], isLoading, isError, error, refetch } = useEducations();
@@ -195,9 +196,7 @@ export function Education() {
 
                   {/* Description Text */}
                   {edu.description && (
-                    <p className="text-muted-foreground max-w-4xl text-sm leading-relaxed sm:pl-16">
-                      {edu.description}
-                    </p>
+                    <ExpandableText text={edu.description} lines={3} className="sm:pl-16 max-w-4xl" />
                   )}
                 </div>
 

@@ -38,6 +38,7 @@ import { useCategoryDropdown } from '@/hooks/api/category';
 import type { Experience as ExperienceType } from '@/types';
 import { Loader } from '@/components/ui/loader';
 import { ErrorState } from '@/components/shared/error-state';
+import { ExpandableText } from '@/components/shared/expandable-text';
 
 export function Experience() {
   const { data: response, isLoading, isError, error, refetch } = useExperiences();
@@ -182,9 +183,7 @@ export function Experience() {
 
                   {/* Description Text */}
                   {exp.description && (
-                    <p className="text-muted-foreground max-w-4xl text-sm leading-relaxed sm:pl-16">
-                      {exp.description}
-                    </p>
+                    <ExpandableText text={exp.description} lines={3} className="sm:pl-16 max-w-4xl" />
                   )}
                 </div>
 

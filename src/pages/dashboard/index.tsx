@@ -373,7 +373,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <span className="group-hover:text-primary truncate text-sm font-semibold transition-colors">
-                        {data.featuredContent.featuredProject}
+                        {data.featuredContent.featuredProject.title}
                       </span>
                     </div>
                     <div className="bg-primary/5 text-primary group-hover:bg-primary/10 flex size-7 shrink-0 -translate-x-2 items-center justify-center rounded-full opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
@@ -397,7 +397,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="group-hover:text-success truncate text-sm font-semibold transition-colors">
-                        {data.featuredContent.latestBlog}
+                        {data.featuredContent.latestBlog.title}
                       </span>
                     </div>
                     <div className="bg-success/5 text-success group-hover:bg-success/10 flex size-7 shrink-0 -translate-x-2 items-center justify-center rounded-full opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">

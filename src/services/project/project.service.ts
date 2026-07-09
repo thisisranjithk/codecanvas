@@ -1,11 +1,13 @@
 import { apiClient } from '@/api/client';
 import { API_ENDPOINTS } from '@/api/endpoints';
 import type { ApiResponse } from '@/types';
-import type { Project, ProjectsListResponse, CreateProjectRequest, UpdateProjectRequest } from '@/types/project.types';
+import type { Project, ProjectsListResponse, ProjectsQueryParams, CreateProjectRequest, UpdateProjectRequest } from '@/types/project.types';
 
 export const projectService = {
-  getProjects(): Promise<ApiResponse<ProjectsListResponse>> {
-    return apiClient.get<ApiResponse<ProjectsListResponse>>(API_ENDPOINTS.PROJECTS.LIST).then((res) => res.data);
+  getProjects(params?: ProjectsQueryParams): Promise<ApiResponse<ProjectsListResponse>> {
+    return apiClient
+      .get<ApiResponse<ProjectsListResponse>>(API_ENDPOINTS.PROJECTS.LIST, { params })
+      .then((res) => res.data);
   },
 
   getProject(id: string): Promise<ApiResponse<Project>> {

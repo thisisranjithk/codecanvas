@@ -4,7 +4,6 @@ import { useCategoryDropdown } from '@/hooks/api/category/use-category-dropdown'
 import {
   Plus,
   Search,
-  Eye,
   ExternalLink,
   MoreHorizontal,
   Pencil,
@@ -42,7 +41,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader } from '@/components/ui/loader';
-import { formatDateTime, formatNumber } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -50,23 +49,27 @@ import { ErrorState } from '@/components/shared/error-state';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
+import { ExpandableText } from '@/components/shared/expandable-text';
 import { projectSchema, type ProjectFormData } from '@/schemas';
 import type { Project } from '@/types/project.types';
 
 export function Projects() {
-  const { data: projects = [], isLoading, isError, error, refetch } = useProjects();
-  const { data: categoryData, isLoading: isCategoryLoading } = useCategoryDropdown('PROJECT');
-
-  const createProject = useCreateProject();
-  const updateProject = useUpdateProject();
-  const deleteProject = useDeleteProject();
-
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<Project | null>(null);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+
+  const { data: projects = [], isLoading, isError, error, refetch } = useProjects({
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    categoryId: categoryFilter !== 'all' ? categoryFilter : undefined,
+  });
+  const { data: categoryData, isLoading: isCategoryLoading } = useCategoryDropdown('PROJECT');
+
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
+  const deleteProject = useDeleteProject();
 
   const categoryOptions = useMemo(
     () => (categoryData ?? []).map((c) => ({ label: c.name, value: c.id })),
@@ -75,18 +78,15 @@ export function Projects() {
 
   const filtered = useMemo(() => {
     const list = Array.isArray(projects) ? projects : [];
-    return list
-      .filter((p) => {
-        const matchSearch =
-          p.title.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase()) ||
-          p.technologies.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-        const matchStatus = statusFilter === 'all' || p.status === statusFilter;
-        const matchCategory = categoryFilter === 'all' || p.categoryId === categoryFilter;
-        return matchSearch && matchStatus && matchCategory;
-      })
-      .sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
-  }, [projects, search, statusFilter, categoryFilter]);
+    if (!search) return list;
+    const q = search.toLowerCase();
+    return list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.technologies.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [projects, search]);
 
   function handleDelete(project: Project) {
     deleteProject.mutate(project.id, {
@@ -216,9 +216,7 @@ export function Projects() {
                         {project.category?.name ?? ''}
                       </span>
 
-                      <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed mt-1">
-                        {project.description}
-                      </p>
+                      <ExpandableText text={project.description} lines={2} className="mt-1" />
 
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {project.technologies.slice(0, 4).map((tech) => (
@@ -240,10 +238,6 @@ export function Projects() {
                       <div className="bg-border/50 my-2.5 h-px w-full" />
 
                       <div className="flex items-center justify-between">
-                        <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
-                          <Eye className="size-3.5 opacity-70" />
-                          {formatNumber(project.views ?? 0)} views
-                        </div>
                         <div className="flex items-center gap-2">
                           {project.githubUrl && (
                             <a
@@ -251,15 +245,26 @@ export function Projects() {
                               target="_blank"
                               rel="noreferrer"
                               className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               GitHub <ExternalLink className="size-3" />
                             </a>
                           )}
-                          <span className="text-muted-foreground/30 hidden sm:inline">•</span>
-                          <span className="text-muted-foreground text-xs font-medium">
-                            {formatDateTime(project.updatedAt ?? '')}
-                          </span>
+                          {project.liveUrl && (
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-success bg-success/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Live <ExternalLink className="size-3" />
+                            </a>
+                          )}
                         </div>
+                        <span className="text-muted-foreground text-xs font-medium">
+                          {formatDateTime(project.updatedAt ?? '')}
+                        </span>
                       </div>
                     </div>
                   </div>
