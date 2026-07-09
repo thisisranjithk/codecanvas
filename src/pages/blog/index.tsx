@@ -41,8 +41,27 @@ import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { FormInput, FormTextarea, FormSwitch } from '@/components/shared/form-field';
 import { blogSchema, type BlogFormData } from '@/schemas';
+import { ComingSoon } from '@/components/shared/coming-soon';
 
 type Blog = (typeof mockBlogs)[0];
+
+export function Blog() {
+  return (
+    <ComingSoon
+      title="Blog"
+      subtitle="Something awesome is on its way"
+      description="The blog section is actively being built. Soon you'll be able to manage, publish, and showcase your articles — all from this dashboard."
+      icon={BookOpen}
+      features={[
+        '✍️  Rich post editor',
+        '🏷️  Tags & categories',
+        '📊  Analytics',
+        '🌐  SEO tools',
+        '⭐  Featured posts',
+      ]}
+    />
+  );
+}
 
 // A simple placeholder generator based on blog id
 function BlogImagePlaceholder({ id }: { id: string }) {
@@ -66,7 +85,8 @@ function BlogImagePlaceholder({ id }: { id: string }) {
   );
 }
 
-export function Blog() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function BlogPage() {
   const [blogs, setBlogs] = useState(mockBlogs);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all');
