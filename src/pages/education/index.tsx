@@ -28,11 +28,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { formatDate } from '@/lib/utils';
+import { formatYear, getEducationActivityIcon, sortByDateDesc } from '@/lib/utils';
 import { toast } from 'sonner';
 import { FormInput, FormTextarea, FormMonthPicker } from '@/components/shared/form-field';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
-import { getEducationActivityIcon } from '@/lib/utils';
 import { educationSchema, type EducationFormData } from '@/schemas';
 import { ErrorState } from '@/components/shared/error-state';
 import {
@@ -116,116 +115,122 @@ export function Education() {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
-          {educations.map((edu) => (
-            <Card key={edu.id} className="border-border/60 card-hover overflow-hidden">
-              <CardContent className="flex flex-col p-4 sm:p-6">
-                <div className="flex flex-col gap-3 sm:gap-4">
-                  {/* Header Row */}
-                  <div className="flex items-start justify-between gap-3 sm:gap-4">
-                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                      <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
-                        <GraduationCap className="size-5" />
-                      </div>
-                      <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
-                          {edu.institution}
-                        </h2>
-                        <p className="text-primary text-sm truncate font-semibold sm:text-sm">
-                          {edu.degree} in {edu.fieldOfStudy}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground hover:text-foreground -mr-2 size-8"
-                          >
-                            <MoreHorizontal className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openEdit(edu)}>
-                            <Pencil className="mr-2 size-3.5" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setDeleteDialog(edu)}
-                          >
-                            <Trash2 className="mr-2 size-3.5" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-
-                  {/* Metadata Row */}
-                  <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="size-3.5 opacity-70" />
-                      {formatDate(edu.startDate)} — {edu.endDate ? formatDate(edu.endDate) : 'Present'}
-                    </span>
-
-                    {edu.location && (
-                      <>
-                        <span className="text-muted-foreground/30 hidden sm:inline">•</span>
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="size-3.5 opacity-70" />
-                          {edu.location}
-                        </span>
-                      </>
-                    )}
-
-                    {edu.gpa && (
-                      <>
-                        <span className="text-muted-foreground/30 hidden sm:inline">•</span>
-                        <span className="flex items-center gap-1.5">
-                          <Star className="size-3.5 opacity-70" />
-                          GPA: {edu.gpa}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Description Text */}
-                  {edu.description && (
-                    <ExpandableText text={edu.description} lines={3} className="sm:pl-16 max-w-4xl" />
-                  )}
-                </div>
-
-                {/* Divider */}
-                {edu.activities && edu.activities.length > 0 && (
-                  <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-16 sm:w-[calc(100%-64px)]" />
-                )}
-
-                {/* Activities section */}
-                {edu.activities && edu.activities.length > 0 && (
-                  <div className="flex flex-col gap-2.5 sm:pl-16">
-                    <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                      Activities & Societies
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {edu.activities.map((act) => (
-                        <div
-                          key={act}
-                          className="border-border/60 bg-muted/20 hover:bg-muted/40 sm:text-xs flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium shadow-sm transition-colors"
-                        >
-                          {getEducationActivityIcon(act)}
-                          <span>{act}</span>
+        <div className="space-y-6">
+          {sortByDateDesc(educations).map((edu, idx) => (
+            <div
+              key={edu.id}
+              className="animate-fade-in"
+              style={{ animationFillMode: 'both', animationDelay: `${idx * 100}ms` }}
+            >
+              <Card className="border-border/60 card-hover overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/20">
+                <CardContent className="flex flex-col p-4 sm:p-6">
+                  <div className="flex flex-col gap-3 sm:gap-4">
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between gap-3 sm:gap-4">
+                      <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                        <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
+                          <GraduationCap className="size-5" />
                         </div>
-                      ))}
+                        <div className="mt-0.5 flex min-w-0 flex-col">
+                          <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
+                            {edu.institution}
+                          </h2>
+                          <p className="text-primary text-sm truncate font-semibold mt-2 sm:text-sm">
+                            {edu.degree} in {edu.fieldOfStudy}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-muted-foreground hover:text-foreground -mr-2 size-8"
+                            >
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEdit(edu)}>
+                              <Pencil className="mr-2 size-3.5" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => setDeleteDialog(edu)}
+                            >
+                              <Trash2 className="mr-2 size-3.5" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
+
+                    {/* Metadata Row */}
+                    <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
+                      <span className="flex items-center gap-1.5">
+                        <Calendar className="size-3.5 opacity-70" />
+                        {formatYear(edu.startDate)} — {edu.endDate ? formatYear(edu.endDate) : 'Present'}
+                      </span>
+
+                      {edu.location && (
+                        <>
+                          <span className="text-muted-foreground/30 hidden sm:inline">•</span>
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="size-3.5 opacity-70" />
+                            {edu.location}
+                          </span>
+                        </>
+                      )}
+
+                      {edu.gpa && (
+                        <>
+                          <span className="text-muted-foreground/30 hidden sm:inline">•</span>
+                          <span className="flex items-center gap-1.5">
+                            <Star className="size-3.5 opacity-70" />
+                            GPA: {edu.gpa}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Description Text */}
+                    {edu.description && (
+                      <ExpandableText text={edu.description} lines={3} className="sm:pl-16 max-w-4xl" />
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+
+                  {/* Divider */}
+                  {edu.activities && edu.activities.length > 0 && (
+                    <div className="bg-border/50 my-4 h-px w-full sm:my-5 sm:ml-16 sm:w-[calc(100%-64px)]" />
+                  )}
+
+                  {/* Activities section */}
+                  {edu.activities && edu.activities.length > 0 && (
+                    <div className="flex flex-col gap-2.5 sm:pl-16">
+                      <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Activities & Societies
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {edu.activities.map((act) => (
+                          <div
+                            key={act}
+                            className="border-border/60 bg-muted/20 hover:bg-muted/40 sm:text-xs flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium shadow-sm transition-colors"
+                          >
+                            {getEducationActivityIcon(act)}
+                            <span>{act}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
       )}

@@ -20,7 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { formatDate, getEmploymentDuration } from '@/lib/utils';
+import {
+  formatYear,
+  getEmploymentDuration,
+  sortByDateDesc,
+} from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -104,7 +108,7 @@ export function Experience() {
         />
       ) : (
         <div className="flex flex-col gap-5">
-          {experiences.map((exp) => (
+          {sortByDateDesc(experiences).map((exp) => (
             <Card key={exp.id} className="border-border/60 card-hover overflow-hidden">
               <CardContent className="flex flex-col p-4 sm:p-6">
                 <div className="flex flex-col gap-3 sm:gap-4">
@@ -118,7 +122,7 @@ export function Experience() {
                         <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
                           {exp.company}
                         </h2>
-                        <p className="text-primary text-sm truncate font-semibold sm:text-sm">
+                        <p className="text-primary text-sm truncate mt-2 font-semibold sm:text-sm">
                           {exp.role}
                         </p>
                       </div>
@@ -163,8 +167,8 @@ export function Experience() {
                   <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
-                      {formatDate(exp.startDate)} —{' '}
-                      {exp.isCurrent ? 'Present' : (exp.endDate ? formatDate(exp.endDate) : '')}
+                      {formatYear(exp.startDate)} —{' '}
+                      {exp.isCurrent ? 'Present' : (exp.endDate ? formatYear(exp.endDate) : '')}
                       <span className="ml-1 sm:hidden">
                         ({getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)})
                       </span>
@@ -193,7 +197,7 @@ export function Experience() {
                 )}
 
                 {/* Responsibilities & Tech */}
-                <div className="flex flex-col gap-5 sm:gap-8 sm:pl-16 lg:flex-row">
+                <div className="flex flex-col gap-5 sm:gap-8 lg:flex-row sm:pl-16">
                   {/* Left Column: Responsibilities */}
                   {exp.responsibilities && exp.responsibilities.length > 0 && (
                     <div className="flex flex-1 flex-col gap-2.5">
