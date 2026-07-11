@@ -23,10 +23,11 @@ const aliases: Record<string, string> = {
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const key = status.toLowerCase();
   const style =
-    aliases[status] ||
-    aliases[`blog-${status}`] ||
-    statusStyles[status] ||
+    aliases[key] ||
+    aliases[`blog-${key}`] ||
+    statusStyles[key] ||
     'bg-muted text-muted-foreground border-border';
 
   return (
@@ -34,7 +35,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       variant="outline"
       className={cn('h-5 px-1.5 text-xs font-medium capitalize', style, className)}
     >
-      {status}
+      {key}
     </Badge>
   );
 }

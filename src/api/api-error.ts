@@ -10,7 +10,7 @@ export class ApiError extends Error {
     message: string,
     statusCode: number,
     errors: ValidationError[] = [],
-    originalError?: unknown,
+    originalError?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
@@ -27,7 +27,7 @@ export class ApiError extends Error {
         response.data.message || 'An unexpected error occurred',
         response.status,
         response.data.errors ?? [],
-        error,
+        error
       );
     }
 
@@ -39,7 +39,7 @@ export class ApiError extends Error {
       error.message || 'Network error. Please check your connection.',
       0,
       [],
-      error,
+      error
     );
   }
 }

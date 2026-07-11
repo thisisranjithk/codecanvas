@@ -20,8 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockExperience } from '@/data/experience';
-import { formatDate, getEmploymentDuration } from '@/lib/utils';
+import {
+  formatYear,
+  getEmploymentDuration,
+  sortByDateDesc,
+} from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -34,33 +37,63 @@ import {
   FormMonthPicker,
 } from '@/components/shared/form-field';
 import { experienceSchema, type ExperienceFormData } from '@/schemas';
-
-type Experience = (typeof mockExperience)[0];
+import { useExperiences, useExperience, useCreateExperience, useUpdateExperience, useDeleteExperience } from '@/hooks/api/experience';
+import { useCategoryDropdown } from '@/hooks/api/category';
+import type { Experience as ExperienceType } from '@/types';
+import { Loader } from '@/components/ui/loader';
+import { ErrorState } from '@/components/shared/error-state';
+import { ExpandableText } from '@/components/shared/expandable-text';
 
 export function Experience() {
-  const [experiences, setExperiences] = useState(mockExperience);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingExp, setEditingExp] = useState<Experience | null>(null);
-  const [deleteDialog, setDeleteDialog] = useState<Experience | null>(null);
+  const { data: response, isLoading, isError, error, refetch } = useExperiences();
+  const experiences = response?.data || [];
 
-  function handleDelete(exp: Experience) {
-    setExperiences((prev) => prev.filter((e) => e.id !== exp.id));
-    setDeleteDialog(null);
-    toast.success(`"${exp.role} at ${exp.company}" removed`);
+  const deleteMutation = useDeleteExperience();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingExpId, setEditingExpId] = useState<string | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<ExperienceType | null>(null);
+
+  function handleDelete(exp: ExperienceType) {
+    deleteMutation.mutate(exp.id, {
+      onSuccess: () => {
+        setDeleteDialog(null);
+        toast.success(`"${exp.role} at ${exp.company}" removed`);
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || 'Failed to delete experience');
+      },
+    });
   }
 
-  function openEdit(exp: Experience) {
-    setEditingExp(exp);
+  function openEdit(exp: ExperienceType) {
+    setEditingExpId(exp.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingExp(null);
+    setEditingExpId(null);
     setDialogOpen(true);
   }
 
+  if (isLoading) {
+    return <Loader variant="section" text="Loading certifications..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load certifications"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-fade-in flex flex-col gap-6 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       <PageHeader
         title="Experience"
         description={`${experiences.length} positions`}
@@ -75,7 +108,7 @@ export function Experience() {
         />
       ) : (
         <div className="flex flex-col gap-5">
-          {experiences.map((exp) => (
+          {sortByDateDesc(experiences).map((exp) => (
             <Card key={exp.id} className="border-border/60 card-hover overflow-hidden">
               <CardContent className="flex flex-col p-4 sm:p-6">
                 <div className="flex flex-col gap-3 sm:gap-4">
@@ -83,13 +116,13 @@ export function Experience() {
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                       <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
-                        {exp.logo}
+                        <Briefcase className="size-5" />
                       </div>
                       <div className="mt-0.5 flex min-w-0 flex-col">
-                        <h2 className="text-foreground truncate text-base font-bold tracking-tight sm:text-lg">
+                        <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
                           {exp.company}
                         </h2>
-                        <p className="text-primary text-3 truncate font-semibold sm:text-sm">
+                        <p className="text-primary text-sm truncate mt-2 font-semibold sm:text-sm">
                           {exp.role}
                         </p>
                       </div>
@@ -100,7 +133,7 @@ export function Experience() {
                         variant="secondary"
                         className="bg-primary/10 text-primary hover:bg-primary/10 hidden h-6 rounded-md border-transparent px-2.5 text-xs font-medium sm:flex"
                       >
-                        {getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)}
+                        {getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)}
                       </Badge>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -131,13 +164,13 @@ export function Experience() {
                   </div>
 
                   {/* Metadata Row */}
-                  <div className="text-muted-foreground sm:text-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
+                  <div className="text-muted-foreground sm:text-xs flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium sm:pl-16">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="size-3.5 opacity-70" />
-                      {formatDate(exp.startDate)} —{' '}
-                      {exp.current ? 'Present' : formatDate(exp.endDate)}
+                      {formatYear(exp.startDate)} —{' '}
+                      {exp.isCurrent ? 'Present' : (exp.endDate ? formatYear(exp.endDate) : '')}
                       <span className="ml-1 sm:hidden">
-                        ({getEmploymentDuration(exp.startDate, exp.current ? null : exp.endDate)})
+                        ({getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)})
                       </span>
                     </span>
                     <span className="text-muted-foreground/30 hidden sm:inline">•</span>
@@ -148,15 +181,13 @@ export function Experience() {
                     <span className="text-muted-foreground/30 hidden sm:inline">•</span>
                     <span className="flex items-center gap-1.5">
                       <Briefcase className="size-3.5 opacity-70" />
-                      {exp.type}
+                      {exp.employmentType?.name || 'Full-time'}
                     </span>
                   </div>
 
                   {/* Description Text */}
                   {exp.description && (
-                    <p className="text-muted-foreground max-w-4xl text-[13.5px] leading-relaxed sm:pl-16 sm:text-sm">
-                      {exp.description}
-                    </p>
+                    <ExpandableText text={exp.description} lines={3} className="sm:pl-16 max-w-4xl" />
                   )}
                 </div>
 
@@ -166,7 +197,7 @@ export function Experience() {
                 )}
 
                 {/* Responsibilities & Tech */}
-                <div className="flex flex-col gap-5 sm:gap-8 sm:pl-16 lg:flex-row">
+                <div className="flex flex-col gap-5 sm:gap-8 lg:flex-row sm:pl-16">
                   {/* Left Column: Responsibilities */}
                   {exp.responsibilities && exp.responsibilities.length > 0 && (
                     <div className="flex flex-1 flex-col gap-2.5">
@@ -177,7 +208,7 @@ export function Experience() {
                         {exp.responsibilities.map((item, i) => (
                           <li
                             key={i}
-                            className="text-foreground/90 text-3 flex items-start gap-2.5 sm:text-[13.5px]"
+                            className="text-foreground/90 text-sm flex items-start gap-2.5"
                           >
                             <span className="bg-primary/60 mt-1.5 size-1 shrink-0 rounded-full" />
                             <span className="leading-relaxed">{item}</span>
@@ -214,7 +245,7 @@ export function Experience() {
       )}
 
       {/* Edit/New Dialog */}
-      <ExperienceDialog experience={editingExp} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ExperienceDialog experienceId={editingExpId} editMode={!!editingExpId} open={dialogOpen} onOpenChange={setDialogOpen} />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -231,33 +262,45 @@ export function Experience() {
             ?
           </>
         }
+        isLoading={deleteMutation.isPending}
       />
-    </div>
+    </main>
   );
 }
 
 function ExperienceDialog({
-  experience,
+  experienceId,
+  editMode,
   open,
   onOpenChange,
 }: {
-  experience: Experience | null;
+  experienceId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { data: fetchedExperience, isFetching: isFetchingExperience } = useExperience(open ? (experienceId || '') : '');
+  const { data: dropdownResponse } = useCategoryDropdown('EMPLOYMENT_TYPE');
+  const employmentTypes = dropdownResponse || [];
+
+  const createMutation = useCreateExperience();
+  const updateMutation = useUpdateExperience();
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingExperience;
+
   const {
     register,
     control,
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ExperienceFormData>({
     resolver: zodResolver(experienceSchema),
     defaultValues: {
       company: '',
       role: '',
-      type: 'Full-time',
+      employmentTypeId: '',
       location: '',
       startDate: undefined as unknown as Date,
       endDate: null,
@@ -270,47 +313,97 @@ function ExperienceDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        company: experience?.company ?? '',
-        role: experience?.role ?? '',
-        type: experience?.type ?? 'Full-time',
-        location: experience?.location ?? '',
-        startDate: experience?.startDate
-          ? new Date(experience.startDate)
-          : (undefined as unknown as Date),
-        endDate: experience?.endDate ? new Date(experience.endDate) : null,
-        current: experience?.current ?? false,
-        description: experience?.description ?? '',
-        responsibilities: experience?.responsibilities?.join('\n') ?? '',
-        technologies: experience?.technologies.join(', ') ?? '',
-      });
+      if (editMode) {
+        if (fetchedExperience?.data) {
+          const expData = fetchedExperience.data;
+          reset({
+            company: expData.company ?? '',
+            role: expData.role ?? '',
+            employmentTypeId: expData.employmentTypeId ?? '',
+            location: expData.location ?? '',
+            startDate: expData.startDate
+              ? new Date(expData.startDate)
+              : (undefined as unknown as Date),
+            endDate: expData.endDate ? new Date(expData.endDate) : null,
+            current: expData.isCurrent ?? false,
+            description: expData.description ?? '',
+            responsibilities: expData.responsibilities?.join('\n') ?? '',
+            technologies: expData.technologies?.join(', ') ?? '',
+          });
+        }
+      } else {
+        reset({
+          company: '',
+          role: '',
+          employmentTypeId: '',
+          location: '',
+          startDate: undefined as unknown as Date,
+          endDate: null,
+          current: false,
+          description: '',
+          responsibilities: '',
+          technologies: '',
+        });
+      }
     }
-  }, [open, experience, reset]);
+  }, [open, editMode, fetchedExperience, reset]);
 
   const isCurrent = watch('current');
 
-  function onSubmit(_data: ExperienceFormData) {
-    onOpenChange(false);
-    toast.success(experience ? 'Experience updated' : 'Experience added');
+  function onSubmit(data: ExperienceFormData) {
+    const payload = {
+      ...data,
+      startDate: data.startDate.toISOString(),
+      endDate: data.current ? null : (data.endDate ? data.endDate.toISOString() : null),
+      isCurrent: data.current,
+      responsibilities: data.responsibilities
+        ? data.responsibilities.split('\n').map((r) => r.trim()).filter(Boolean)
+        : [],
+      technologies: data.technologies
+        ? data.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+        : [],
+    };
+
+    if (editMode && experienceId) {
+      updateMutation.mutate(
+        { id: experienceId, data: payload },
+        {
+          onSuccess: (data) => {
+            onOpenChange(false);
+            toast.success(data.message || 'Experience updated successfully');
+          },
+          onError: (error: any) => {
+            toast.error(error?.response?.data?.message || 'Failed to update experience');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: (data) => {
+          onOpenChange(false);
+          toast.success(data.message || 'Experience added successfully');
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || 'Failed to create experience');
+        },
+      });
+    }
   }
 
-  const employmentTypes = [
-    { label: 'Full-time', value: 'Full-time' },
-    { label: 'Part-time', value: 'Part-time' },
-    { label: 'Contract', value: 'Contract' },
-    { label: 'Freelance', value: 'Freelance' },
-    { label: 'Internship', value: 'Internship' },
-  ];
+  const employmentTypeOptions = employmentTypes.map((type) => ({
+    label: type.name,
+    value: type.id,
+  }));
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={isPending ? undefined : onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg">
-            {experience ? 'Edit Experience' : 'Add Experience'}
+            {editMode ? 'Edit Experience' : 'Add Experience'}
           </DialogTitle>
-          <DialogDescription className="text-base">
-            {experience ? 'Update position details.' : 'Add a work experience entry.'}
+          <DialogDescription className="text-sm">
+            {editMode ? 'Update position details.' : 'Add a work experience entry.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -321,8 +414,6 @@ function ExperienceDialog({
               error={errors.company}
               placeholder="TechCorp Pvt. Ltd."
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
             <FormInput
               label="Role / Title"
@@ -330,20 +421,18 @@ function ExperienceDialog({
               error={errors.role}
               placeholder="Frontend Developer"
               required
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
 
             <div className="grid grid-cols-2 gap-4">
               <FormSelect
                 label="Employment Type"
-                name="type"
+                name="employmentTypeId"
                 control={control}
-                error={errors.type}
-                options={employmentTypes}
+                error={errors.employmentTypeId}
+                options={employmentTypeOptions}
+                placeholder="Select Employment Type"
                 required
-                labelClassName="text-base"
-                selectClassName="h-9 text-base w-full"
+                selectClassName="w-full"
               />
               <FormInput
                 label="Location"
@@ -351,8 +440,7 @@ function ExperienceDialog({
                 error={errors.location}
                 placeholder="Bengaluru, India"
                 required
-                labelClassName="text-base"
-                inputClassName="h-9 text-base w-full"
+                inputClassName="w-full"
               />
             </div>
 
@@ -363,17 +451,15 @@ function ExperienceDialog({
                 control={control}
                 error={errors.startDate}
                 required
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                pickerClassName="w-full"
               />
               <FormMonthPicker
                 label="End Date"
                 name="endDate"
                 control={control}
                 error={errors.endDate}
-                disabled={isCurrent}
-                labelClassName="text-base"
-                pickerClassName="w-full h-9 text-base"
+                disabled={isCurrent || isPending}
+                pickerClassName="w-full"
               />
             </div>
 
@@ -383,7 +469,6 @@ function ExperienceDialog({
               control={control}
               description="This will hide the end date"
               className="bg-muted/20 mb-4"
-              labelClassName="text-base"
             />
 
             <FormTextarea
@@ -392,8 +477,6 @@ function ExperienceDialog({
               error={errors.description}
               placeholder="Brief summary of your role..."
               rows={2}
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
 
             <FormTextarea
@@ -402,8 +485,6 @@ function ExperienceDialog({
               placeholder="List your responsibilities (one per line)..."
               rows={4}
               description="Press Enter to separate each responsibility bullet point."
-              labelClassName="text-base"
-              textareaClassName="text-base"
             />
 
             <FormInput
@@ -411,8 +492,6 @@ function ExperienceDialog({
               registration={register('technologies')}
               placeholder="React, Next.js, Tailwind CSS..."
               description="Separate each technology with a comma."
-              labelClassName="text-base"
-              inputClassName="h-9 text-base"
             />
           </div>
           <DialogFooter className="pt-2">
@@ -421,12 +500,12 @@ function ExperienceDialog({
               size="sm"
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-9 text-base"
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button size="sm" type="submit" className="h-9 text-base">
-              {experience ? 'Save Changes' : 'Add Experience'}
+            <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
+              {editMode ? 'Save Changes' : 'Add Experience'}
             </Button>
           </DialogFooter>
         </form>

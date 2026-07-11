@@ -1,4 +1,11 @@
 import { Save, Globe, User, Bell, Shield, Link, Info } from 'lucide-react';
+import { useEffect } from 'react';
+import {
+  useProfile,
+  useCreateProfile,
+  useUpdateProfile,
+  useUpdatePortfolioSettings,
+} from '@/hooks/api/profile';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +16,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
+import { useChangePassword, useDeleteAccount } from '@/hooks/api/auth';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
 import {
   profileSchema,
@@ -25,30 +33,59 @@ import {
 
 function ProfileTab() {
   const { user } = useAuth();
+  const { data: profileResponse, isLoading } = useProfile();
+  const profile = profileResponse?.data;
+  const createProfile = useCreateProfile();
+  const updateProfile = useUpdateProfile();
+
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.fullName || '',
       email: user?.email || '',
-      headline: 'Senior Software Engineer & Open Source Contributor',
-      bio: "I'm a software engineer with 6+ years of experience building high-performance web applications. Currently at Vercel, previously at Stripe and Linear.",
-      location: 'San Francisco, CA',
+      headline: '',
+      bio: '',
+      location: '',
       timezone: 'america-la',
-      github: 'alexmorgan',
-      linkedin: 'alexmorgan',
-      twitter: 'alexmorgan',
-      website: 'alexmorgan.dev',
+      github: '',
+      linkedin: '',
+      twitter: '',
+      website: '',
     },
   });
 
-  function onSubmit(_data: ProfileFormData) {
-    toast.success('Profile settings saved');
+  useEffect(() => {
+    if (profile) {
+      reset({
+        name: profile.name || user?.fullName || '',
+        email: profile.email || user?.email || '',
+        headline: profile.headline || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        timezone: profile.timezone || 'america-la',
+        github: profile.github || '',
+        linkedin: profile.linkedin || '',
+        twitter: profile.twitter || '',
+        website: profile.website || '',
+      });
+    }
+  }, [profile, reset, user]);
+
+  function onSubmit(data: ProfileFormData) {
+    if (profile) {
+      updateProfile.mutate(data);
+    } else {
+      createProfile.mutate(data);
+    }
   }
+
+  const isPending = createProfile.isPending || updateProfile.isPending;
 
   const socialLinks = [
     { label: 'GitHub', field: 'github' as const, prefix: 'github.com/' },
@@ -71,7 +108,11 @@ function ProfileTab() {
             <div className="flex items-center gap-3">
               <Avatar className="ring-border size-14 ring-2">
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                  {user?.fullName?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'U'}
+                  {user?.fullName
+                    ?.split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">
@@ -171,9 +212,9 @@ function ProfileTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5">
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading || !isDirty}>
             <Save className="size-3.5" />
-            Save Profile
+            {isPending ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
       </div>
@@ -184,18 +225,40 @@ function ProfileTab() {
 // ── Portfolio Tab ──
 
 function PortfolioTab() {
-  const { control, handleSubmit } = useForm<PortfolioFormData>({
+  const { data: profileResponse, isLoading } = useProfile();
+  const settings = profileResponse?.data;
+  const updateSettings = useUpdatePortfolioSettings();
+
+  const { control, handleSubmit, reset, formState: { isDirty } } = useForm<PortfolioFormData>({
     resolver: zodResolver(portfolioSchema),
     defaultValues: {
-      portfolioPublic: true,
+      portfolioPublic: false,
       showEmail: false,
-      openToWork: true,
+      openToWork: false,
     },
   });
 
-  function onSubmit(_data: PortfolioFormData) {
-    toast.success('Portfolio settings saved');
+  useEffect(() => {
+    if (settings) {
+      reset({
+        portfolioPublic: settings.portfolioVisibility === 'PUBLIC',
+        showEmail: settings.showEmail,
+        openToWork: settings.openToWork,
+      });
+    }
+  }, [settings, reset]);
+
+  function onSubmit(data: PortfolioFormData) {
+    const payload = {
+      portfolioVisibility: data.portfolioPublic ? 'PUBLIC' : 'PRIVATE',
+      showEmail: data.showEmail,
+      openToWork: data.openToWork,
+    };
+
+    updateSettings.mutate(payload);
   }
+
+  const isPending = updateSettings.isPending;
 
   const visibilityItems = [
     {
@@ -237,9 +300,9 @@ function PortfolioTab() {
         </Card>
 
         <div className="flex justify-end">
-          <Button size="sm" type="submit" className="h-8 gap-1.5">
+          <Button size="sm" type="submit" className="h-8 gap-1.5" disabled={isPending || isLoading || !isDirty}>
             <Save className="size-3.5" />
-            Save Changes
+            {isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
@@ -336,10 +399,13 @@ function NotificationsTab() {
 // ── Security Tab ──
 
 function SecurityTab() {
+  const { logout } = useAuth();
+  const changePassword = useChangePassword();
+  const deleteAccount = useDeleteAccount();
+
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -350,9 +416,25 @@ function SecurityTab() {
     },
   });
 
-  function onSubmit(_data: ChangePasswordFormData) {
-    toast.success('Password updated');
-    reset();
+  async function onSubmit(data: ChangePasswordFormData) {
+    try {
+      await changePassword.mutateAsync(data);
+      toast.success('Password updated');
+      logout();
+    } catch {
+      toast.error('Failed to change password');
+    }
+  }
+
+  async function handleDeleteAccount() {
+    // try {
+    //   await deleteAccount.mutateAsync();
+    //   toast.success('Account deleted');
+    //   logout();
+    // } catch {
+    //   toast.error('Failed to delete account');
+    // }
+    toast.info('Account deletion feature disabled because of demo mode');
   }
 
   return (
@@ -395,8 +477,8 @@ function SecurityTab() {
                 labelClassName="text-xs"
                 inputClassName="h-8 text-xs"
               />
-              <Button size="sm" className="h-8 w-fit" type="submit">
-                Update Password
+              <Button size="sm" className="h-8 w-fit" type="submit" disabled={changePassword.isPending}>
+                {changePassword.isPending ? 'Updating...' : 'Update Password'}
               </Button>
             </div>
           </form>
@@ -422,9 +504,10 @@ function SecurityTab() {
               variant="destructive"
               size="sm"
               className="h-7 text-xs"
-              onClick={() => toast.error('This action is disabled in demo mode')}
+              disabled={deleteAccount.isPending}
+              onClick={handleDeleteAccount}
             >
-              Delete Account
+              {deleteAccount.isPending ? 'Deleting...' : 'Delete Account'}
             </Button>
           </div>
         </CardContent>
@@ -437,10 +520,10 @@ function SecurityTab() {
 
 export function Settings() {
   return (
-    <div className="animate-fade-in flex flex-col gap-4 p-5">
+    <main className="animate-fade-in px-6 py-8 pb-20 space-y-12 w-full">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground mt-0.5 text-xs">
+        <p className="text-muted-foreground mt-0.5 text-sm">
           Manage your portfolio configuration and preferences.
         </p>
       </div>
@@ -481,6 +564,6 @@ export function Settings() {
           <SecurityTab />
         </TabsContent>
       </Tabs>
-    </div>
+    </main>
   );
 }

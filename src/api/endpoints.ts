@@ -2,6 +2,8 @@ export const API_ENDPOINTS = {
   AUTH: {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
+    REFRESH: '/auth/refresh',
+    LOGOUT: '/auth/logout',
     ME: '/auth/me',
     CHANGE_PASSWORD: '/auth/change-password',
     DELETE_ACCOUNT: '/auth/account',
@@ -84,11 +86,8 @@ export const API_ENDPOINTS = {
   PORTFOLIO: {
     HOMEPAGE: (username: string) => `/portfolio/${username}`,
     PROJECTS: (username: string) => `/portfolio/${username}/projects`,
-    PROJECT_DETAIL: (username: string, id: string) =>
-      `/portfolio/${username}/projects/${id}`,
+    PROJECT_DETAIL: (username: string, id: string) => `/portfolio/${username}/projects/${id}`,
     BLOGS: (username: string) => `/portfolio/${username}/blogs`,
-    BLOG_DETAIL: (username: string, slug: string) =>
-      `/portfolio/${username}/blogs/${slug}`,
+    BLOG_DETAIL: (username: string, slug: string) => `/portfolio/${username}/blogs/${slug}`,
   },
-
 } as const;

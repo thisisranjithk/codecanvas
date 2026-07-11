@@ -3,6 +3,7 @@
 API documentation for Portfolio CMS
 
 ## Base URL
+
 `/api/v1`
 
 ## Endpoints
@@ -40,12 +41,7 @@ API documentation for Portfolio CMS
       "maxLength": 128
     }
   },
-  "required": [
-    "fullName",
-    "username",
-    "email",
-    "password"
-  ]
+  "required": ["fullName", "username", "email", "password"]
 }
 ```
 
@@ -76,10 +72,7 @@ API documentation for Portfolio CMS
       "minLength": 1
     }
   },
-  "required": [
-    "email",
-    "password"
-  ]
+  "required": ["email", "password"]
 }
 ```
 
@@ -283,7 +276,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -301,7 +294,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -341,11 +334,7 @@ API documentation for Portfolio CMS
     },
     "status": {
       "type": "string",
-      "enum": [
-        "DRAFT",
-        "PUBLISHED",
-        "ARCHIVED"
-      ],
+      "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"],
       "default": "DRAFT",
       "example": "PUBLISHED"
     },
@@ -355,11 +344,7 @@ API documentation for Portfolio CMS
         "type": "string"
       },
       "minItems": 1,
-      "example": [
-        "React",
-        "Node.js",
-        "Prisma"
-      ]
+      "example": ["React", "Node.js", "Prisma"]
     },
     "liveUrl": {
       "anyOf": [
@@ -369,9 +354,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -387,9 +370,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -410,9 +391,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -420,12 +399,7 @@ API documentation for Portfolio CMS
       ]
     }
   },
-  "required": [
-    "title",
-    "description",
-    "categoryId",
-    "technologies"
-  ]
+  "required": ["title", "description", "categoryId", "technologies"]
 }
 ```
 
@@ -445,13 +419,13 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `page` (query):  
-- `limit` (query):  
-- `search` (query):  
-- `sortBy` (query):  
-- `sortOrder` (query):  
-- `categoryId` (query):  
-- `status` (query):  
+- `page` (query):
+- `limit` (query):
+- `search` (query):
+- `sortBy` (query):
+- `sortOrder` (query):
+- `categoryId` (query):
+- `status` (query):
 
 **Responses:**
 
@@ -468,7 +442,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -509,11 +483,7 @@ API documentation for Portfolio CMS
     },
     "status": {
       "type": "string",
-      "enum": [
-        "DRAFT",
-        "PUBLISHED",
-        "ARCHIVED"
-      ],
+      "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"],
       "example": "PUBLISHED"
     },
     "technologies": {
@@ -522,11 +492,7 @@ API documentation for Portfolio CMS
         "type": "string"
       },
       "minItems": 1,
-      "example": [
-        "React",
-        "Node.js",
-        "Prisma"
-      ]
+      "example": ["React", "Node.js", "Prisma"]
     },
     "liveUrl": {
       "anyOf": [
@@ -536,9 +502,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -554,9 +518,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -575,9 +537,7 @@ API documentation for Portfolio CMS
         },
         {
           "type": "string",
-          "enum": [
-            ""
-          ]
+          "enum": [""]
         },
         {
           "nullable": true
@@ -590,7 +550,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -610,7 +570,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -657,10 +617,7 @@ API documentation for Portfolio CMS
       "default": 0
     }
   },
-  "required": [
-    "name",
-    "categoryId"
-  ]
+  "required": ["name", "categoryId"]
 }
 ```
 
@@ -693,7 +650,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -742,7 +699,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -762,7 +719,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -798,12 +755,7 @@ API documentation for Portfolio CMS
     },
     "type": {
       "type": "string",
-      "enum": [
-        "PROJECT",
-        "SKILL",
-        "BLOG",
-        "EMPLOYMENT_TYPE"
-      ]
+      "enum": ["PROJECT", "SKILL", "BLOG", "EMPLOYMENT_TYPE"]
     },
     "displayOrder": {
       "type": "integer"
@@ -812,11 +764,7 @@ API documentation for Portfolio CMS
       "type": "boolean"
     }
   },
-  "required": [
-    "name",
-    "slug",
-    "type"
-  ]
+  "required": ["name", "slug", "type"]
 }
 ```
 
@@ -847,7 +795,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `type` (query):  (Required)
+- `type` (query): (Required)
 
 **Responses:**
 
@@ -863,7 +811,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -891,12 +839,7 @@ API documentation for Portfolio CMS
     },
     "type": {
       "type": "string",
-      "enum": [
-        "PROJECT",
-        "SKILL",
-        "BLOG",
-        "EMPLOYMENT_TYPE"
-      ]
+      "enum": ["PROJECT", "SKILL", "BLOG", "EMPLOYMENT_TYPE"]
     },
     "displayOrder": {
       "type": "integer"
@@ -911,7 +854,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -928,7 +871,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -994,10 +937,7 @@ API documentation for Portfolio CMS
         "type": "string"
       },
       "default": [],
-      "example": [
-        "Built things",
-        "Fixed bugs"
-      ]
+      "example": ["Built things", "Fixed bugs"]
     },
     "technologies": {
       "type": "array",
@@ -1005,10 +945,7 @@ API documentation for Portfolio CMS
         "type": "string"
       },
       "default": [],
-      "example": [
-        "Go",
-        "Kubernetes"
-      ]
+      "example": ["Go", "Kubernetes"]
     },
     "displayOrder": {
       "type": "integer",
@@ -1016,12 +953,7 @@ API documentation for Portfolio CMS
       "example": 0
     }
   },
-  "required": [
-    "company",
-    "role",
-    "employmentTypeId",
-    "startDate"
-  ]
+  "required": ["company", "role", "employmentTypeId", "startDate"]
 }
 ```
 
@@ -1054,7 +986,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1120,20 +1052,14 @@ API documentation for Portfolio CMS
       "items": {
         "type": "string"
       },
-      "example": [
-        "Built things",
-        "Fixed bugs"
-      ]
+      "example": ["Built things", "Fixed bugs"]
     },
     "technologies": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "example": [
-        "Go",
-        "Kubernetes"
-      ]
+      "example": ["Go", "Kubernetes"]
     },
     "displayOrder": {
       "type": "integer",
@@ -1145,7 +1071,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1165,7 +1091,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1233,10 +1159,7 @@ API documentation for Portfolio CMS
         "type": "string"
       },
       "default": [],
-      "example": [
-        "Coding Club",
-        "Robotics Team"
-      ]
+      "example": ["Coding Club", "Robotics Team"]
     },
     "displayOrder": {
       "type": "integer",
@@ -1244,12 +1167,7 @@ API documentation for Portfolio CMS
       "example": 0
     }
   },
-  "required": [
-    "institution",
-    "degree",
-    "fieldOfStudy",
-    "startDate"
-  ]
+  "required": ["institution", "degree", "fieldOfStudy", "startDate"]
 }
 ```
 
@@ -1282,7 +1200,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1348,10 +1266,7 @@ API documentation for Portfolio CMS
       "items": {
         "type": "string"
       },
-      "example": [
-        "Coding Club",
-        "Robotics Team"
-      ]
+      "example": ["Coding Club", "Robotics Team"]
     },
     "displayOrder": {
       "type": "integer",
@@ -1363,7 +1278,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1383,7 +1298,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1448,11 +1363,7 @@ API documentation for Portfolio CMS
       "example": 0
     }
   },
-  "required": [
-    "name",
-    "issuer",
-    "issueDate"
-  ]
+  "required": ["name", "issuer", "issueDate"]
 }
 ```
 
@@ -1485,7 +1396,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1553,7 +1464,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1573,7 +1484,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1629,10 +1540,7 @@ API documentation for Portfolio CMS
     },
     "status": {
       "type": "string",
-      "enum": [
-        "DRAFT",
-        "PUBLISHED"
-      ]
+      "enum": ["DRAFT", "PUBLISHED"]
     },
     "featured": {
       "type": "boolean"
@@ -1644,12 +1552,7 @@ API documentation for Portfolio CMS
       "type": "string"
     }
   },
-  "required": [
-    "title",
-    "slug",
-    "excerpt",
-    "content"
-  ]
+  "required": ["title", "slug", "excerpt", "content"]
 }
 ```
 
@@ -1670,13 +1573,13 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `page` (query):  
-- `limit` (query):  
-- `search` (query):  
-- `sortBy` (query):  
-- `sortOrder` (query):  
-- `status` (query):  
-- `featured` (query):  
+- `page` (query):
+- `limit` (query):
+- `search` (query):
+- `sortBy` (query):
+- `sortOrder` (query):
+- `status` (query):
+- `featured` (query):
 
 **Responses:**
 
@@ -1693,7 +1596,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1749,10 +1652,7 @@ API documentation for Portfolio CMS
     },
     "status": {
       "type": "string",
-      "enum": [
-        "DRAFT",
-        "PUBLISHED"
-      ]
+      "enum": ["DRAFT", "PUBLISHED"]
     },
     "featured": {
       "type": "boolean"
@@ -1769,7 +1669,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1790,7 +1690,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `id` (path):  (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1809,7 +1709,7 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `username` (path):  (Required)
+- `username` (path): (Required)
 
 **Responses:**
 
@@ -1826,14 +1726,14 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `username` (path):  (Required)
-- `page` (query):  
-- `limit` (query):  
-- `search` (query):  
-- `sortBy` (query):  
-- `sortOrder` (query):  
-- `categoryId` (query):  
-- `status` (query):  
+- `username` (path): (Required)
+- `page` (query):
+- `limit` (query):
+- `search` (query):
+- `sortBy` (query):
+- `sortOrder` (query):
+- `categoryId` (query):
+- `status` (query):
 
 **Responses:**
 
@@ -1850,8 +1750,8 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `username` (path):  (Required)
-- `id` (path):  (Required)
+- `username` (path): (Required)
+- `id` (path): (Required)
 
 **Responses:**
 
@@ -1868,14 +1768,14 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `username` (path):  (Required)
-- `page` (query):  
-- `limit` (query):  
-- `search` (query):  
-- `sortBy` (query):  
-- `sortOrder` (query):  
-- `status` (query):  
-- `featured` (query):  
+- `username` (path): (Required)
+- `page` (query):
+- `limit` (query):
+- `search` (query):
+- `sortBy` (query):
+- `sortOrder` (query):
+- `status` (query):
+- `featured` (query):
 
 **Responses:**
 
@@ -1892,8 +1792,8 @@ API documentation for Portfolio CMS
 
 **Parameters:**
 
-- `username` (path):  (Required)
-- `slug` (path):  (Required)
+- `username` (path): (Required)
+- `slug` (path): (Required)
 
 **Responses:**
 
@@ -1914,4 +1814,3 @@ API documentation for Portfolio CMS
 - **401:** Unauthorized
 
 ---
-

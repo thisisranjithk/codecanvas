@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useProjects, useProject, useCreateProject, useUpdateProject, useDeleteProject } from '@/hooks/api/project';
+import { useCategoryDropdown } from '@/hooks/api/category/use-category-dropdown';
 import {
   Plus,
   Search,
-  Eye,
   ExternalLink,
   MoreHorizontal,
   Pencil,
@@ -39,77 +40,98 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockProjects } from '@/data/projects';
-import { formatDateTime, formatNumber } from '@/lib/utils';
+import { Loader } from '@/components/ui/loader';
+import { formatDateTime } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
+import { ErrorState } from '@/components/shared/error-state';
 import { ConfirmDeleteDialog } from '@/components/shared/confirm-delete-dialog';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
+import { ExpandableText } from '@/components/shared/expandable-text';
 import { projectSchema, type ProjectFormData } from '@/schemas';
-
-type Project = (typeof mockProjects)[0];
+import type { Project } from '@/types/project.types';
 
 export function Projects() {
-  const [projects, setProjects] = useState(mockProjects);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<Project | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
-  const categories = useMemo(() => Array.from(new Set(mockProjects.map((p) => p.category))), []);
+  const { data: projects = [], isLoading, isError, error, refetch } = useProjects({
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    categoryId: categoryFilter !== 'all' ? categoryFilter : undefined,
+  });
+  const { data: categoryData, isLoading: isCategoryLoading } = useCategoryDropdown('PROJECT');
+
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
+  const deleteProject = useDeleteProject();
+
+  const categoryOptions = useMemo(
+    () => (categoryData ?? []).map((c) => ({ label: c.name, value: c.id })),
+    [categoryData]
+  );
 
   const filtered = useMemo(() => {
-    return projects
-      .filter((p) => {
-        const matchSearch =
-          p.title.toLowerCase().includes(search.toLowerCase()) ||
-          p.description.toLowerCase().includes(search.toLowerCase()) ||
-          p.technologies.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-        const matchStatus = statusFilter === 'all' || p.status === statusFilter;
-        const matchCategory = categoryFilter === 'all' || p.category === categoryFilter;
-        return matchSearch && matchStatus && matchCategory;
-      })
-      .sort((a, b) => {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-      });
-  }, [projects, search, statusFilter, categoryFilter]);
+    const list = Array.isArray(projects) ? projects : [];
+    if (!search) return list;
+    const q = search.toLowerCase();
+    return list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.technologies.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [projects, search]);
 
   function handleDelete(project: Project) {
-    setProjects((prev) => prev.filter((p) => p.id !== project.id));
-    setDeleteDialog(null);
-    toast.success(`"${project.title}" deleted`);
-  }
-
-  function handleToggleFeatured(id: string) {
-    setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, featured: !p.featured } : p)));
-    toast.success('Featured updated');
-  }
-
-  function handleStatusChange(id: string, status: string) {
-    setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
-    toast.success('Status updated');
+    deleteProject.mutate(project.id, {
+      onSuccess: (data) => {
+        setDeleteDialog(null);
+        toast.success(data.message || `"${project.title}" deleted`);
+      },
+      onError: (err: any) => {
+        toast.error(err.response?.data?.message || 'Failed to delete project');
+      },
+    });
   }
 
   function openEdit(project: Project) {
-    setEditingProject(project);
+    setEditingProjectId(project.id);
     setDialogOpen(true);
   }
 
   function openNew() {
-    setEditingProject(null);
+    setEditingProjectId(null);
     setDialogOpen(true);
   }
 
+  if (isLoading) {
+    return <Loader variant="section" text="Loading projects..." />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <ErrorState
+          title="Failed to load projects"
+          description={error?.message || 'An unexpected error occurred.'}
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-fade-in flex flex-col gap-5 p-6">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
       {/* Header */}
       <PageHeader
         title="Projects"
-        description={`${projects.length} projects · ${projects.filter((p) => p.status === 'published').length} published`}
+        description={`${projects.length} projects · ${projects.filter((p) => p.status === 'PUBLISHED').length} published`}
         action={{ label: 'New Project', onClick: openNew, icon: <Plus className="size-4" /> }}
       />
 
@@ -130,20 +152,20 @@ export function Projects() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
+            <SelectItem value="PUBLISHED">Published</SelectItem>
+            <SelectItem value="DRAFT">Draft</SelectItem>
+            <SelectItem value="ARCHIVED">Archived</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter} disabled={isCategoryLoading}>
           <SelectTrigger className="h-9 w-36 text-sm">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={isCategoryLoading ? 'Loading…' : 'Category'} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
+            {categoryOptions.map((c) => (
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -166,125 +188,117 @@ export function Projects() {
           }}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((project) => (
             <Card
               key={project.id}
-              className="card-hover border-border/60 group overflow-hidden py-0"
+              className="card-hover border-border/60 group overflow-hidden"
             >
-              {/* Color bar */}
-              <div
-                className={`h-0.5 w-full ${
-                  project.status === 'published'
-                    ? 'bg-success'
-                    : project.status === 'draft'
-                      ? 'bg-warning'
-                      : 'bg-muted-foreground/30'
-                }`}
-              />
-              <CardContent className="flex flex-col gap-3 p-4">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <div className="flex items-center gap-1.5">
-                      {project.featured && (
-                        <Star className="text-warning fill-warning size-3.5 shrink-0" />
-                      )}
-                      <span className="truncate text-base leading-tight font-semibold">
-                        {project.title}
-                      </span>
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-4 flex-1">
+                    <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border shadow-sm sm:size-12">
+                      <Code2 className="size-5" />
                     </div>
-                    <span className="text-muted-foreground text-xs">{project.category}</span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <StatusBadge status={project.status} />
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => openEdit(project)}>
-                          <Pencil className="size-3.5" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleFeatured(project.id)}>
-                          <Star className="size-3.5" />
-                          {project.featured ? 'Unfeature' : 'Feature'}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handleStatusChange(
-                              project.id,
-                              project.status === 'published' ? 'draft' : 'published'
-                            )
-                          }
-                        >
-                          {project.status === 'published' ? 'Unpublish' : 'Publish'}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleStatusChange(project.id, 'archived')}
-                        >
-                          <Archive className="size-3.5" />
-                          Archive
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => setDeleteDialog(project)}
-                        >
-                          <Trash2 className="size-3.5" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
 
-                <p className="text-muted-foreground line-clamp-2 flex-1 text-xs leading-relaxed">
-                  {project.description}
-                </p>
+                    <div className="mt-0.5 flex min-w-0 flex-col gap-1 w-full">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-foreground truncate text-sm leading-tight font-bold sm:text-sm">
+                          {project.title}
+                        </h3>
+                        {project.featured && (
+                          <Star className="text-warning fill-warning size-3.5 shrink-0" />
+                        )}
+                        <StatusBadge status={project.status} />
+                      </div>
 
-                <div className="flex flex-wrap gap-1">
-                  {project.technologies.slice(0, 4).map((tech) => (
-                    <Badge
-                      key={tech}
-                      variant="secondary"
-                      className="bg-secondary/60 h-5 px-1.5 text-xs font-normal"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                  {project.technologies.length > 4 && (
-                    <Badge variant="outline" className="h-5 px-1.5 text-xs font-normal">
-                      +{project.technologies.length - 4}
-                    </Badge>
-                  )}
-                </div>
+                      <span className="text-primary/80 text-sm truncate font-medium sm:text-sm">
+                        {project.category?.name ?? ''}
+                      </span>
 
-                <div className="border-border/40 flex items-center justify-between border-t pt-2">
-                  <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                    <Eye className="size-3.5" />
-                    {formatNumber(project.views)}
+                      <ExpandableText text={project.description} lines={2} className="mt-1" />
+
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {project.technologies.slice(0, 4).map((tech) => (
+                          <Badge
+                            key={tech}
+                            variant="secondary"
+                            className="bg-secondary/60 hover:bg-secondary/80 h-6 border-transparent px-2.5 text-xs font-normal sm:text-xs"
+                          >
+                            {tech}
+                          </Badge>
+                        ))}
+                        {project.technologies.length > 4 && (
+                          <Badge variant="secondary" className="bg-secondary/60 h-6 border-transparent px-2.5 text-xs font-normal sm:text-xs">
+                            +{project.technologies.length - 4}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="bg-border/50 my-2.5 h-px w-full" />
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary bg-primary/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              GitHub <ExternalLink className="size-3" />
+                            </a>
+                          )}
+                          {project.liveUrl && (
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-success bg-success/5 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors hover:underline sm:text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Live <ExternalLink className="size-3" />
+                            </a>
+                          )}
+                        </div>
+                        <span className="text-muted-foreground text-xs font-medium">
+                          {formatDateTime(project.updatedAt ?? '')}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    {project.githubUrl && (
-                      <Button variant="ghost" size="icon" className="size-7" asChild>
-                        <a href={project.githubUrl} target="_blank" rel="noreferrer">
-                          <ExternalLink className="size-3.5" />
-                        </a>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-foreground -mr-2 size-8 shrink-0 opacity-100 transition-opacity group-hover:opacity-100 sm:opacity-0"
+                      >
+                        <MoreHorizontal className="size-4" />
                       </Button>
-                    )}
-                    <span className="text-muted-foreground/60 text-xs">
-                      {formatDateTime(project.updatedAt)}
-                    </span>
-                  </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem onClick={() => openEdit(project)}>
+                        <Pencil className="size-3.5" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => openEdit(project)}>
+                        <Archive className="size-3.5" />
+                        Change Status
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => setDeleteDialog(project)}
+                      >
+                        <Trash2 className="size-3.5" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>
@@ -293,7 +307,16 @@ export function Projects() {
       )}
 
       {/* Edit / New Dialog */}
-      <ProjectDialog project={editingProject} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ProjectDialog
+        projectId={editingProjectId}
+        editMode={!!editingProjectId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        categoryOptions={categoryOptions}
+        isCategoryLoading={isCategoryLoading}
+        createMutation={createProject}
+        updateMutation={updateProject}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDeleteDialog
@@ -301,34 +324,54 @@ export function Projects() {
         onClose={() => setDeleteDialog(null)}
         onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
         title="Delete Project"
+        description={
+          <>
+            Delete <strong>"{deleteDialog?.title}"</strong> from your portfolio?
+          </>
+        }
+        isLoading={deleteProject.isPending}
         itemName={deleteDialog?.title}
       />
-    </div>
+    </main>
   );
 }
 
 function ProjectDialog({
-  project,
+  projectId,
+  editMode,
   open,
   onOpenChange,
+  categoryOptions,
+  isCategoryLoading,
+  createMutation,
+  updateMutation,
 }: {
-  project: Project | null;
+  projectId: string | null;
+  editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  categoryOptions: { label: string; value: string }[];
+  isCategoryLoading: boolean;
+  createMutation: ReturnType<typeof useCreateProject>;
+  updateMutation: ReturnType<typeof useUpdateProject>;
 }) {
+  const { data: fetchedProject, isFetching: isFetchingProject } = useProject(
+    open ? (projectId || '') : ''
+  );
+
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       title: '',
       description: '',
-      category: '',
-      status: 'draft',
+      categoryId: '',
+      status: 'DRAFT',
       technologies: '',
       liveUrl: '',
       githubUrl: '',
@@ -338,31 +381,82 @@ function ProjectDialog({
 
   useEffect(() => {
     if (open) {
-      reset({
-        title: project?.title ?? '',
-        description: project?.description ?? '',
-        category: project?.category ?? '',
-        status: (project?.status as ProjectFormData['status']) ?? 'draft',
-        technologies: project?.technologies.join(', ') ?? '',
-        liveUrl: project?.liveUrl ?? '',
-        githubUrl: project?.githubUrl ?? '',
-        featured: project?.featured ?? false,
+      if (editMode && fetchedProject) {
+        reset({
+          title: fetchedProject.title ?? '',
+          description: fetchedProject.description ?? '',
+          categoryId: fetchedProject.categoryId ?? '',
+          status: fetchedProject.status ?? 'DRAFT',
+          technologies: fetchedProject.technologies.join(', '),
+          liveUrl: fetchedProject.liveUrl ?? '',
+          githubUrl: fetchedProject.githubUrl ?? '',
+          featured: fetchedProject.featured ?? false,
+        });
+      } else if (!editMode) {
+        reset({
+          title: '',
+          description: '',
+          categoryId: '',
+          status: 'DRAFT',
+          technologies: '',
+          liveUrl: '',
+          githubUrl: '',
+          featured: false,
+        });
+      }
+    }
+  }, [open, editMode, fetchedProject, reset]);
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isFetchingProject;
+
+  function parseTechnologies(raw: string): string[] {
+    return raw
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+
+  function onSubmit(data: ProjectFormData) {
+    const payload = {
+      ...data,
+      technologies: parseTechnologies(data.technologies),
+      liveUrl: data.liveUrl || null,
+      githubUrl: data.githubUrl || null,
+    };
+
+    if (editMode && projectId) {
+      updateMutation.mutate(
+        { id: projectId, data: payload },
+        {
+          onSuccess: (res) => {
+            onOpenChange(false);
+            toast.success(res.message || 'Project updated successfully');
+          },
+          onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Failed to update project');
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(payload, {
+        onSuccess: (res) => {
+          onOpenChange(false);
+          toast.success(res.message || 'Project created successfully');
+        },
+        onError: (err: any) => {
+          toast.error(err.response?.data?.message || 'Failed to create project');
+        },
       });
     }
-  }, [open, project, reset]);
-
-  function onSubmit(_data: ProjectFormData) {
-    onOpenChange(false);
-    toast.success(project ? 'Project updated' : 'Project created');
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(val) => !isPending && onOpenChange(val)}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-lg">{project ? 'Edit Project' : 'New Project'}</DialogTitle>
+          <DialogTitle className="text-lg">{editMode ? 'Edit Project' : 'New Project'}</DialogTitle>
           <DialogDescription className="text-sm">
-            {project ? 'Update project details.' : 'Fill in details to create a new project.'}
+            {editMode ? 'Update project details.' : 'Fill in details to create a new project.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -383,12 +477,15 @@ function ProjectDialog({
               required
             />
             <div className="grid grid-cols-2 gap-3">
-              <FormInput
+              <FormSelect
                 label="Category"
-                registration={register('category')}
-                error={errors.category}
-                placeholder="e.g. Full Stack"
+                name="categoryId"
+                control={control}
+                error={errors.categoryId}
+                options={categoryOptions}
+                placeholder={isCategoryLoading ? 'Loading…' : 'Select category'}
                 required
+                selectClassName={isCategoryLoading ? 'opacity-60' : undefined}
               />
               <FormSelect
                 label="Status"
@@ -396,9 +493,9 @@ function ProjectDialog({
                 control={control}
                 error={errors.status}
                 options={[
-                  { label: 'Draft', value: 'draft' },
-                  { label: 'Published', value: 'published' },
-                  { label: 'Archived', value: 'archived' },
+                  { label: 'Draft', value: 'DRAFT' },
+                  { label: 'Published', value: 'PUBLISHED' },
+                  { label: 'Archived', value: 'ARCHIVED' },
                 ]}
                 required
               />
@@ -432,11 +529,17 @@ function ProjectDialog({
             />
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" size="sm" type="button" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={isPending}
+            >
               Cancel
             </Button>
-            <Button size="sm" type="submit">
-              {project ? 'Save Changes' : 'Create'}
+            <Button size="sm" type="submit" disabled={isPending || (editMode && !isDirty)}>
+              {editMode ? 'Save Changes' : 'Create'}
             </Button>
           </DialogFooter>
         </form>

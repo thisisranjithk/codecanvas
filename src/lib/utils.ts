@@ -13,6 +13,11 @@ export function formatDate(dateStr: string | null): string {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
+export function formatYear(dateStr: string | null): string {
+  if (!dateStr) return 'Present';
+  return new Date(dateStr).getFullYear().toString();
+}
+
 export function formatDateTime(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -77,4 +82,19 @@ export function getEducationActivityIcon(activity: string): React.ReactNode {
     return React.createElement(GraduationCap, { className: 'size-3.5 text-blue-500' });
   }
   return React.createElement(Briefcase, { className: 'size-3.5 text-muted-foreground' });
+}
+
+export function sortByDateDesc<T extends { startDate: string; endDate?: string | null; isCurrent?: boolean }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const aEnd = (a.isCurrent || !a.endDate) ? Infinity : new Date(a.endDate).getTime();
+    const bEnd = (b.isCurrent || !b.endDate) ? Infinity : new Date(b.endDate).getTime();
+
+    if (bEnd !== aEnd) {
+      if (bEnd === Infinity) return 1;
+      if (aEnd === Infinity) return -1;
+      return bEnd - aEnd;
+    }
+
+    return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+  });
 }

@@ -26,11 +26,11 @@ function FormErrorMessage({ error, description }: { error?: FieldError; descript
   return (
     <div className="flex min-h-[20px] flex-col justify-start">
       {error?.message ? (
-        <p className="text-destructive animate-in fade-in-0 slide-in-from-top-1 text-3 duration-200">
+        <p className="text-destructive animate-in fade-in-0 slide-in-from-top-1 text-sm mb-4 text-3 duration-200">
           {error.message}
         </p>
       ) : description ? (
-        <p className="text-muted-foreground text-3">{description}</p>
+        <p className="text-muted-foreground text-sm mb-4 text-3">{description}</p>
       ) : null}
     </div>
   );
@@ -81,8 +81,9 @@ interface FormInputProps {
   inputClassName?: string;
   description?: string;
   required?: boolean;
-  min?: number;
-  max?: number;
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
   labelClassName?: string;
 }
 
@@ -98,6 +99,7 @@ function FormInput({
   required,
   min,
   max,
+  step,
   labelClassName,
 }: FormInputProps) {
   return (
@@ -115,6 +117,7 @@ function FormInput({
         placeholder={placeholder}
         min={min}
         max={max}
+        step={step}
         aria-invalid={!!error}
         className={cn('h-9 text-sm', inputClassName)}
       />
@@ -261,7 +264,7 @@ function FormSwitch<T extends FieldValues>({
         >
           <div className="flex flex-col gap-0.5">
             <Label className={cn('text-sm font-medium', labelClassName)}>{label}</Label>
-            {description && <p className="text-muted-foreground text-3">{description}</p>}
+            {description && <p className="text-muted-foreground text-xs text-3">{description}</p>}
           </div>
           <Switch checked={field.value} onCheckedChange={field.onChange} />
         </div>

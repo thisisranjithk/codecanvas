@@ -1,4 +1,13 @@
-import type { User } from './models';
+export interface User {
+  id: string;
+  fullName: string;
+  username: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface LoginRequest {
   email: string;
@@ -23,4 +32,9 @@ export interface RegisterRequest {
 
 export interface RegisterResponse {
   user: User;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword?: string;
+  newPassword?: string;
 }
