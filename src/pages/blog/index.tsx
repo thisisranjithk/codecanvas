@@ -86,7 +86,7 @@ function BlogImagePlaceholder({ id }: { id: string }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function BlogPage() {
+export function BlogPage() {
   const [blogs, setBlogs] = useState(mockBlogs);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all');
