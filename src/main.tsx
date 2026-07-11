@@ -6,15 +6,12 @@ import { router } from './router';
 import './index.css';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
-import { AuthProvider } from '@/providers/auth-context';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryProvider>
       <ThemeProvider>
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
+        <RouterProvider router={router} />
       </ThemeProvider>
     </QueryProvider>
   </StrictMode>

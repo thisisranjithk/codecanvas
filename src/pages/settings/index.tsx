@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
+import { useChangePassword, useDeleteAccount } from '@/hooks/api/auth';
 import { FormInput, FormTextarea, FormSelect, FormSwitch } from '@/components/shared/form-field';
 import {
   profileSchema,
@@ -398,10 +399,13 @@ function NotificationsTab() {
 // ── Security Tab ──
 
 function SecurityTab() {
+  const { logout } = useAuth();
+  const changePassword = useChangePassword();
+  const deleteAccount = useDeleteAccount();
+
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -412,9 +416,25 @@ function SecurityTab() {
     },
   });
 
-  function onSubmit(_data: ChangePasswordFormData) {
-    toast.success('Password updated');
-    reset();
+  async function onSubmit(data: ChangePasswordFormData) {
+    try {
+      await changePassword.mutateAsync(data);
+      toast.success('Password updated');
+      logout();
+    } catch {
+      toast.error('Failed to change password');
+    }
+  }
+
+  async function handleDeleteAccount() {
+    // try {
+    //   await deleteAccount.mutateAsync();
+    //   toast.success('Account deleted');
+    //   logout();
+    // } catch {
+    //   toast.error('Failed to delete account');
+    // }
+    toast.info('Account deletion feature disabled because of demo mode');
   }
 
   return (
@@ -457,8 +477,8 @@ function SecurityTab() {
                 labelClassName="text-xs"
                 inputClassName="h-8 text-xs"
               />
-              <Button size="sm" className="h-8 w-fit" type="submit">
-                Update Password
+              <Button size="sm" className="h-8 w-fit" type="submit" disabled={changePassword.isPending}>
+                {changePassword.isPending ? 'Updating...' : 'Update Password'}
               </Button>
             </div>
           </form>
@@ -484,9 +504,10 @@ function SecurityTab() {
               variant="destructive"
               size="sm"
               className="h-7 text-xs"
-              onClick={() => toast.error('This action is disabled in demo mode')}
+              disabled={deleteAccount.isPending}
+              onClick={handleDeleteAccount}
             >
-              Delete Account
+              {deleteAccount.isPending ? 'Deleting...' : 'Delete Account'}
             </Button>
           </div>
         </CardContent>

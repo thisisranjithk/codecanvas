@@ -6,7 +6,9 @@ import { Toaster } from '@/components/ui/sonner';
 import { GlobalSearch } from '@/components/shared/global-search';
 import { useAuth } from '@/hooks/use-auth';
 
-export function RootLayout() {
+import { AuthProvider } from '@/providers/auth-context';
+
+function RootLayoutInner() {
   const { isAuthenticated, isLoading } = useAuth();
   const routerState = useRouterState();
   const isAuthPage =
@@ -49,5 +51,13 @@ export function RootLayout() {
       <Toaster position="bottom-right" richColors />
       <GlobalSearch />
     </SidebarProvider>
+  );
+}
+
+export function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootLayoutInner />
+    </AuthProvider>
   );
 }

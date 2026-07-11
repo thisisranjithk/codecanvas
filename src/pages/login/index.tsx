@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { useLogin } from '@/hooks/api/auth';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
 import { Field, FieldLabel, FieldContent, FieldError } from '@/components/ui/field';
@@ -144,10 +145,13 @@ export function Login({ onNavigate }: LoginProps) {
     },
   });
 
+  const loginMutation = useLogin();
+
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.password);
+      const response = await loginMutation.mutateAsync({ email: data.email, password: data.password });
+      login(response.data.accessToken);
       toast.success('Successfully logged in.');
       navigate({ to: '/' });
       onNavigate?.('/');

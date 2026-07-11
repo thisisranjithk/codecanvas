@@ -33,3 +33,8 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   user: User;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword?: string;
+  newPassword?: string;
+}
