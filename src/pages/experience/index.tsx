@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, MoreHorizontal, MapPin, Calendar, Briefcase } from 'lucide-react';
+import { Plus, Pencil, Trash2, MoreHorizontal, MapPin, Calendar, Briefcase, Hash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent } from '@/components/ui/card';
@@ -54,6 +54,9 @@ export function Experience() {
   const [editingExpId, setEditingExpId] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<ExperienceType | null>(null);
 
+  // Sort by displayOrder ascending
+  const sortedExperiences = [...experiences].sort((a, b) => a.displayOrder - b.displayOrder);
+
   function handleDelete(exp: ExperienceType) {
     deleteMutation.mutate(exp.id, {
       onSuccess: () => {
@@ -77,14 +80,14 @@ export function Experience() {
   }
 
   if (isLoading) {
-    return <Loader variant="section" text="Loading certifications..." />;
+    return <Loader variant="section" text="Loading experience..." />;
   }
 
   if (isError) {
     return (
       <div className="p-6">
         <ErrorState
-          title="Failed to load certifications"
+          title="Failed to load experience"
           description={error?.message || 'An unexpected error occurred.'}
           onRetry={() => refetch()}
         />
@@ -93,14 +96,14 @@ export function Experience() {
   }
 
   return (
-    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-8 w-full">
       <PageHeader
         title="Experience"
-        description={`${experiences.length} positions`}
+        description={`${experiences.length} ${experiences.length === 1 ? 'position' : 'positions'} · sorted by display order`}
         action={{ label: 'Add Experience', onClick: openNew, icon: <Plus className="size-4" /> }}
       />
 
-      {experiences.length === 0 ? (
+      {sortedExperiences.length === 0 ? (
         <EmptyState
           icon={Briefcase}
           title="No experience added"
@@ -115,9 +118,19 @@ export function Experience() {
                   {/* Header Row */}
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                      <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
-                        <Briefcase className="size-5" />
+                      {/* Icon with order badge */}
+                      <div className="relative flex-shrink-0">
+                        <div className="bg-primary/10 border-primary/20 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl border text-base font-bold shadow-sm sm:size-12 sm:text-lg">
+                          <Briefcase className="size-5" />
+                        </div>
+                        <span
+                          className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full border border-primary/30 bg-primary text-[10px] font-bold text-primary-foreground shadow-sm"
+                          title={`Display order: ${exp.displayOrder}`}
+                        >
+                          {exp.displayOrder}
+                        </span>
                       </div>
+
                       <div className="mt-0.5 flex min-w-0 flex-col">
                         <h2 className="text-foreground truncate text-sm font-bold tracking-tight sm:text-sm">
                           {exp.company}
@@ -129,12 +142,18 @@ export function Experience() {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
+                      {/* Duration badge */}
                       <Badge
                         variant="secondary"
                         className="bg-primary/10 text-primary hover:bg-primary/10 hidden h-6 rounded-md border-transparent px-2.5 text-xs font-medium sm:flex"
                       >
                         {getEmploymentDuration(exp.startDate, exp.isCurrent ? null : exp.endDate)}
                       </Badge>
+                      {/* Order indicator chip */}
+                      <span className="hidden lg:flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-muted/60 border border-border/50 rounded-md px-2 py-0.5">
+                        <Hash className="size-3 opacity-60" />
+                        {exp.displayOrder}
+                      </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -245,7 +264,13 @@ export function Experience() {
       )}
 
       {/* Edit/New Dialog */}
-      <ExperienceDialog experienceId={editingExpId} editMode={!!editingExpId} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ExperienceDialog
+        experienceId={editingExpId}
+        editMode={!!editingExpId}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        nextOrder={experiences.length + 1}
+      />
 
       {/* Delete Dialog */}
       <ConfirmDeleteDialog
@@ -273,11 +298,13 @@ function ExperienceDialog({
   editMode,
   open,
   onOpenChange,
+  nextOrder,
 }: {
   experienceId: string | null;
   editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  nextOrder: number;
 }) {
   const { data: fetchedExperience, isFetching: isFetchingExperience } = useExperience(open ? (experienceId || '') : '');
   const { data: dropdownResponse } = useCategoryDropdown('EMPLOYMENT_TYPE');
@@ -308,6 +335,7 @@ function ExperienceDialog({
       description: '',
       responsibilities: '',
       technologies: '',
+      displayOrder: nextOrder,
     },
   });
 
@@ -329,6 +357,7 @@ function ExperienceDialog({
             description: expData.description ?? '',
             responsibilities: expData.responsibilities?.join('\n') ?? '',
             technologies: expData.technologies?.join(', ') ?? '',
+            displayOrder: expData.displayOrder ?? 1,
           });
         }
       } else {
@@ -343,10 +372,11 @@ function ExperienceDialog({
           description: '',
           responsibilities: '',
           technologies: '',
+          displayOrder: nextOrder,
         });
       }
     }
-  }, [open, editMode, fetchedExperience, reset]);
+  }, [open, editMode, fetchedExperience, reset, nextOrder]);
 
   const isCurrent = watch('current');
 
@@ -362,6 +392,7 @@ function ExperienceDialog({
       technologies: data.technologies
         ? data.technologies.split(',').map((t) => t.trim()).filter(Boolean)
         : [],
+      displayOrder: data.displayOrder,
     };
 
     if (editMode && experienceId) {
@@ -423,26 +454,38 @@ function ExperienceDialog({
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormSelect
-                label="Employment Type"
-                name="employmentTypeId"
-                control={control}
-                error={errors.employmentTypeId}
-                options={employmentTypeOptions}
-                placeholder="Select Employment Type"
-                required
-                selectClassName="w-full"
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2">
+                <FormSelect
+                  label="Employment Type"
+                  name="employmentTypeId"
+                  control={control}
+                  error={errors.employmentTypeId}
+                  options={employmentTypeOptions}
+                  placeholder="Select Employment Type"
+                  required
+                  selectClassName="w-full"
+                />
+              </div>
               <FormInput
-                label="Location"
-                registration={register('location')}
-                error={errors.location}
-                placeholder="Bengaluru, India"
+                label="Display Order"
+                registration={register('displayOrder', { valueAsNumber: true })}
+                error={errors.displayOrder}
+                placeholder="e.g. 1"
+                type="number"
+                description="Portfolio order"
                 required
-                inputClassName="w-full"
               />
             </div>
+
+            <FormInput
+              label="Location"
+              registration={register('location')}
+              error={errors.location}
+              placeholder="Bengaluru, India"
+              required
+              inputClassName="w-full"
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormMonthPicker
