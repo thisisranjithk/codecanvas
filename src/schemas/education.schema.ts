@@ -10,6 +10,7 @@ export const educationSchema = z.object({
   location: z.string().max(200),
   description: z.string().max(2000),
   activities: z.string(),
+  displayOrder: z.number({ error: 'Display order is required' }).int().min(1, 'Must be at least 1'),
 });
 
 export type EducationFormData = z.infer<typeof educationSchema>;

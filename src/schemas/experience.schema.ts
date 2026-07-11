@@ -11,6 +11,7 @@ const experienceBaseSchema = z.object({
   description: z.string().max(2000, 'Description must be 2000 characters or less'),
   responsibilities: z.string(),
   technologies: z.string(),
+  displayOrder: z.number({ error: 'Display order is required' }).int().min(1, 'Must be at least 1'),
 });
 
 export const experienceSchema = experienceBaseSchema.refine(

@@ -8,6 +8,7 @@ import {
   Calendar,
   Star,
   MapPin,
+  Hash,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,6 +54,9 @@ export function Education() {
   const [editingEduId, setEditingEduId] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Education | null>(null);
 
+  // Sort by displayOrder ascending
+  const sortedEducations = [...educations].sort((a, b) => a.displayOrder - b.displayOrder);
+
   function handleDelete(edu: Education) {
     deleteMutation.mutate(edu.id, {
       onSuccess: (data) => {
@@ -92,11 +96,14 @@ export function Education() {
   }
 
   return (
-    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-12 w-full">
+    <main className="animate-fade-in max-w-5xl mx-auto px-6 py-8 pb-20 space-y-8 w-full">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Education</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">{educations.length} entries</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {educations.length} {educations.length === 1 ? 'entry' : 'entries'} · sorted by display order
+          </p>
         </div>
         <Button size="sm" onClick={openNew} className="h-9 gap-1.5">
           <Plus className="size-4" />
@@ -104,7 +111,7 @@ export function Education() {
         </Button>
       </div>
 
-      {educations.length === 0 ? (
+      {sortedEducations.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-16">
           <div className="bg-muted flex size-12 items-center justify-center rounded-xl">
             <GraduationCap className="text-muted-foreground size-5" />
@@ -115,7 +122,7 @@ export function Education() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {sortByDateDesc(educations).map((edu, idx) => (
             <div
               key={edu.id}
@@ -241,6 +248,7 @@ export function Education() {
         editMode={!!editingEduId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        nextOrder={educations.length + 1}
       />
 
       {/* Delete Dialog */}
@@ -265,11 +273,13 @@ function EducationDialog({
   editMode,
   open,
   onOpenChange,
+  nextOrder,
 }: {
   educationId: string | null;
   editMode: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  nextOrder: number;
 }) {
   const { data: fetchedEdu, isFetching } = useEducation(open ? (educationId || '') : '');
   const createMutation = useCreateEducation();
@@ -293,6 +303,7 @@ function EducationDialog({
       location: '',
       description: '',
       activities: '',
+      displayOrder: nextOrder,
     },
   });
 
@@ -311,6 +322,7 @@ function EducationDialog({
           location: fetchedEdu.location ?? '',
           description: fetchedEdu.description ?? '',
           activities: fetchedEdu.activities?.join(', ') ?? '',
+          displayOrder: fetchedEdu.displayOrder ?? 1,
         });
       } else if (!editMode) {
         reset({
@@ -323,10 +335,11 @@ function EducationDialog({
           location: '',
           description: '',
           activities: '',
+          displayOrder: nextOrder,
         });
       }
     }
-  }, [open, editMode, fetchedEdu, reset]);
+  }, [open, editMode, fetchedEdu, reset, nextOrder]);
 
   const isPending = createMutation.isPending || updateMutation.isPending || isFetching;
 
@@ -343,7 +356,7 @@ function EducationDialog({
       activities: data.activities
         ? data.activities.split(',').map((s) => s.trim()).filter(Boolean)
         : [],
-      displayOrder: fetchedEdu?.displayOrder || 0,
+      displayOrder: data.displayOrder,
     };
 
     if (editMode && educationId) {
@@ -423,7 +436,7 @@ function EducationDialog({
                 error={errors.endDate} pickerClassName="w-full"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <FormInput
                 label="GPA (optional)"
                 registration={register('gpa')}
@@ -435,6 +448,15 @@ function EducationDialog({
                 registration={register('location')}
                 error={errors.location}
                 placeholder="e.g. Pittsburgh, PA"
+              />
+              <FormInput
+                label="Display Order"
+                registration={register('displayOrder', { valueAsNumber: true })}
+                error={errors.displayOrder}
+                placeholder="e.g. 1"
+                type="number"
+                description="Portfolio order"
+                required
               />
             </div>
             <FormTextarea
